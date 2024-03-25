@@ -1,4 +1,5 @@
 import { BIish } from "@ckb-lumos/bi";
+import { Script } from "@ckb-lumos/lumos";
 import BI from "jsbi";
 export interface AccountData {
   chain: string;
@@ -115,6 +116,7 @@ export interface ckb_TransferOptions {
   from: string;
   to: string;
   amount: BIish;
+  typeScript?: Script;
 }
 
 // type

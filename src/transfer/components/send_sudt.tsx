@@ -62,9 +62,15 @@ export function SendSudt() {
           from: DataManager.instance.curWalletAddr,
           to: receiveAddress.trim(),
           amount: sendAmount,
+          typeScript: {
+            codeHash:
+              "0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4",
+            args: "0x30452490e0f5bc2b2c832ed04a349be90cab3f25aaece06612195642f61fa114",
+            hashType: "type",
+          },
         })
         .then((rs) => {
-          console.log("Success send txHash");
+          console.log("Success send txHash", rs);
 
           toast({
             title: "Success",

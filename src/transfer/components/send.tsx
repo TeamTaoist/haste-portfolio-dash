@@ -55,6 +55,8 @@ export function Send() {
           amount: sendCkb,
         })
         .then((rs) => {
+          console.log(rs);
+
           toast({
             title: "Success",
             description: rs,

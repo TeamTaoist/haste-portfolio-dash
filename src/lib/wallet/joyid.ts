@@ -20,6 +20,8 @@ import {
 import { getCotaTypeScript } from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 
+const isMainnet = false;
+
 export interface CellCollector {
   collect(): AsyncIterable<Cell>;
 }
@@ -70,13 +72,13 @@ export function createJoyIDScriptInfo(config: {
   connection: Connection;
 }): commons.LockScriptInfo {
   return {
-    codeHash: getJoyIDLockScript(false).codeHash,
+    codeHash: getJoyIDLockScript(isMainnet).codeHash,
     hashType: "type",
     lockScriptInfo: {
       CellCollector: JoyIDCellCollector,
       prepareSigningEntries: (txSkeleton) => txSkeleton,
       async setupInputCell(txSkeleton, inputCell, _, options = {}) {
-        const template = getJoyIDLockScript(false);
+        const template = getJoyIDLockScript(isMainnet);
 
         const fromScript = inputCell.cellOutput.lock;
         asserts(
@@ -88,18 +90,20 @@ export function createJoyIDScriptInfo(config: {
           inputs.push(inputCell)
         );
 
-        const output: Cell = {
-          cellOutput: {
-            capacity: inputCell.cellOutput.capacity,
-            lock: inputCell.cellOutput.lock,
-            type: inputCell.cellOutput.type,
-          },
-          data: inputCell.data,
-        };
+        if (inputCell.cellOutput.capacity != "0x0") {
+          const output: Cell = {
+            cellOutput: {
+              capacity: inputCell.cellOutput.capacity,
+              lock: inputCell.cellOutput.lock,
+              type: inputCell.cellOutput.type,
+            },
+            data: inputCell.data,
+          };
 
-        txSkeleton = txSkeleton.update("outputs", (outputs) => {
-          return outputs.push(output);
-        });
+          txSkeleton = txSkeleton.update("outputs", (outputs) => {
+            return outputs.push(output);
+          });
+        }
 
         const since = options.since;
         if (since) {
