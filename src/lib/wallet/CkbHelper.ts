@@ -128,18 +128,12 @@ export class CkbHepler {
 
     if (
       options.typeScript &&
-      options.typeScript.codeHash == sudtScript.codeHash
+      (options.typeScript.codeHash == sudtScript.codeHash ||
+        options.typeScript.codeHash == xudtScript.codeHash)
     ) {
       // sudt
-      const txSkeleton = await this.sudt_buildTransfer(options);
+      const txSkeleton = await this.sudt_xudt_buildTransfer(options);
 
-      return txSkeleton;
-    } else if (
-      options.typeScript &&
-      options.typeScript.codeHash == xudtScript.codeHash
-    ) {
-      //TODO xudt
-      const txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
       return txSkeleton;
     } else if (
       options.typeScript &&
@@ -184,14 +178,21 @@ export class CkbHepler {
     }
   }
 
-  // build sudt transfer
-  async sudt_buildTransfer(options: ckb_TransferOptions) {
+  // build sudt and xudt transfer
+  async sudt_xudt_buildTransfer(options: ckb_TransferOptions) {
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
 
     const sudtToken = options.typeScript;
     if (!sudtToken) {
-      throw new Error("No sudt type script");
+      throw new Error("No sudt or xudt type script");
     }
+
+    let isXUDT = false;
+    const xudtScript = getXudtTypeScript(isMainnet);
+    if (sudtToken.codeHash == xudtScript.codeHash) {
+      isXUDT = true;
+    }
+    console.log("script is xudt", isXUDT);
 
     const fromScript = helpers.parseAddress(options.from);
     const fromAddress = helpers.encodeToAddress(fromScript, { config: CONFIG });
