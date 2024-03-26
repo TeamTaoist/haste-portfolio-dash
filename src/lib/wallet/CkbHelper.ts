@@ -15,12 +15,13 @@ import { DataManager } from "../manager/DataManager";
 import { CKBTransaction, connect, signRawTransaction } from "@joyid/ckb";
 import { createJoyIDScriptInfo } from "./joyid";
 import {
+  getSporeDep,
   getSporeTypeScript,
   getSudtTypeScript,
   getXudtTypeScript,
 } from "./constants";
 import { number, bytes } from "@ckb-lumos/codec";
-import { calculateEmptyCellMinCapacity } from "../utils";
+import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
 
 export const CONFIG = config.predefined.AGGRON4;
 config.initializeConfig(CONFIG);
@@ -114,11 +115,26 @@ export class CkbHepler {
     throw new Error("Please connect wallet");
   }
 
-  // TODO:transfer xudt
-  async transfer_xudt() {}
+  // transfer spore
+  async transfer_spore(options: ckb_TransferOptions) {
+    const unsigned = await this.buildTransfer(options);
+    const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-  // TODO:transfer spore
-  async transfer_spore() {}
+    if (DataManager.instance.curWalletType == "joyid") {
+      const signed = await signRawTransaction(
+        tx as CKBTransaction,
+        options.from
+      );
+
+      console.log("sign raw tx", signed);
+
+      console.log("spore type script", options.typeScript);
+
+      return this.sendTransaction(signed);
+    }
+
+    throw new Error("Please connect wallet");
+  }
 
   // build ckb transfer
   async buildTransfer(options: ckb_TransferOptions) {
@@ -139,8 +155,8 @@ export class CkbHepler {
       options.typeScript &&
       options.typeScript.codeHash == sporeScript.codeHash
     ) {
-      //TODO spore
-      const txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+      // spore
+      const txSkeleton = await this.spore_buildTransfer(options);
       return txSkeleton;
     } else {
       // ckb
@@ -176,6 +192,130 @@ export class CkbHepler {
       );
       return txSkeleton;
     }
+  }
+
+  // build spore transfer
+  async spore_buildTransfer(options: ckb_TransferOptions) {
+    let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+
+    const sporeTS = options.typeScript;
+    if (!sporeTS) {
+      throw new Error("No spore type script");
+    }
+
+    const spore_cellDeps = getSporeDep(isMainnet);
+    if (spore_cellDeps == null) {
+      throw new Error("No spore cell deps");
+    }
+
+    txSkeleton = addCellDep(txSkeleton, spore_cellDeps);
+
+    const fromScript = helpers.parseAddress(options.from);
+    const fromAddress = helpers.encodeToAddress(fromScript, { config: CONFIG });
+
+    console.log(fromAddress);
+
+    const toScript = helpers.parseAddress(options.to);
+    const toAddress = helpers.encodeToAddress(toScript, { config: CONFIG });
+
+    console.log(toAddress);
+
+    // find spore cells
+    // <<
+    const spore_collect = indexer.collector({
+      lock: fromScript,
+      type: sporeTS,
+    });
+    const inputs_spore: Cell[] = [];
+    let spore_sumCapacity = BI.from(0);
+    for await (const cell of spore_collect.collect()) {
+      inputs_spore.push(cell);
+      spore_sumCapacity = spore_sumCapacity.add(cell.cellOutput.capacity);
+    }
+    if (inputs_spore.length <= 0) {
+      throw new Error("Not find spore");
+    }
+    // >>
+
+    let output_sumCapacity = BI.from(0);
+    const spore_inputCellOutput: {
+      capacity: string;
+      lock: Script;
+      type?: Script;
+    }[] = [];
+    for (let i = 0; i < inputs_spore.length; i++) {
+      const input = inputs_spore[i];
+      const inputCellOutput = input.cellOutput;
+      input.cellOutput = {
+        capacity: inputCellOutput.capacity,
+        lock: toScript,
+        type: inputCellOutput.type,
+      };
+      spore_inputCellOutput.push(inputCellOutput);
+      txSkeleton = await commons.common.setupInputCell(
+        txSkeleton,
+        input,
+        undefined,
+        { config: CONFIG }
+      );
+      output_sumCapacity = output_sumCapacity.add(input.cellOutput.capacity);
+    }
+    const sporeCoBuild = generateSporeCoBuild(
+      inputs_spore,
+      spore_inputCellOutput
+    );
+
+    const minEmptyCapacity = calculateEmptyCellMinCapacity(fromScript);
+    const needCapacity = output_sumCapacity
+      .sub(spore_sumCapacity)
+      .add(minEmptyCapacity)
+      .add(2000); // fee
+
+    // find ckb
+    // <<
+    const collect_ckb = indexer.collector({
+      lock: {
+        script: fromScript,
+        searchMode: "exact",
+      },
+      type: "empty",
+    });
+    const inputs_ckb: Cell[] = [];
+    let ckb_sum = BI.from(0);
+    for await (const collect of collect_ckb.collect()) {
+      inputs_ckb.push(collect);
+      ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
+      if (ckb_sum.gte(needCapacity)) {
+        break;
+      }
+    }
+    // >>
+    if (ckb_sum.lt(needCapacity)) {
+      throw new Error("No enough capacity");
+    }
+    for (let i = 0; i < inputs_ckb.length; i++) {
+      const element = inputs_ckb[i];
+      element.cellOutput.capacity = "0x0";
+      txSkeleton = await commons.common.setupInputCell(txSkeleton, element);
+    }
+    const ckb_change = ckb_sum.sub(needCapacity);
+    if (ckb_change.gt(0)) {
+      const output_ckb_change: Cell = {
+        cellOutput: {
+          lock: fromScript,
+          capacity: ckb_change.toHexString(),
+        },
+        data: "0x",
+      };
+      txSkeleton = txSkeleton.update("outputs", (outputs) =>
+        outputs.push(output_ckb_change)
+      );
+    }
+
+    txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
+      witnesses.push(sporeCoBuild)
+    );
+    return txSkeleton;
   }
 
   // build sudt and xudt transfer

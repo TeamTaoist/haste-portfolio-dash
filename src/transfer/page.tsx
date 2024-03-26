@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
 import { SendSudt } from "./components/send_sudt";
+import { SendSpore } from "./components/send_spore";
 
 export function Transfer() {
   const [reload, setReload] = useState(false);
@@ -30,11 +31,13 @@ export function Transfer() {
             <TabsTrigger value="Send">Send</TabsTrigger>
             <TabsTrigger value="Receive">Receive</TabsTrigger>
             <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
+            <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
           </TabsList>
         </div>
         <Send></Send>
         <Receive></Receive>
         <SendSudt></SendSudt>
+        <SendSpore></SendSpore>
       </Tabs>
     </div>
   );
