@@ -12,6 +12,7 @@ import { EventManager } from "@/lib/manager/EventManager";
 import { sortStr } from "@/lib/utils";
 import { BtcHepler } from "@/lib/wallet/BtcHelper";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
+import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { useState } from "react";
 
 export function UserNav() {
@@ -22,11 +23,13 @@ export function UserNav() {
   const handlerUnisat = () => {
     BtcHepler.instance
       .unisat_onConnect()
-      .then((accounts) => {
+      .then((rs) => {
+        const { accounts, pubkey } = rs;
         console.log(accounts);
 
         DataManager.instance.curWalletType = "unisat";
         DataManager.instance.curWalletAddr = accounts[0];
+        DataManager.instance.curWalletPubKey = pubkey;
 
         setIsConnent(true);
 
@@ -45,13 +48,17 @@ export function UserNav() {
   const handlerJoyId = () => {
     CkbHepler.instance
       .joyid_onConnect()
-      .then((account) => {
+      .then((rs) => {
+        const { account, pubkey } = rs;
         console.log(account);
 
         DataManager.instance.curWalletType = "joyid";
         DataManager.instance.curWalletAddr = account;
+        DataManager.instance.curWalletPubKey = pubkey;
 
         setIsConnent(true);
+
+        RGBHelper.instance.btc_connect();
 
         EventManager.instance.publish(EventType.transfer_reload_page, {});
       })

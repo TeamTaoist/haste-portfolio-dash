@@ -119,4 +119,20 @@ export class DataManager {
   public set curWalletAddr(v: string) {
     this._curWalletAddr = v;
   }
+
+  private _curWalletPubKey: string = "";
+  public get curWalletPubKey(): string {
+    return this._curWalletPubKey;
+  }
+  public set curWalletPubKey(v: string) {
+    this._curWalletPubKey = v;
+  }
+
+  private _joyIdConnectionType: string = "";
+  public get joyIdConnectionType(): string {
+    return this._joyIdConnectionType;
+  }
+  public set joyIdConnectionType(v: string) {
+    this._joyIdConnectionType = v;
+  }
 }

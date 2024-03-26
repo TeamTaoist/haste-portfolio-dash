@@ -12,7 +12,12 @@ import {
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import { ckb_TransferOptions } from "../interface";
 import { DataManager } from "../manager/DataManager";
-import { CKBTransaction, connect, signRawTransaction } from "@joyid/ckb";
+import {
+  CKBTransaction,
+  connect,
+  initConfig,
+  signRawTransaction,
+} from "@joyid/ckb";
 import { createJoyIDScriptInfo } from "./joyid";
 import {
   getSporeDep,
@@ -46,13 +51,25 @@ export class CkbHepler {
   }
 
   async joyid_onConnect() {
+    initConfig({
+      // your app name
+      name: "JoyID demo",
+      // your app logo
+      logo: "https://fav.farm/🆔",
+      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
+      joyidAppURL: "https://testnet.joyid.dev",
+    });
+
     const connection = await connect();
 
     commons.common.registerCustomLockScriptInfos([
       createJoyIDScriptInfo({ connection }),
     ]);
 
-    return connection.address;
+    console.log("JoyId connect", connection);
+
+    DataManager.instance.joyIdConnectionType = connection.keyType;
+    return { account: connection.address, pubkey: connection.pubkey };
   }
 
   // transfer ckb

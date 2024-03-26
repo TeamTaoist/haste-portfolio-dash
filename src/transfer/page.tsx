@@ -6,6 +6,7 @@ import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
 import { SendSudt } from "./components/send_sudt";
 import { SendSpore } from "./components/send_spore";
+import { CkbToBtc } from "./components/ckb_to_btc";
 
 export function Transfer() {
   const [reload, setReload] = useState(false);
@@ -32,12 +33,14 @@ export function Transfer() {
             <TabsTrigger value="Receive">Receive</TabsTrigger>
             <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
             <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
+            <TabsTrigger value="CkbToBtc">CkbToBtc</TabsTrigger>
           </TabsList>
         </div>
         <Send></Send>
         <Receive></Receive>
         <SendSudt></SendSudt>
         <SendSpore></SendSpore>
+        <CkbToBtc></CkbToBtc>
       </Tabs>
     </div>
   );

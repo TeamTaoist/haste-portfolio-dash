@@ -119,5 +119,17 @@ export interface ckb_TransferOptions {
   typeScript?: Script;
 }
 
+export interface btc_utxo {
+  txid: string;
+  vout: number;
+  status: {
+    confirmed: boolean;
+    block_height: number;
+    block_hash: string;
+    block_time: number;
+  };
+  value: number;
+}
+
 // type
 export type WalletType = "none" | "unisat" | "okx" | "joyid";

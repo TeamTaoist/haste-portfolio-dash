@@ -1,4 +1,5 @@
 import { DataManager } from "../manager/DataManager";
+import superagent from "superagent";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -24,7 +25,8 @@ export class BtcHepler {
       }
 
       const accounts: string[] = await unisat.requestAccounts();
-      return accounts;
+      const pubkey: string = await unisat.getPublicKey();
+      return { accounts, pubkey };
     } else {
       throw new Error("UniSat Wallet is no installed!");
     }
@@ -51,6 +53,18 @@ export class BtcHepler {
         break;
       default:
         break;
+    }
+  }
+
+  async getUtxo(address: string) {
+    const result = await superagent
+      .get(`https://mempool.space/testnet/api/address/${address}/utxo`)
+      .catch((err) => {
+        console.error(err.message);
+      });
+
+    if (result && result.status == 200) {
+      return JSON.parse(result.text);
     }
   }
 }
