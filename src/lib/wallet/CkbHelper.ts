@@ -36,6 +36,7 @@ import {
   TransactionCollector,
   TransactionWithStatus,
 } from "@ckb-lumos/base";
+import superagent from "superagent";
 
 config.initializeConfig(CONFIG);
 
@@ -706,5 +707,24 @@ export class CkbHepler {
     }
 
     return txList;
+  }
+
+  // suggest_queries
+  async getSuggestQueries(hex: string) {
+    const result = await superagent
+      .get(
+        `https://${
+          isMainnet ? "mainnet" : "testnet"
+        }-api.explorer.nervos.org/api/v1/suggest_queries?q=${hex}`
+      )
+      .set("Accept", "application/vnd.api+json")
+      .set("Content-Type", "application/vnd.api+json")
+      .catch((err) => {
+        console.error(err.message);
+      });
+
+    if (result && result.status == 200) {
+      return JSON.parse(result.text);
+    }
   }
 }
