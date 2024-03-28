@@ -77,21 +77,21 @@ export class HttpManager {
             }
 
             ckbChain.balance = ckbChain.balance.add(
-              element.addressInfo.data.attributes.balance
+              element.addressInfo.data[0].attributes.balance
             );
 
             DataManager.instance.curLiveCells = Number.parseInt(
-              element.addressInfo.data.attributes.live_cells_count
+              element.addressInfo.data[0].attributes.live_cells_count
             );
 
-            if (element.addressInfo.data.attributes.udt_accounts) {
+            if (element.addressInfo.data[0].attributes.udt_accounts) {
               for (
                 let i = 0;
-                i < element.addressInfo.data.attributes.udt_accounts.length;
+                i < element.addressInfo.data[0].attributes.udt_accounts.length;
                 i++
               ) {
                 const item =
-                  element.addressInfo.data.attributes.udt_accounts[i];
+                  element.addressInfo.data[0].attributes.udt_accounts[i];
                 if (item.udt_type == "spore_cell") {
                   DataManager.instance.tokens.spore.push(item.amount);
                 } else if (item.udt_type == "sudt") {

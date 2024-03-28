@@ -80,7 +80,7 @@ export interface ckb_AddressInfo {
         dao_compensation: string;
         balance_occupied: string;
       };
-    };
+    }[];
   };
   address: string;
 }
