@@ -11,8 +11,6 @@ import { DataManager } from "../manager/DataManager";
 import { BI } from "@ckb-lumos/lumos";
 import { BtcHepler } from "../wallet/BtcHelper";
 import { CkbHepler } from "../wallet/CkbHelper";
-import { backend } from "../wallet/constants";
-
 export class HttpManager {
   private static _instance: HttpManager;
   private constructor() {}
@@ -23,8 +21,6 @@ export class HttpManager {
     }
     return this._instance;
   }
-
-  private _host: string = backend;
 
   public async getAsset(address: string) {
     EventManager.instance.publish(EventType.dashboard_page_hide_tabs, {});

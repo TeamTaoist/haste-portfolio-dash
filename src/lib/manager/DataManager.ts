@@ -13,7 +13,7 @@ export class DataManager {
     this._accounts = [
       {
         chain: "BTC",
-        addr: "3AbdWZYCxoDEixW8rxB4rTDxGVGLR7DM25",
+        addr: "tb1pnprtrusgvq9tsf7dsm7yfwxf7qsazpdguw6xkducu020pc0wlw4s4f6w3n",
       },
       {
         chain: "CKB",
