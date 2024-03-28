@@ -7,6 +7,7 @@ import { EventType } from "@/lib/enum";
 import { SendSudt } from "./components/send_sudt";
 import { SendSpore } from "./components/send_spore";
 import { CkbToBtc } from "./components/ckb_to_btc";
+import { BtcToCkb } from "./components/btc_to_ckb";
 
 export function Transfer() {
   const [reload, setReload] = useState(false);
@@ -34,6 +35,7 @@ export function Transfer() {
             <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
             <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
             <TabsTrigger value="CkbToBtc">CkbToBtc</TabsTrigger>
+            <TabsTrigger value="BtcToCkb">BtcToCkb</TabsTrigger>
           </TabsList>
         </div>
         <Send></Send>
@@ -41,6 +43,7 @@ export function Transfer() {
         <SendSudt></SendSudt>
         <SendSpore></SendSpore>
         <CkbToBtc></CkbToBtc>
+        <BtcToCkb></BtcToCkb>
       </Tabs>
     </div>
   );

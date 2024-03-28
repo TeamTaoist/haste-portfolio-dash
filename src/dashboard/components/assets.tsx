@@ -2,8 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
-import BI from "jsbi";
 import { useEffect, useState } from "react";
+import { formatUnit } from "@ckb-lumos/bi";
 
 export function Assets() {
   const assetList = DataManager.instance.curAsset;
@@ -49,7 +49,7 @@ export function Assets() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {BI.toNumber(asset.balance) / 1e8}
+              {formatUnit(asset.balance, "ckb")}
             </div>
           </CardContent>
         </Card>

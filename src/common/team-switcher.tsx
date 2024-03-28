@@ -51,7 +51,8 @@ const groups: { label: string; teams: { label: string; value: string }[] }[] =
 for (let i = 0; i < DataManager.instance.accounts.length; i++) {
   const element = DataManager.instance.accounts[i];
 
-  let group = undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let group: any = undefined;
   for (let j = 0; j < groups.length; j++) {
     const itemGroup = groups[j];
     if (itemGroup.label == element.chain) {

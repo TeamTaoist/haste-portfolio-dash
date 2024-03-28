@@ -1,6 +1,5 @@
 import { BIish } from "@ckb-lumos/bi";
-import { Script } from "@ckb-lumos/lumos";
-import BI from "jsbi";
+import { BI, Script } from "@ckb-lumos/lumos";
 export interface AccountData {
   chain: string;
   addr: string;
@@ -129,6 +128,12 @@ export interface btc_utxo {
     block_time: number;
   };
   value: number;
+}
+
+export interface UdtInfo {
+  type: string;
+  typeScriptHex: string;
+  balance: BI;
 }
 
 // type

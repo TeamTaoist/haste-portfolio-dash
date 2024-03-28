@@ -6,10 +6,10 @@ import {
   ckb_TxInfo,
   txInfo,
 } from "../interface";
-import BI from "jsbi";
 import { EventManager } from "../manager/EventManager";
 import { EventType } from "../enum";
 import { DataManager } from "../manager/DataManager";
+import { BI } from "@ckb-lumos/lumos";
 
 export class HttpManager {
   private static _instance: HttpManager;
@@ -52,14 +52,11 @@ export class HttpManager {
             if (!btcChain) {
               btcChain = {
                 chain: "BTC",
-                balance: BI.BigInt(0),
+                balance: BI.from(0),
               };
             }
 
-            btcChain.balance = BI.add(
-              btcChain.balance,
-              BI.BigInt(element.final_balance)
-            );
+            btcChain.balance = btcChain.balance.add(element.final_balance);
           }
         }
         if (btcChain) {
@@ -75,13 +72,12 @@ export class HttpManager {
             if (!ckbChain) {
               ckbChain = {
                 chain: "CKB",
-                balance: BI.BigInt(0),
+                balance: BI.from(0),
               };
             }
 
-            ckbChain.balance = BI.add(
-              ckbChain.balance,
-              BI.BigInt(element.addressInfo.data.attributes.balance)
+            ckbChain.balance = ckbChain.balance.add(
+              element.addressInfo.data.attributes.balance
             );
 
             DataManager.instance.curLiveCells = Number.parseInt(

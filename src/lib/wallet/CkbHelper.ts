@@ -10,7 +10,7 @@ import {
   helpers,
 } from "@ckb-lumos/lumos";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
-import { ckb_TransferOptions } from "../interface";
+import { UdtInfo, ckb_TransferOptions } from "../interface";
 import { DataManager } from "../manager/DataManager";
 import {
   CKBTransaction,
@@ -20,24 +20,27 @@ import {
 } from "@joyid/ckb";
 import { createJoyIDScriptInfo } from "./joyid";
 import {
+  CKB_INDEX_URL,
+  CKB_RPC_URL,
+  CONFIG,
   getSporeDep,
   getSporeTypeScript,
   getSudtTypeScript,
   getXudtTypeScript,
+  isMainnet,
 } from "./constants";
 import { number, bytes } from "@ckb-lumos/codec";
 import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
+import {
+  blockchain,
+  TransactionCollector,
+  TransactionWithStatus,
+} from "@ckb-lumos/base";
 
-export const CONFIG = config.predefined.AGGRON4;
 config.initializeConfig(CONFIG);
-
-const CKB_RPC_URL = "https://testnet.ckb.dev";
-const CKB_INDEX_URL = "https://testnet.ckb.dev";
 
 const rpc = new RPC(CKB_RPC_URL);
 const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
-
-const isMainnet = false;
 
 export class CkbHepler {
   private static _instance: CkbHepler;
@@ -565,5 +568,143 @@ export class CkbHepler {
     );
 
     return txSkeleton;
+  }
+
+  // udt balance
+  async getUdtBalance(address: string) {
+    const lock = helpers.parseAddress(address);
+
+    const sudtType = getSudtTypeScript(isMainnet);
+
+    const xudtType = getXudtTypeScript(isMainnet);
+
+    const sudtCellList: Cell[] = [];
+
+    const xudtCellList: Cell[] = [];
+
+    const sudtUtxoCollector = indexer.collector({
+      lock,
+      type: {
+        script: {
+          codeHash: sudtType.codeHash,
+          hashType: sudtType.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    const xudtUtxoCollector = indexer.collector({
+      lock,
+      type: {
+        script: {
+          codeHash: xudtType.codeHash,
+          hashType: xudtType.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    for await (const sudt_cell of sudtUtxoCollector.collect()) {
+      sudtCellList.push(sudt_cell);
+    }
+
+    for await (const xudt_cell of xudtUtxoCollector.collect()) {
+      xudtCellList.push(xudt_cell);
+    }
+
+    const udtMap: { [key: string]: UdtInfo } = {};
+
+    for (let i = 0; i < sudtCellList.length; i++) {
+      const sudtCell = sudtCellList[i];
+      if (sudtCell.cellOutput.type) {
+        const typeScriptHex = bytes.hexify(
+          blockchain.Script.pack(sudtCell.cellOutput.type)
+        );
+        if (!udtMap[typeScriptHex]) {
+          udtMap[typeScriptHex] = {
+            type: "sudt",
+            typeScriptHex: typeScriptHex,
+            balance: BI.from(0),
+          };
+        }
+        udtMap[typeScriptHex].balance = udtMap[typeScriptHex].balance.add(
+          number.Uint128LE.unpack(sudtCell.data)
+        );
+      }
+    }
+
+    for (let i = 0; i < xudtCellList.length; i++) {
+      const xudtCell = xudtCellList[i];
+      if (xudtCell.cellOutput.type) {
+        const typeScriptHex = bytes.hexify(
+          blockchain.Script.pack(xudtCell.cellOutput.type)
+        );
+        if (!udtMap[typeScriptHex]) {
+          udtMap[typeScriptHex] = {
+            type: "xudt",
+            typeScriptHex: typeScriptHex,
+            balance: BI.from(0),
+          };
+        }
+        udtMap[typeScriptHex].balance = udtMap[typeScriptHex].balance.add(
+          number.Uint128LE.unpack(xudtCell.data)
+        );
+      }
+    }
+
+    return udtMap;
+  }
+
+  // spore
+  async getSpore(address: string) {
+    const lock = helpers.parseAddress(address);
+
+    const sporeType = getSporeTypeScript(isMainnet);
+
+    const sporeCellList: Cell[] = [];
+
+    const sporeCollector = indexer.collector({
+      lock,
+      type: {
+        script: {
+          codeHash: sporeType.codeHash,
+          hashType: sporeType.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    for await (const sporeCell of sporeCollector.collect()) {
+      sporeCellList.push(sporeCell);
+    }
+
+    return sporeCellList;
+  }
+
+  // transactions
+  async getTx(address: string, page: number = 0) {
+    const lock = helpers.parseAddress(address);
+
+    const txCollector = new TransactionCollector(
+      indexer,
+      {
+        lock,
+        order: "desc",
+        skip: page ? page * 20 : undefined,
+      },
+      {
+        skipMissing: true,
+      }
+    );
+
+    const txList: (Transaction | TransactionWithStatus<Transaction>)[] = [];
+    for await (const tx of txCollector.collect()) {
+      txList.push(tx);
+    }
+
+    return txList;
   }
 }

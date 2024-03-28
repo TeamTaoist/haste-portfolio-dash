@@ -1,5 +1,6 @@
 import { DataManager } from "../manager/DataManager";
 import superagent from "superagent";
+import { isMainnet } from "./constants";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -58,7 +59,11 @@ export class BtcHepler {
 
   async getUtxo(address: string) {
     const result = await superagent
-      .get(`https://mempool.space/testnet/api/address/${address}/utxo`)
+      .get(
+        `https://mempool.space${
+          isMainnet ? "" : "/testnet"
+        }/api/address/${address}/utxo`
+      )
       .catch((err) => {
         console.error(err.message);
       });
@@ -67,4 +72,77 @@ export class BtcHepler {
       return JSON.parse(result.text);
     }
   }
+
+  async unisat_signPsdt(hex: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unisat = (window as any)["unisat"];
+    if (typeof unisat !== "undefined") {
+      console.log("UniSat Wallet is installed!");
+
+      const curNetwork = await unisat.getNetwork();
+      if (curNetwork != this._network) {
+        await unisat.switchNetwork(this._network);
+      }
+
+      const newHex = await unisat.signPsbt(hex);
+      return newHex;
+    } else {
+      throw new Error("UniSat Wallet is no installed!");
+    }
+  }
+
+  async unisat_pushTx(rawtx: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unisat = (window as any)["unisat"];
+    if (typeof unisat !== "undefined") {
+      console.log("UniSat Wallet is installed!");
+
+      const curNetwork = await unisat.getNetwork();
+      if (curNetwork != this._network) {
+        await unisat.switchNetwork(this._network);
+      }
+
+      return unisat.pushTx({
+        rawtx: rawtx,
+      });
+    } else {
+      throw new Error("UniSat Wallet is no installed!");
+    }
+  }
+
+  async getTx(address: string, after_txid?: string) {
+    const result = await superagent
+      .get(
+        `https://mempool.space${
+          isMainnet ? "" : "/testnet"
+        }/api/address/${address}/txs${
+          after_txid ? `?after_txid=${after_txid}` : ""
+        }`
+      )
+      .catch((err) => {
+        console.error(err.message);
+      });
+
+    if (result && result.status == 200) {
+      return JSON.parse(result.text);
+    }
+  }
+
+  async getBTC(address: string) {
+    const result = await superagent
+      .get(
+        `https://mempool.space${
+          isMainnet ? "" : "/testnet"
+        }/api/address/${address}`
+      )
+      .catch((err) => {
+        console.error(err.message);
+      });
+
+    if (result && result.status == 200) {
+      return JSON.parse(result.text);
+    }
+  }
+
+  // async getRGBAsset(address: string) {}
 }
