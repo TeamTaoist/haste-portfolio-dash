@@ -32,7 +32,7 @@ export function TabSpore() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {spores &&
           spores.map((spore) => (
-            <Card key={spore}>
+            <Card key={spore.type_hash}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">SPORE</CardTitle>
                 <svg
@@ -51,7 +51,9 @@ export function TabSpore() {
               <CardContent>
                 <div className="flex flex-col justify-center">
                   <img src="https://a-simple-demo.spore.pro/api/media/0xff7d234d08aac9927756778f2f028171a073a3b888613a48ccea57df54f8ffec" />
-                  <div className="text-2xl font-bold">#{sortStr(spore, 3)}</div>
+                  <div className="text-2xl font-bold">
+                    #{sortStr(spore.type_hash, 3)}
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -31,9 +31,11 @@ export function TabUdt() {
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {udts.map((udt) => (
-          <Card key={udt.type + udt.symbol}>
+          <Card key={udt.type_hash}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{udt.type}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {udt.udt_type}
+              </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -48,7 +50,9 @@ export function TabUdt() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatUnit(udt.balance, "ckb")}</div>
+              <div className="text-2xl font-bold">
+                {formatUnit(udt.amount, "ckb")}
+              </div>
               <p className="text-xs text-muted-foreground">{udt.symbol}</p>
             </CardContent>
           </Card>

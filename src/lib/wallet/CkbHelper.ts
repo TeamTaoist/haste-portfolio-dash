@@ -10,7 +10,7 @@ import {
   helpers,
 } from "@ckb-lumos/lumos";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
-import { UdtInfo, ckb_TransferOptions } from "../interface";
+import { UdtInfo, ckb_AddressInfo, ckb_TransferOptions } from "../interface";
 import { DataManager } from "../manager/DataManager";
 import {
   CKBTransaction,
@@ -23,6 +23,8 @@ import {
   CKB_INDEX_URL,
   CKB_RPC_URL,
   CONFIG,
+  backend,
+  ckb_explorer_api,
   getSporeDep,
   getSporeTypeScript,
   getSudtTypeScript,
@@ -31,11 +33,7 @@ import {
 } from "./constants";
 import { number, bytes } from "@ckb-lumos/codec";
 import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
-import {
-  blockchain,
-  TransactionCollector,
-  TransactionWithStatus,
-} from "@ckb-lumos/base";
+import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
 
 config.initializeConfig(CONFIG);
@@ -687,44 +685,43 @@ export class CkbHepler {
 
   // transactions
   async getTx(address: string, page: number = 0) {
-    const lock = helpers.parseAddress(address);
+    //https://mainnet-api.explorer.nervos.org/api/v1/address_transactions/${address}?page=1&page_size=10&sort=time.desc
+    const rs = await superagent
+      .post(`${backend}/api/explore`)
+      .set("Content-Type", "application/json")
+      .send({
+        req: `https://${ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
+          page + 1
+        }&page_size=10&sort=time.desc`,
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
-    const txCollector = new TransactionCollector(
-      indexer,
-      {
-        lock,
-        order: "desc",
-        skip: page ? page * 20 : undefined,
-      },
-      {
-        skipMissing: true,
-      }
-    );
-
-    const txList: (Transaction | TransactionWithStatus<Transaction>)[] = [];
-    for await (const tx of txCollector.collect()) {
-      txList.push(tx);
+    if (rs && rs.status == 200) {
+      return JSON.parse(rs.text);
     }
-
-    return txList;
   }
 
   // suggest_queries
   async getSuggestQueries(hex: string) {
-    const result = await superagent
-      .get(
-        `https://${
-          isMainnet ? "mainnet" : "testnet"
-        }-api.explorer.nervos.org/api/v1/suggest_queries?q=${hex}`
-      )
-      .set("Accept", "application/vnd.api+json")
-      .set("Content-Type", "application/vnd.api+json")
+    const rs = await superagent
+      .post(`${backend}/api/explore`)
+      .set("Content-Type", "application/json")
+      .send({
+        req: `https://${ckb_explorer_api}/api/v1/suggest_queries?q=${hex}`,
+      })
       .catch((err) => {
-        console.error(err.message);
+        console.error(err);
       });
 
-    if (result && result.status == 200) {
-      return JSON.parse(result.text);
+    if (rs && rs.status == 200) {
+      return JSON.parse(rs.text);
     }
+  }
+
+  async getAddressInfo(address: string): Promise<ckb_AddressInfo | undefined> {
+    const result = await this.getSuggestQueries(address);
+    return result;
   }
 }

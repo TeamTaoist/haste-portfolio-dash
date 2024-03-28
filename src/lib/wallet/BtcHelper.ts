@@ -1,6 +1,7 @@
 import { DataManager } from "../manager/DataManager";
 import superagent from "superagent";
 import { isMainnet } from "./constants";
+import { btc_AddressInfo, btc_TxInfo } from "../interface";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -171,7 +172,10 @@ export class BtcHepler {
     throw new Error("Please connect btc wallet");
   }
 
-  async getTx(address: string, after_txid?: string) {
+  async getTx(
+    address: string,
+    after_txid?: string
+  ): Promise<btc_TxInfo[] | undefined> {
     const result = await superagent
       .get(
         `https://mempool.space${
@@ -189,7 +193,7 @@ export class BtcHepler {
     }
   }
 
-  async getBTC(address: string) {
+  async getBTC(address: string): Promise<btc_AddressInfo | undefined> {
     const result = await superagent
       .get(
         `https://mempool.space${

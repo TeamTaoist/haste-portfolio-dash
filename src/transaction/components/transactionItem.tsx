@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
+import { isMainnet } from "@/lib/wallet/constants";
 import { useEffect, useState } from "react";
 
 export function TransactionItem() {
@@ -50,13 +51,39 @@ export function TransactionItem() {
           <Card key={tx.txHash} hidden={hide} className="m-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <p className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground">
-                block:{tx.blockNumber}
+                block:{tx.block}
               </p>
             </CardHeader>
             <CardContent>
               <div className="font-SourceSanPro text-left flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#080808" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
-                <a href={`https://pudge.explorer.nervos.org/transaction/${tx.txHash}`} target="_href">{tx.txHash}</a>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#080808"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="lucide lucide-chevron-right"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+                <a
+                  href={
+                    tx.txHash && tx.txHash.startsWith("0x")
+                      ? `https://${
+                          isMainnet ? "" : "pudge."
+                        }explorer.nervos.org/transaction/${tx.txHash}`
+                      : `https://mempool.space/${
+                          isMainnet ? "" : "testnet"
+                        }/tx/${tx.txHash}`
+                  }
+                  target="_href"
+                >
+                  {tx.txHash}
+                </a>
               </div>
             </CardContent>
           </Card>
