@@ -264,16 +264,14 @@ export class RGBHelper {
       source,
     });
     // psbt.signAllInputs(keyPair);
-    const psbtHex = await BtcHepler.instance.unisat_signPsdt(psbt.toHex());
+    const psbtHex = await BtcHepler.instance.signPsdt(psbt.toHex());
     psbt = bitcoin.Psbt.fromHex(psbtHex);
     psbt.finalizeAllInputs();
 
     const btcTx = psbt.extractTransaction();
     // Remove the witness from BTC tx for RGBPP unlock
     const btcTxBytes = transactionToHex(btcTx, false);
-    const { txid: btcTxId } = await BtcHepler.instance.unisat_pushTx(
-      btcTx.toHex()
-    );
+    const { txid: btcTxId } = await BtcHepler.instance.pushTx(btcTx.toHex());
 
     console.log("BTC Tx bytes: ", btcTxBytes);
     console.log("BTC TxId: ", btcTxId);

@@ -33,6 +33,25 @@ export class BtcHepler {
     }
   }
 
+  async okx_onConnect() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const okxwallet = (window as any)["okxwallet"];
+    if (typeof okxwallet !== "undefined") {
+      console.log("OKX is installed!");
+
+      // {address publicKey}
+      if (isMainnet) {
+        const result = await okxwallet.bitcoin.connect();
+        return result;
+      } else {
+        const result = await okxwallet.bitcoinTestnet.connect();
+        return result;
+      }
+    } else {
+      throw new Error("OKX Wallet is no installed!");
+    }
+  }
+
   // TODO:transfer btc
   async transfer(toAddress: string, satoshis: number, feeRate?: number) {
     switch (DataManager.instance.curWalletType) {
@@ -73,41 +92,83 @@ export class BtcHepler {
     }
   }
 
-  async unisat_signPsdt(hex: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const unisat = (window as any)["unisat"];
-    if (typeof unisat !== "undefined") {
-      console.log("UniSat Wallet is installed!");
+  async signPsdt(hex: string) {
+    if (DataManager.instance.curWalletType == "unisat") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const unisat = (window as any)["unisat"];
+      if (typeof unisat !== "undefined") {
+        console.log("UniSat Wallet is installed!");
 
-      const curNetwork = await unisat.getNetwork();
-      if (curNetwork != this._network) {
-        await unisat.switchNetwork(this._network);
+        const curNetwork = await unisat.getNetwork();
+        if (curNetwork != this._network) {
+          await unisat.switchNetwork(this._network);
+        }
+
+        const newHex = await unisat.signPsbt(hex);
+        return newHex;
+      } else {
+        throw new Error("UniSat Wallet is no installed!");
       }
+    } else if (DataManager.instance.curWalletType == "okx") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const okxwallet = (window as any)["okxwallet"];
+      if (typeof okxwallet !== "undefined") {
+        console.log("OKX is installed!");
 
-      const newHex = await unisat.signPsbt(hex);
-      return newHex;
-    } else {
-      throw new Error("UniSat Wallet is no installed!");
+        // {address publicKey}
+        if (isMainnet) {
+          const result = await okxwallet.bitcoin.signPsbt(hex);
+          return result;
+        } else {
+          const result = await okxwallet.bitcoinTestnet.signPsbt(hex);
+          return result;
+        }
+      } else {
+        throw new Error("OKX Wallet is no installed!");
+      }
     }
+
+    throw new Error("Please connect btc wallet");
   }
 
-  async unisat_pushTx(rawtx: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const unisat = (window as any)["unisat"];
-    if (typeof unisat !== "undefined") {
-      console.log("UniSat Wallet is installed!");
+  async pushTx(rawtx: string) {
+    if (DataManager.instance.curWalletType == "unisat") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const unisat = (window as any)["unisat"];
+      if (typeof unisat !== "undefined") {
+        console.log("UniSat Wallet is installed!");
 
-      const curNetwork = await unisat.getNetwork();
-      if (curNetwork != this._network) {
-        await unisat.switchNetwork(this._network);
+        const curNetwork = await unisat.getNetwork();
+        if (curNetwork != this._network) {
+          await unisat.switchNetwork(this._network);
+        }
+
+        return unisat.pushTx({
+          rawtx: rawtx,
+        });
+      } else {
+        throw new Error("UniSat Wallet is no installed!");
       }
+    } else if (DataManager.instance.curWalletType == "okx") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const okxwallet = (window as any)["okxwallet"];
+      if (typeof okxwallet !== "undefined") {
+        console.log("OKX is installed!");
 
-      return unisat.pushTx({
-        rawtx: rawtx,
-      });
-    } else {
-      throw new Error("UniSat Wallet is no installed!");
+        // {address publicKey}
+        if (isMainnet) {
+          const result = await okxwallet.bitcoin.pushTx(rawtx);
+          return result;
+        } else {
+          const result = await okxwallet.bitcoinTestnet.pushTx(rawtx);
+          return result;
+        }
+      } else {
+        throw new Error("OKX Wallet is no installed!");
+      }
     }
+
+    throw new Error("Please connect btc wallet");
   }
 
   async getTx(address: string, after_txid?: string) {
