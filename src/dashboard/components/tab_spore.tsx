@@ -49,7 +49,10 @@ export function TabSpore() {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">#{sortStr(spore, 3)}</div>
+                <div className="flex flex-col justify-center">
+                  <img src="https://a-simple-demo.spore.pro/api/media/0xff7d234d08aac9927756778f2f028171a073a3b888613a48ccea57df54f8ffec" />
+                  <div className="text-2xl font-bold">#{sortStr(spore, 3)}</div>
+                </div>
               </CardContent>
             </Card>
           ))}

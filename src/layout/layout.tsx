@@ -5,7 +5,7 @@ import { UserNav } from "@/common/user-nav";
 const Layout = ({ children }) => {
   return (
     <>
-      <div className="hidden flex-col md:flex">
+      <div className="hidden flex-1 flex-col md:flex">
         <div className="border-b">
           <div className="flex h-16 items-center px-4">
             <TeamSwitcher />

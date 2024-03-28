@@ -18,12 +18,14 @@ const App = () => {
 
 const AppWrapper = () => {
   return (
-    <Router>
-      <Layout>
-        <App />
-      </Layout>
-      <Toaster></Toaster>
-    </Router>
+    <div className="h-[100%] flex flex-col">
+      <Router>
+        <Layout>
+          <App />
+        </Layout>
+        <Toaster></Toaster>
+      </Router>
+    </div>
   );
 };
 

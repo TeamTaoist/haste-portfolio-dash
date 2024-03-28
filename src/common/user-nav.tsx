@@ -86,7 +86,7 @@ export function UserNav() {
             {sortStr(DataManager.instance.curWalletAddr, 6)}
           </Button>
         ) : (
-          <Button className="relative rounded-full border-none">
+          <Button className="relative rounded-full border-none font-SourceSanPro">
             Connect Wallet
           </Button>
         )}

@@ -104,6 +104,7 @@ export interface txInfo {
   txHash: string;
   txIndex: string;
   blockNumber: string;
+  balance: bigint;
 }
 
 export interface tokensInfo {

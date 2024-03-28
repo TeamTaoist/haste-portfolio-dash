@@ -13,6 +13,17 @@ import { toast } from "@/components/ui/use-toast";
 import { DataManager } from "@/lib/manager/DataManager";
 import { sortStr } from "@/lib/utils";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
+import {
+  Select,
+  SelectContent,
+  
+  SelectGroup,
+  
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useState } from "react";
 
 export function SendSudt() {
@@ -106,7 +117,25 @@ export function SendSudt() {
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Receive Address</Label>
+                <Label htmlFor="name" className="text-left">Select UDT</Label>
+                <Select>
+                  <SelectTrigger className="w-[100%]">
+                    <SelectValue placeholder="Select a fruit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Fruits</SelectLabel>
+                      <SelectItem value="apple">Apple</SelectItem>
+                      <SelectItem value="banana">Banana</SelectItem>
+                      <SelectItem value="blueberry">Blueberry</SelectItem>
+                      <SelectItem value="grapes">Grapes</SelectItem>
+                      <SelectItem value="pineapple">Pineapple</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name" className="text-left">Receive Address</Label>
                 <Input
                   id="receiver"
                   placeholder="Receive Address"
@@ -115,7 +144,7 @@ export function SendSudt() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Amount</Label>
+                <Label htmlFor="name" className="text-left">Amount</Label>
                 <Input
                   id="amount"
                   placeholder="Amount"
@@ -124,7 +153,7 @@ export function SendSudt() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Send Address</Label>
+                <Label htmlFor="name" className="text-left">Send Address</Label>
                 <Label htmlFor="name">
                   {sortStr(DataManager.instance.curWalletAddr, 6)}
                 </Label>

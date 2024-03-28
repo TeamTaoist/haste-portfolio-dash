@@ -25,10 +25,10 @@ export function Transfer() {
   }, [reload]);
 
   return (
-    <div className="mt-7">
+    <div className="mx-auto mt-7">
       <div hidden={true}>{reload ? 1 : 2}</div>
       <Tabs defaultValue="Send" className="space-y-4">
-        <div className="flex">
+        <div className="flex justify-center">
           <TabsList>
             <TabsTrigger value="Send">Send</TabsTrigger>
             <TabsTrigger value="Receive">Receive</TabsTrigger>
@@ -38,12 +38,14 @@ export function Transfer() {
             <TabsTrigger value="BtcToCkb">BtcToCkb</TabsTrigger>
           </TabsList>
         </div>
-        <Send></Send>
-        <Receive></Receive>
-        <SendSudt></SendSudt>
-        <SendSpore></SendSpore>
-        <CkbToBtc></CkbToBtc>
-        <BtcToCkb></BtcToCkb>
+        <div className="flex justify-center">
+          <Send></Send>
+          <Receive></Receive>
+          <SendSudt></SendSudt>
+          <SendSpore></SendSpore>
+          <CkbToBtc></CkbToBtc>
+          <BtcToCkb></BtcToCkb>
+        </div>
       </Tabs>
     </div>
   );

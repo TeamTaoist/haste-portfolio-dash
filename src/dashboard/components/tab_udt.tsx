@@ -4,6 +4,7 @@ import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { useEffect, useState } from "react";
+import { formatUnit } from "@ckb-lumos/bi";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
@@ -47,7 +48,7 @@ export function TabUdt() {
               </svg>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{udt.balance}</div>
+              <div className="text-2xl font-bold">{formatUnit(udt.balance, "ckb")}</div>
               <p className="text-xs text-muted-foreground">{udt.symbol}</p>
             </CardContent>
           </Card>

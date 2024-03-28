@@ -13,6 +13,8 @@ export function MainNav({
     setMenuType(DataManager.instance.curMenu);
   };
 
+  console.log(menuType);
+
   return (
     <nav
       className={cn("flex items-center space-x-4 lg:space-x-6", className)}
@@ -21,8 +23,8 @@ export function MainNav({
       <Link
         to="/"
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
-          menuType == "asset" ? "" : "text-muted-foreground"
+          "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
+          menuType == "asset" ? "text-primary004" : "",
         )}
         onClick={() => {
           DataManager.instance.curMenu = "asset";
@@ -34,8 +36,8 @@ export function MainNav({
       <Link
         to="/tx"
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
-          menuType == "transaction" ? "" : "text-muted-foreground"
+          "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
+          menuType == "transaction" ? "text-primary004" : "",
         )}
         onClick={() => {
           DataManager.instance.curMenu = "transaction";
@@ -47,8 +49,9 @@ export function MainNav({
       <Link
         to="/transfer"
         className={cn(
-          "text-sm font-medium transition-colors hover:text-primary",
-          menuType == "send&receive" ? "" : "text-muted-foreground"
+          "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
+          menuType == "send&receive" ? "text-primary004" : "",
+          "text-white001"
         )}
         onClick={() => {
           DataManager.instance.curMenu = "send&receive";

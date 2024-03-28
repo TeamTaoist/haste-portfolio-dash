@@ -45,7 +45,7 @@ export function TransactionItem() {
   return (
     <>
       <div hidden={true}>{loadmore ? 1 : 2}</div>
-      <ScrollArea className="flex h-[550px] rounded-md border p-4">
+      <ScrollArea className="flex flex-1 h-[550px] rounded-md border p-4">
         {txList.map((tx) => (
           <Card key={tx.txHash} hidden={hide} className="m-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -54,7 +54,10 @@ export function TransactionItem() {
               </p>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{tx.txHash}</div>
+              <div className="font-SourceSanPro text-left flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#080808" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+                <a href={`https://pudge.explorer.nervos.org/${tx.txHash}`} target="_href">{tx.txHash}</a>
+              </div>
             </CardContent>
           </Card>
         ))}
