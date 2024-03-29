@@ -4,6 +4,7 @@ import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { sortStr } from "@/lib/utils";
+import { BI } from "@ckb-lumos/lumos";
 import { useEffect, useState } from "react";
 
 export function TabSpore() {
@@ -50,7 +51,9 @@ export function TabSpore() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col justify-center">
-                  <img src="https://a-simple-demo.spore.pro/api/media/0xff7d234d08aac9927756778f2f028171a073a3b888613a48ccea57df54f8ffec" />
+                  <div className="w-32 h-32 overflow-hidden mx-auto">
+                    <img src={`https://a-simple-demo.spore.pro/api/media/${BI.from(spore.amount).toHexString()}`} className="w-full h-full object-cover object-center"/>
+                  </div>
                   <div className="text-2xl font-bold">
                     #{sortStr(spore.type_hash, 3)}
                   </div>

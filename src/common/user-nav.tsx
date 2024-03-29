@@ -1,23 +1,29 @@
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { useToast } from "@/components/ui/use-toast";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
-import { sortStr } from "@/lib/utils";
 import { BtcHepler } from "@/lib/wallet/BtcHelper";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { CommandSeparator } from "@/components/ui/command";
+import { Separator } from "@radix-ui/react-select";
 
 export function UserNav() {
   const [isConnect, setIsConnent] = useState(false);
-
+  const [isWalletConnectWallet, setIsWalletConnect] = useState(true);
+  const [isJoyIDConnect, setIsJoyIDConnect] = useState(false);
   const { toast } = useToast();
 
   const handlerUnisat = () => {
@@ -57,7 +63,7 @@ export function UserNav() {
         DataManager.instance.curWalletPubKey = pubkey;
 
         setIsConnent(true);
-
+        setIsJoyIDConnect(true);
         RGBHelper.instance.btc_connect();
 
         EventManager.instance.publish(EventType.transfer_reload_page, {});
@@ -79,30 +85,53 @@ export function UserNav() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {isConnect ? (
-          <Button className="relative rounded-full border-none">
-            {sortStr(DataManager.instance.curWalletAddr, 6)}
-          </Button>
-        ) : (
-          <Button className="relative rounded-full border-none font-SourceSanPro">
-            Connect Wallet
-          </Button>
-        )}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        {isConnect ? (
-          <DropdownMenuItem onClick={handleDisconnect}>
-            Disconnect
-          </DropdownMenuItem>
-        ) : (
-          <>
-            <DropdownMenuItem onClick={handlerUnisat}>UniSat</DropdownMenuItem>
-            <DropdownMenuItem onClick={handlerJoyId}>JoyID</DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div>
+        <div className="">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="relative rounded-full border-none font-SourceSanPro">
+                Connect Wallet
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Connect Wallet</DialogTitle>
+                <DialogDescription>
+                  At least connect a BTC wallet and a CKB wallet
+                </DialogDescription>
+              </DialogHeader>
+              <Separator />
+              <div className="flex flex-col gap-4">
+                <div className="flex px-4 w-[100%] h-12 border rounded-md border-primary005 font-Montserrat justify-between items-center text-center cursor">
+                  <img src="/okx.png" width={24} height={24}/>
+                  <div>
+                    OKX Wallet
+                  </div>
+                </div>
+                <div className="flex px-4 w-[100%] h-12 border rounded-md border-primary005 font-Montserrat justify-between items-center text-center cursor">
+                  <img src="/unisat.png" width={24} height={24}/>
+                  <div>
+                    Unisat
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col gap-4">
+                <div 
+                  className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-center items-center txt-center cursor
+                    ${isJoyIDConnect ? 'bg-green-200' : 'border-primary005'}
+                  `}
+                  onClick={handlerJoyId}
+                >
+                  <img src="/joyid.png" className="w-24"/>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+
+    </div>
   );
 }
