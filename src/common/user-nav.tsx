@@ -17,7 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CommandSeparator } from "@/components/ui/command";
 import { Separator } from "@radix-ui/react-select";
 
 export function UserNav() {

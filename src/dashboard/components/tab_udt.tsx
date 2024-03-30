@@ -5,9 +5,15 @@ import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { useEffect, useState } from "react";
 import { formatUnit } from "@ckb-lumos/bi";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
+  const [toAddress, setToAddress] = useState<string>("");
+  const [amount,setAmount] = useState<number>(0);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
@@ -54,6 +60,40 @@ export function TabUdt() {
                 {formatUnit(udt.amount, "ckb")}
               </div>
               <p className="text-xs text-muted-foreground">{udt.symbol}</p>
+              <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="relative mt-2 border-none font-SourceSanPro">
+                      Transfer {udt.symbol}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Transfer {udt.symbol}</DialogTitle>
+                      <DialogDescription>
+                        * Make sure type correct wallet address
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="username" className="text-right">
+                        Amount
+                      </Label>
+                      <Input id="toAddress" type="number" value={amount} onChange={(e) => {
+                        setAmount(parseFloat(e.target.value))
+                      }} className="col-span-3" />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="username" className="text-right">
+                        To Address
+                      </Label>
+                      <Input id="toAddress" value={toAddress} onChange={(e) => {
+                        setToAddress(e.target.value)
+                      }} className="col-span-3" />
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Confirm</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
             </CardContent>
           </Card>
         ))}

@@ -1,17 +1,22 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { sortStr } from "@/lib/utils";
 import { BI } from "@ckb-lumos/lumos";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
 
 export function TabSpore() {
   const [reload, setReload] = useState(false);
+  const [toAddress, setToAddress] = useState<string>("");
 
   const spores = DataManager.instance.tokens.spore;
-
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
       setReload(!reload);
@@ -58,6 +63,36 @@ export function TabSpore() {
                     #{sortStr(spore.type_hash, 3)}
                   </div>
                 </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="relative mt-2 border-none font-SourceSanPro">
+                      Transfer Spore
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Transfer Spore</DialogTitle>
+                      <DialogDescription>
+                        * Make sure type correct wallet address
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Separator />
+                    <div className="flex flex-col gap-4">
+                      <img src={`https://a-simple-demo.spore.pro/api/media/${BI.from(spore.amount).toHexString()}`} className="w-full h-full object-cover object-center"/>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="username" className="text-right">
+                        To Address
+                      </Label>
+                      <Input id="toAddress" value={toAddress} onChange={(e) => {
+                        setToAddress(e.target.value)
+                      }} className="col-span-3" />
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Confirm</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </CardContent>
             </Card>
           ))}
