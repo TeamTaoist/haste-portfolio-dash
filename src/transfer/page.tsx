@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Send } from "./components/send";
-import { Receive } from "./components/receive";
+// import { Receive } from "./components/receive";
 import { useEffect, useState } from "react";
 import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
@@ -45,7 +45,7 @@ export function Transfer() {
         <div className="flex justify-center">
           <TabsList>
             <TabsTrigger value="Send">Send</TabsTrigger>
-            <TabsTrigger value="Receive">Receive</TabsTrigger>
+            {/* <TabsTrigger value="Receive">Receive</TabsTrigger> */}
             {/* <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
             <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
             <TabsTrigger value="CkbToBtc">CkbToBtc</TabsTrigger>
@@ -54,7 +54,7 @@ export function Transfer() {
         </div>
         <div className="flex justify-center">
           <Send></Send>
-          <Receive></Receive>
+          {/* <Receive></Receive> */}
           {/* <SendSudt></SendSudt>
           <SendSpore></SendSpore>
           <CkbToBtc></CkbToBtc>

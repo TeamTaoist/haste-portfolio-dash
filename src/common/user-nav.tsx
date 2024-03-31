@@ -17,7 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@radix-ui/react-select";
-import { observer } from 'mobx-react';
+import { observer } from "mobx-react";
 import { accountStore } from "@/store/AccountStore";
 
 export const UserNav = observer(() => {
@@ -25,9 +25,7 @@ export const UserNav = observer(() => {
   const [isUnisatConnect, setIsUnisatConnect] = useState(false);
   const [isJoyIDConnect, setIsJoyIDConnect] = useState(false);
   const [isOKXConnect, setIsOKXConnect] = useState(false);
-  const [isOpen, setIsOpen] = useState(
-    DataManager.instance.accounts.length <= 0 ? true : false
-  );
+  const [isOpen, setIsOpen] = useState(accountStore.accounts ? false : true);
 
   const { toast } = useToast();
 
@@ -53,9 +51,9 @@ export const UserNav = observer(() => {
           address: accounts[0],
           type: "unisat",
           pubkey: pubkey,
-          chain: "BTC"
+          chain: "BTC",
         });
-        
+
         const canFind = DataManager.instance.accounts.find(
           (v) => v.addr == accounts[0]
         );
@@ -135,7 +133,7 @@ export const UserNav = observer(() => {
 
   const setDefaultAddress = (address: string) => {
     accountStore.setCurrentAddress(address);
-  }
+  };
 
   // const handleDisconnect = () => {
   //   DataManager.instance.curWalletType = "none";
@@ -172,7 +170,7 @@ export const UserNav = observer(() => {
   return (
     <div>
       <div className="">
-        <Dialog open={accountStore.accounts ? false: true} onOpenChange={handleOpenChange}>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button className="relative rounded-full border-none font-SourceSanPro">
               Add Wallet
@@ -224,4 +222,4 @@ export const UserNav = observer(() => {
       </div>
     </div>
   );
-})
+});
