@@ -84,6 +84,37 @@ export function TabRgb() {
 
         if (!isRgb) {
           // transfer to other btc
+          RGBHelper.instance
+            .transfer_btc_to_btc(
+              rgb.txHash,
+              rgb.idx,
+              toAddress,
+              {
+                codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
+                hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
+                args: rs["data"]["attributes"]["type_script"]["args"],
+              },
+              BI.from(rgb.ckbCellInfo?.amount).toBigInt()
+            )
+            .then((rs) => {
+              console.log("btc to btc tx hash:", rs);
+
+              toast({
+                title: "Success",
+                description: rs,
+              });
+
+              accountStore.setCurrentAddress(curAccount);
+            })
+            .catch((err) => {
+              console.error(err.message);
+
+              toast({
+                title: "Warning",
+                description: err.message,
+                variant: "destructive",
+              });
+            });
         } else {
           RGBHelper.instance
             .transfer_btc_to_ckb(

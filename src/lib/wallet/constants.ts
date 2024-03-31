@@ -1,4 +1,5 @@
 import { CellDep, Script, config } from "@ckb-lumos/lumos";
+import { NetworkType } from "@rgbpp-sdk/btc";
 
 export const isMainnet = false;
 export const CONFIG = config.predefined.AGGRON4;
@@ -12,6 +13,8 @@ export const BTC_ASSETS_TOKEN =
 export const ckb_explorer_api = "testnet-api.explorer.nervos.org";
 
 export const backend: string = "https://blockchain-serverless.vercel.app";
+
+export const rgb_networkType = NetworkType.TESTNET;
 
 const TestnetInfo = {
   JoyIDLockScript: {

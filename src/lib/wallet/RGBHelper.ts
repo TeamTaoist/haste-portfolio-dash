@@ -8,6 +8,7 @@ import {
   genBtcJumpCkbVirtualTx,
   isBtcTimeCellsSpent,
   genRgbppLockScript,
+  genBtcTransferCkbVirtualTx,
 } from "@rgbpp-sdk/ckb";
 import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
 import {
@@ -29,8 +30,9 @@ import {
   // getSporeDep,
   // getSporeTypeScript,
   isMainnet,
+  rgb_networkType,
 } from "./constants";
-import { DataSource, NetworkType, sendRgbppUtxos } from "@rgbpp-sdk/btc";
+import { DataSource, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { accountStore } from "@/store/AccountStore";
 
@@ -45,7 +47,35 @@ export class RGBHelper {
     return this._instance;
   }
 
-  async transfer_btc_to_btc() {}
+  async transfer_btc_to_btc(
+    btcTxHash: string,
+    btcTxIdx: number,
+    toAddress: string,
+    typeScript: Script,
+    amount: bigint = 0n
+  ) {
+    const curAccount = DataManager.instance.getCurAccount();
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+
+    if (wallet.chain != "BTC") return;
+
+    const txHash = await this.btc_to_btc_buildTx(
+      [buildRgbppLockArgs(btcTxIdx, btcTxHash)],
+      toAddress,
+      wallet as WalletInfo,
+      typeScript,
+      amount
+    );
+
+    return txHash;
+  }
 
   async transfer_ckb_to_btc(
     btcTxHash: string,
@@ -112,6 +142,62 @@ export class RGBHelper {
     );
 
     return txHash;
+  }
+
+  async btc_to_btc_buildTx(
+    rgbppLockArgsList: string[],
+    toAddress: string,
+    btc_wallet: WalletInfo,
+    typeScript: Script,
+    transferAmount: bigint = 0n
+  ) {
+    const collector = new Collector({
+      ckbNodeUrl: CKB_RPC_URL,
+      ckbIndexerUrl: CKB_INDEX_URL,
+    });
+
+    const networkType = rgb_networkType;
+    const service = BtcAssetsApi.fromToken(
+      BTC_ASSETS_API_URL,
+      BTC_ASSETS_TOKEN,
+      "http://localhost"
+    );
+    const source = new DataSource(service, networkType);
+
+    const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
+      collector,
+      rgbppLockArgsList,
+      xudtTypeBytes: serializeScript(typeScript),
+      transferAmount,
+      isMainnet,
+    });
+
+    const { commitment, ckbRawTx } = ckbVirtualTxResult;
+
+    // Send BTC tx
+    const psbt = await sendRgbppUtxos({
+      ckbVirtualTx: ckbRawTx,
+      commitment,
+      tos: [toAddress],
+      ckbCollector: collector,
+      from: btc_wallet.address!,
+      fromPubkey: btc_wallet.pubkey,
+      source,
+    });
+
+    const psbtHex = await BtcHepler.instance.signPsdt(
+      psbt.toHex(),
+      btc_wallet.type
+    );
+    const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, btc_wallet.type);
+
+    const rgbppState = await service.sendRgbppCkbTransaction({
+      btc_txid: btcTxId,
+      ckb_virtual_result: ckbVirtualTxResult,
+    });
+    console.log("rgbppState", rgbppState);
+
+    return btcTxId;
   }
 
   async ckb_to_btc_buildTx(
@@ -218,7 +304,7 @@ export class RGBHelper {
       ckbIndexerUrl: CKB_INDEX_URL,
     });
 
-    const networkType = NetworkType.TESTNET;
+    const networkType = rgb_networkType;
     const service = BtcAssetsApi.fromToken(
       BTC_ASSETS_API_URL,
       BTC_ASSETS_TOKEN,
