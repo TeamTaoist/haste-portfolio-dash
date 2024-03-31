@@ -1,6 +1,7 @@
 import {
   AccountData,
   AssetInfo,
+  RgbAssert,
   WalletInfo,
   tokensInfo,
   txInfo,
@@ -96,5 +97,13 @@ export class DataManager {
   }
   public set walletInfo(v: { [key: string]: WalletInfo }) {
     this._walletInfo = v;
+  }
+
+  private _curRgbAssert: RgbAssert[] = [];
+  public get curRgbAssert(): RgbAssert[] {
+    return this._curRgbAssert;
+  }
+  public set curRgbAssert(v: RgbAssert[]) {
+    this._curRgbAssert = v;
   }
 }

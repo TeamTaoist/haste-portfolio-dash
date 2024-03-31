@@ -1,5 +1,5 @@
 import { BIish } from "@ckb-lumos/bi";
-import { BI, Script } from "@ckb-lumos/lumos";
+import { BI, Cell, Script } from "@ckb-lumos/lumos";
 export interface AccountData {
   chain: string;
   addr: string;
@@ -237,6 +237,12 @@ export interface WalletInfo {
   pubkey: string;
   type: WalletType;
   chain: "BTC" | "CKB";
+}
+
+export interface RgbAssert {
+  txHash: string;
+  idx: number;
+  ckbCell: Cell;
 }
 
 // type

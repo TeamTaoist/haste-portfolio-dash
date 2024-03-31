@@ -745,4 +745,11 @@ export class CkbHepler {
     );
     return result;
   }
+
+  async getAddress(address: string) {
+    const result = await this.sendExploreApi(
+      `https://${ckb_explorer_api}/api/v1/addresses?q=${address}`
+    );
+    return result;
+  }
 }

@@ -9,11 +9,16 @@ import { TabSpore } from "./components/tab_spore";
 import { useLocation } from "react-router-dom";
 import { DataManager } from "@/lib/manager/DataManager";
 import { HttpManager } from "@/lib/api/HttpManager";
+import { TabRgb } from "./components/tab_rgb";
 
 export default function Dashboard() {
   const [hideTab, setHideTab] = useState(true);
 
   const location = useLocation();
+
+  const [hide, setHide] = useState(false);
+
+  const [tabValue, setTabValue] = useState<string>("");
 
   useEffect(() => {
     DataManager.instance.curMenu = "asset";
@@ -32,9 +37,11 @@ export default function Dashboard() {
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_page_show_tabs, () => {
       setHideTab(false);
+      setTabValue("UDT");
     });
     EventManager.instance.subscribe(EventType.dashboard_page_hide_tabs, () => {
       setHideTab(true);
+      setTabValue("RGB++");
     });
 
     return () => {
@@ -53,6 +60,24 @@ export default function Dashboard() {
     };
   }, []);
 
+  useEffect(() => {
+    EventManager.instance.subscribe(EventType.dashboard_assets_show, () => {
+      setHide(false);
+    });
+    EventManager.instance.subscribe(EventType.dashboard_assets_hide, () => {
+      setHide(true);
+    });
+
+    return () => {
+      EventManager.instance.unsubscribe(EventType.dashboard_assets_show, () => {
+        setHide(false);
+      });
+      EventManager.instance.unsubscribe(EventType.dashboard_assets_hide, () => {
+        setHide(true);
+      });
+    };
+  }, []);
+
   return (
     <>
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -62,15 +87,35 @@ export default function Dashboard() {
           </h2>
         </div>
         <Assets />
-        <Tabs defaultValue="UDT" className="space-y-4" hidden={hideTab}>
+        <Tabs value={tabValue} className="space-y-4" hidden={hide}>
           <div className="flex">
             <TabsList>
-              <TabsTrigger value="UDT">UDT</TabsTrigger>
-              <TabsTrigger value="SPORE">SPORE</TabsTrigger>
+              {!hideTab ? (
+                <TabsTrigger value="UDT" onClick={() => setTabValue("UDT")}>
+                  UDT
+                </TabsTrigger>
+              ) : (
+                ""
+              )}
+              {!hideTab ? (
+                <TabsTrigger value="SPORE" onClick={() => setTabValue("SPORE")}>
+                  SPORE
+                </TabsTrigger>
+              ) : (
+                ""
+              )}
+              {!hideTab ? (
+                ""
+              ) : (
+                <TabsTrigger value="RGB++" onClick={() => setTabValue("RGB++")}>
+                  RGB++
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
           <TabUdt></TabUdt>
           <TabSpore></TabSpore>
+          <TabRgb></TabRgb>
         </Tabs>
       </div>
     </>

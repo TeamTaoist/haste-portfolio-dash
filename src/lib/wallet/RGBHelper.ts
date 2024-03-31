@@ -1,5 +1,5 @@
-import { Script, helpers, utils } from "@ckb-lumos/lumos";
-import { WalletInfo, btc_utxo } from "../interface";
+import { Indexer, Script, config, helpers, utils } from "@ckb-lumos/lumos";
+import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
   buildRgbppLockArgs,
@@ -7,6 +7,8 @@ import {
   Collector,
   genBtcJumpCkbVirtualTx,
   isBtcTimeCellsSpent,
+  genRgbppLockScript,
+  getXudtTypeScript,
 } from "@rgbpp-sdk/ckb";
 import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
 import {
@@ -25,12 +27,17 @@ import {
   BTC_ASSETS_TOKEN,
   CKB_INDEX_URL,
   CKB_RPC_URL,
+  CONFIG,
   getSporeDep,
   getSporeTypeScript,
   isMainnet,
 } from "./constants";
 import { DataSource, NetworkType, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
+
+config.initializeConfig(CONFIG);
+
+const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -308,6 +315,63 @@ export class RGBHelper {
       // TODO 这里需要找到已绑定的rgb
       return result[0];
     }
+  }
+
+  async getRgbppAssert(address: string) {
+    const result: btc_utxo[] | undefined = await BtcHepler.instance.getUtxo(
+      address
+    );
+
+    const rgbAssertList: RgbAssert[] = [];
+
+    if (result) {
+      const rgbppLockArgsList: { args: string; txHash: string; idx: number }[] =
+        [];
+      for (let i = 0; i < result.length; i++) {
+        const element = result[i];
+        const rgbArgs = buildRgbppLockArgs(element.vout, element.txid);
+        rgbppLockArgsList.push({
+          args: rgbArgs,
+          txHash: element.txid,
+          idx: element.vout,
+        });
+      }
+      const rgbppLocks = rgbppLockArgsList.map((item) => {
+        const lock = genRgbppLockScript(item.args, isMainnet);
+
+        return {
+          lock,
+          txHash: item.txHash,
+          idx: item.idx,
+        };
+      });
+      const xudtTypeScript = getXudtTypeScript(isMainnet);
+      for await (const rgbppLock of rgbppLocks) {
+        const xudtCollector = indexer.collector({
+          lock: rgbppLock.lock,
+          type: {
+            script: {
+              codeHash: xudtTypeScript.codeHash,
+              hashType: xudtTypeScript.hashType,
+              args: "0x",
+            },
+            searchMode: "prefix",
+          },
+        });
+
+        for await (const xudt of xudtCollector.collect()) {
+          rgbAssertList.push({
+            txHash: rgbppLock.txHash,
+            idx: rgbppLock.idx,
+            ckbCell: xudt,
+          });
+        }
+      }
+    }
+
+    console.log(rgbAssertList);
+
+    return rgbAssertList;
   }
 
   async getIsBtcTimeCellSpent(ckbAddress: string, btcTxId: string) {

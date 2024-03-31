@@ -11,6 +11,7 @@ import { DataManager } from "../manager/DataManager";
 import { BI } from "@ckb-lumos/lumos";
 import { BtcHepler } from "../wallet/BtcHelper";
 import { CkbHepler } from "../wallet/CkbHelper";
+import { RGBHelper } from "../wallet/RGBHelper";
 export class HttpManager {
   private static _instance: HttpManager;
   private constructor() {}
@@ -82,6 +83,9 @@ export class HttpManager {
           balance: BI.from(0),
         });
       }
+
+      const rgbAssertList = await RGBHelper.instance.getRgbppAssert(address);
+      DataManager.instance.curRgbAssert = rgbAssertList;
     }
 
     if (hasTabs) {
