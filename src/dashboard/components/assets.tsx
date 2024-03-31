@@ -4,8 +4,12 @@ import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { useEffect, useState } from "react";
 import { formatUnit } from "@ckb-lumos/bi";
+import { observer } from "mobx-react";
+import { accountStore } from "@/store/AccountStore";
+import { HttpManager } from "@/lib/api/HttpManager";
+import { autorun } from "mobx";
 
-export function Assets() {
+export const Assets = observer(() => {
   const assetList = DataManager.instance.curAsset;
 
   const [hide, setHide] = useState(false);
@@ -27,6 +31,22 @@ export function Assets() {
       });
     };
   }, []);
+  
+  const getAssetData = async () => {
+    if (accountStore.currentAddress) {
+      await HttpManager.instance.getAsset(accountStore.currentAddress)
+    }
+  }
+
+  useEffect(() => {
+    const disposer = autorun(() => {
+      console.log(accountStore.currentAddress)
+      if (accountStore.currentAddress) {
+        getAssetData();
+      }
+    })
+    return () => disposer();
+  }, [])
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 ">
@@ -45,3 +65,4 @@ export function Assets() {
     </div>
   );
 }
+)

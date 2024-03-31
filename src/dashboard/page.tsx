@@ -10,8 +10,9 @@ import { useLocation } from "react-router-dom";
 import { DataManager } from "@/lib/manager/DataManager";
 import { HttpManager } from "@/lib/api/HttpManager";
 import { TabRgb } from "./components/tab_rgb";
+import { observer } from "mobx-react";
 
-export default function Dashboard() {
+const Dashboard = observer(() => {
   const [hideTab, setHideTab] = useState(true);
 
   const location = useLocation();
@@ -120,4 +121,6 @@ export default function Dashboard() {
       </div>
     </>
   );
-}
+})
+
+export default Dashboard

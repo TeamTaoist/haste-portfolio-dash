@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
@@ -21,6 +21,7 @@ import { ckb_UDTInfo } from "@/lib/interface";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { toast } from "@/components/ui/use-toast";
 import { parseUnit } from "@ckb-lumos/bi";
+import { TabsList } from "@radix-ui/react-tabs";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
@@ -148,12 +149,28 @@ export function TabUdt() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Transfer {udt.symbol}</DialogTitle>
-                    <DialogDescription>
-                      * Make sure type correct wallet address
-                    </DialogDescription>
-                  </DialogHeader>
+                <Tabs defaultValue="rgb++" className="w-[100%]">
+                  <TabsList className="w-[100%]">
+                    <TabsTrigger value="rgb++" className="w-[50%]">RGB++</TabsTrigger>
+                    <TabsTrigger value={udt.symbol} className="w-[50%]">{udt.symbol}</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="rgb++">
+                    <DialogHeader>
+                      <DialogTitle>Transfer RGB++</DialogTitle>
+                      <DialogDescription>
+                        * Make sure type correct wallet address
+                      </DialogDescription>
+                    </DialogHeader>
+                  </TabsContent>
+                  <TabsContent value={udt.symbol}>
+                    <DialogHeader>
+                      <DialogTitle>Transfer {udt.symbol}</DialogTitle>
+                      <DialogDescription>
+                        * Make sure type correct wallet address
+                      </DialogDescription>
+                    </DialogHeader>
+                  </TabsContent>
+                </Tabs>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="username" className="text-right">
                       Amount
