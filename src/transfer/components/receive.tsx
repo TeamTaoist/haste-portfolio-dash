@@ -21,7 +21,9 @@ export function Receive() {
         </CardHeader>
         <CardContent>
           <h1>Address</h1>
-          <Label>{sortStr(DataManager.instance.curWalletAddr, 12)}</Label>
+          <Label>
+            {sortStr(DataManager.instance.getCurAccount()?.addr, 12)}
+          </Label>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button>Copy</Button>

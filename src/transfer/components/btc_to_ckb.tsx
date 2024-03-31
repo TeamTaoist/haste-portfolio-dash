@@ -9,11 +9,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
-import { toast } from "@/components/ui/use-toast";
-import { DataManager } from "@/lib/manager/DataManager";
-import { sortStr } from "@/lib/utils";
-import { RGBHelper } from "@/lib/wallet/RGBHelper";
-import { BI } from "@ckb-lumos/lumos";
+// import { toast } from "@/components/ui/use-toast";
+// import { DataManager } from "@/lib/manager/DataManager";
+// import { sortStr } from "@/lib/utils";
+// import { RGBHelper } from "@/lib/wallet/RGBHelper";
+// import { BI } from "@ckb-lumos/lumos";
 import { useState } from "react";
 
 export function BtcToCkb() {
@@ -21,48 +21,43 @@ export function BtcToCkb() {
   const [amount, setAmount] = useState("");
 
   const handleSend = () => {
-    console.log(btcAddress, amount, DataManager.instance.curWalletAddr);
-
-    if (DataManager.instance.curWalletType == "joyid") {
-      const sendAmount = amount;
-      console.log(sendAmount);
-
-      RGBHelper.instance
-        .transfer_btc_to_ckb(
-          RGBHelper.instance.btcAddress,
-          DataManager.instance.curWalletAddr,
-          {
-            codeHash:
-              "0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4",
-            args: "0x30452490e0f5bc2b2c832ed04a349be90cab3f25aaece06612195642f61fa114",
-            hashType: "type",
-          },
-          BI.from(sendAmount).toBigInt()
-        )
-        .then((rs) => {
-          console.log("Success send txHash", rs);
-
-          toast({
-            title: "Success",
-            description: rs,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-
-          toast({
-            title: "Warning",
-            description: err.message,
-            variant: "destructive",
-          });
-        });
-    } else {
-      toast({
-        title: "Warning",
-        description: "Please use ckb wallet",
-        variant: "destructive",
-      });
-    }
+    // console.log(btcAddress, amount, DataManager.instance.curWalletAddr);
+    // if (DataManager.instance.curWalletType == "joyid") {
+    //   const sendAmount = amount;
+    //   console.log(sendAmount);
+    //   RGBHelper.instance
+    //     .transfer_btc_to_ckb(
+    //       "",
+    //       {
+    //         codeHash:
+    //           "0xc5e5dcf215925f7ef4dfaf5f4b4f105bc321c02776d6e7d52a1db3fcd9d011a4",
+    //         args: "0x30452490e0f5bc2b2c832ed04a349be90cab3f25aaece06612195642f61fa114",
+    //         hashType: "type",
+    //       },
+    //       BI.from(sendAmount).toBigInt()
+    //     )
+    //     .then((rs) => {
+    //       console.log("Success send txHash", rs);
+    //       toast({
+    //         title: "Success",
+    //         description: rs,
+    //       });
+    //     })
+    //     .catch((err) => {
+    //       console.error(err);
+    //       toast({
+    //         title: "Warning",
+    //         description: err.message,
+    //         variant: "destructive",
+    //       });
+    //     });
+    // } else {
+    //   toast({
+    //     title: "Warning",
+    //     description: "Please use ckb wallet",
+    //     variant: "destructive",
+    //   });
+    // }
   };
 
   return (
@@ -96,7 +91,7 @@ export function BtcToCkb() {
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Receive Address</Label>
                 <Label htmlFor="name">
-                  {sortStr(DataManager.instance.curWalletAddr, 6)}
+                  {/* {sortStr(DataManager.instance.curWalletAddr, 6)} */}
                 </Label>
               </div>
             </div>

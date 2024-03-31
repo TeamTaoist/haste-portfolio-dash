@@ -1,7 +1,7 @@
 import { DataManager } from "../manager/DataManager";
 import superagent from "superagent";
 import { isMainnet } from "./constants";
-import { btc_AddressInfo, btc_TxInfo } from "../interface";
+import { WalletType, btc_AddressInfo, btc_TxInfo } from "../interface";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -55,7 +55,11 @@ export class BtcHepler {
 
   // TODO:transfer btc
   async transfer(toAddress: string, satoshis: number, feeRate?: number) {
-    switch (DataManager.instance.curWalletType) {
+    const curAccount = DataManager.instance.getCurAccount();
+
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+
+    switch (wallet.type) {
       case "unisat":
         // eslint-disable-next-line no-case-declarations, @typescript-eslint/no-explicit-any
         const unisat = (window as any)["unisat"];
@@ -93,8 +97,8 @@ export class BtcHepler {
     }
   }
 
-  async signPsdt(hex: string) {
-    if (DataManager.instance.curWalletType == "unisat") {
+  async signPsdt(hex: string, walletType: WalletType) {
+    if (walletType == "unisat") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const unisat = (window as any)["unisat"];
       if (typeof unisat !== "undefined") {
@@ -110,7 +114,7 @@ export class BtcHepler {
       } else {
         throw new Error("UniSat Wallet is no installed!");
       }
-    } else if (DataManager.instance.curWalletType == "okx") {
+    } else if (walletType == "okx") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const okxwallet = (window as any)["okxwallet"];
       if (typeof okxwallet !== "undefined") {
@@ -132,8 +136,8 @@ export class BtcHepler {
     throw new Error("Please connect btc wallet");
   }
 
-  async pushTx(rawtx: string) {
-    if (DataManager.instance.curWalletType == "unisat") {
+  async pushTx(rawtx: string, walletType: WalletType) {
+    if (walletType == "unisat") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const unisat = (window as any)["unisat"];
       if (typeof unisat !== "undefined") {
@@ -150,7 +154,7 @@ export class BtcHepler {
       } else {
         throw new Error("UniSat Wallet is no installed!");
       }
-    } else if (DataManager.instance.curWalletType == "okx") {
+    } else if (walletType == "okx") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const okxwallet = (window as any)["okxwallet"];
       if (typeof okxwallet !== "undefined") {
@@ -210,4 +214,42 @@ export class BtcHepler {
   }
 
   // async getRGBAsset(address: string) {}
+
+  async pushPsbt(psbtHex: string, walletType: WalletType) {
+    if (walletType == "unisat") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const unisat = (window as any)["unisat"];
+      if (typeof unisat !== "undefined") {
+        console.log("UniSat Wallet is installed!");
+
+        const curNetwork = await unisat.getNetwork();
+        if (curNetwork != this._network) {
+          await unisat.switchNetwork(this._network);
+        }
+
+        return unisat.pushPsbt(psbtHex);
+      } else {
+        throw new Error("UniSat Wallet is no installed!");
+      }
+    } else if (walletType == "okx") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const okxwallet = (window as any)["okxwallet"];
+      if (typeof okxwallet !== "undefined") {
+        console.log("OKX is installed!");
+
+        // {address publicKey}
+        if (isMainnet) {
+          const result = await okxwallet.bitcoin.pushPsbt(psbtHex);
+          return result;
+        } else {
+          const result = await okxwallet.bitcoinTestnet.pushPsbt(psbtHex);
+          return result;
+        }
+      } else {
+        throw new Error("OKX Wallet is no installed!");
+      }
+    }
+
+    throw new Error("Please connect btc wallet");
+  }
 }

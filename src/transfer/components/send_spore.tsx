@@ -19,12 +19,15 @@ export function SendSpore() {
   const [receiveAddress, setReceiverAddress] = useState("");
 
   const handleSend = () => {
-    console.log(receiveAddress, DataManager.instance.curWalletAddr);
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
 
-    if (DataManager.instance.curWalletType == "joyid") {
+    console.log(receiveAddress, wallet.address);
+
+    if (wallet.type == "joyid") {
       CkbHepler.instance
         .transfer_spore({
-          from: DataManager.instance.curWalletAddr,
+          from: wallet.address,
           to: receiveAddress.trim(),
           amount: 0,
           typeScript: {
@@ -85,7 +88,7 @@ export function SendSpore() {
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Send Address</Label>
                 <Label htmlFor="name">
-                  {sortStr(DataManager.instance.curWalletAddr, 6)}
+                  {sortStr(DataManager.instance.getCurAccount()?.addr, 6)}
                 </Label>
               </div>
             </div>

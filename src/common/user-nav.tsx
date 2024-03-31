@@ -6,7 +6,6 @@ import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { BtcHepler } from "@/lib/wallet/BtcHelper";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
-import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { useState } from "react";
 import {
   Dialog,
@@ -16,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import { Separator } from "@radix-ui/react-select";
 
 export function UserNav() {
@@ -33,13 +32,31 @@ export function UserNav() {
         const { accounts, pubkey } = rs;
         console.log(accounts);
 
-        DataManager.instance.curWalletType = "unisat";
-        DataManager.instance.curWalletAddr = accounts[0];
-        DataManager.instance.curWalletPubKey = pubkey;
+        // DataManager.instance.curWalletType = "unisat";
+        // DataManager.instance.curWalletAddr = accounts[0];
+        // DataManager.instance.curWalletPubKey = pubkey;
 
-        setIsUnisatConnect(true)
+        DataManager.instance.walletInfo[accounts[0]] = {
+          address: accounts[0],
+          type: "unisat",
+          pubkey: pubkey,
+          chain: "BTC",
+        };
+
+        const canFind = DataManager.instance.accounts.find(
+          (v) => v.addr == accounts[0]
+        );
+        if (!canFind) {
+          DataManager.instance.accounts.push({
+            chain: "BTC",
+            addr: accounts[0],
+          });
+        }
+
+        setIsUnisatConnect(true);
         detectWallet();
         EventManager.instance.publish(EventType.transfer_reload_page, {});
+        EventManager.instance.publish(EventType.team_switcher_reload, {});
       })
       .catch((err) => {
         console.error(err);
@@ -53,45 +70,36 @@ export function UserNav() {
 
   const handleOKX = () => {
     BtcHepler.instance
-    .okx_onConnect()
-    .then((rs) => {
-      const { address, publicKey } = rs;
-      console.log(address, publicKey);
-
-      DataManager.instance.curWalletType = "okx";
-      DataManager.instance.curWalletAddr = address;
-      DataManager.instance.curWalletPubKey = publicKey;
-
-      setIsOKXConnect(true);
-      detectWallet()
-      EventManager.instance.publish(EventType.transfer_reload_page, {});
-    })
-    .catch((err) => {
-      console.error(err);
-      toast({
-        title: "Warning",
-        description: err.message,
-        variant: "destructive",
-      });
-    });
-  }
-
-  const handlerJoyId = () => {
-    CkbHepler.instance
-      .joyid_onConnect()
+      .okx_onConnect()
       .then((rs) => {
-        const { account, pubkey } = rs;
-        console.log(account);
+        const { address, publicKey } = rs;
+        console.log(address, publicKey);
 
-        DataManager.instance.curWalletType = "joyid";
-        DataManager.instance.curWalletAddr = account;
-        DataManager.instance.curWalletPubKey = pubkey;
+        // DataManager.instance.curWalletType = "okx";
+        // DataManager.instance.curWalletAddr = address;
+        // DataManager.instance.curWalletPubKey = publicKey;
 
-        setIsJoyIDConnect(true);
+        DataManager.instance.walletInfo[address] = {
+          address: address,
+          type: "okx",
+          pubkey: publicKey,
+          chain: "BTC",
+        };
+
+        const canFind = DataManager.instance.accounts.find(
+          (v) => v.addr == address
+        );
+        if (!canFind) {
+          DataManager.instance.accounts.push({
+            chain: "BTC",
+            addr: address,
+          });
+        }
+
+        setIsOKXConnect(true);
         detectWallet();
-        RGBHelper.instance.btc_connect();
-
         EventManager.instance.publish(EventType.transfer_reload_page, {});
+        EventManager.instance.publish(EventType.team_switcher_reload, {});
       })
       .catch((err) => {
         console.error(err);
@@ -103,11 +111,56 @@ export function UserNav() {
       });
   };
 
-  // detect BTC and CKB wallet is both connected 
+  const handlerJoyId = () => {
+    CkbHepler.instance
+      .joyid_onConnect()
+      .then((rs) => {
+        const { account, pubkey } = rs;
+        console.log(account);
+
+        // DataManager.instance.curWalletType = "joyid";
+        // DataManager.instance.curWalletAddr = account;
+        // DataManager.instance.curWalletPubKey = pubkey;
+
+        DataManager.instance.walletInfo[account] = {
+          address: account,
+          type: "joyid",
+          pubkey: pubkey,
+          chain: "CKB",
+        };
+
+        const canFind = DataManager.instance.accounts.find(
+          (v) => v.addr == account
+        );
+        if (!canFind) {
+          DataManager.instance.accounts.push({
+            chain: "CKB",
+            addr: account,
+          });
+        }
+
+        setIsJoyIDConnect(true);
+        detectWallet();
+        EventManager.instance.publish(EventType.transfer_reload_page, {});
+        EventManager.instance.publish(EventType.team_switcher_reload, {});
+      })
+      .catch((err) => {
+        console.error(err);
+        toast({
+          title: "Warning",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
+  };
+
+  // detect BTC and CKB wallet is both connected
 
   const detectWallet = () => {
-    setIsConnent((isJoyIDConnect && isOKXConnect) || (isJoyIDConnect && isUnisatConnect))
-  }
+    setIsConnent(
+      (isJoyIDConnect && isOKXConnect) || (isJoyIDConnect && isUnisatConnect)
+    );
+  };
 
   // const handleDisconnect = () => {
   //   DataManager.instance.curWalletType = "none";
@@ -117,60 +170,59 @@ export function UserNav() {
 
   return (
     <div>
-        <div className="">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="relative rounded-full border-none font-SourceSanPro">
-                Connect Wallet
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Connect Wallet</DialogTitle>
-                <DialogDescription>
-                  At least connect a BTC wallet and a CKB wallet
-                </DialogDescription>
-              </DialogHeader>
-              <Separator />
-              <div className="flex flex-col gap-4">
-                <div 
-                  onClick={handleOKX}
-                  className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-between items-center txt-center cursor
-                  ${isOKXConnect ? 'bg-green-200' : 'border-primary005'}
-                  `}    
-                >
-                  <img src="/okx.png" width={24} height={24}/>
-                  <div>
-                    OKX Wallet
-                  </div>
-                </div>
-                <div onClick={handlerUnisat} 
-                  className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-between items-center txt-center cursor
-                    ${isUnisatConnect ? 'bg-green-200' : 'border-primary005'}
-                  `}                >
-                  <img src="/unisat.png" width={24} height={24}/>
-                  <div>
-                    Unisat
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col gap-4">
-                <div 
-                  className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-center items-center txt-center cursor
-                    ${isJoyIDConnect ? 'bg-green-200' : 'border-primary005'}
+      <div className="">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="relative rounded-full border-none font-SourceSanPro">
+              Connect Wallet
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Connect Wallet</DialogTitle>
+              <DialogDescription>
+                At least connect a BTC wallet and a CKB wallet
+              </DialogDescription>
+            </DialogHeader>
+            <Separator />
+            <div className="flex flex-col gap-4">
+              <div
+                onClick={handleOKX}
+                className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-between items-center txt-center cursor
+                  ${isOKXConnect ? "bg-green-200" : "border-primary005"}
                   `}
-                  onClick={handlerJoyId}
-                >
-                  <img src="/joyid.png" className="w-24"/>
-                </div>
+              >
+                <img src="/okx.png" width={24} height={24} />
+                <div>OKX Wallet</div>
               </div>
-              <DialogFooter>
-                <Button disabled={isConnect} type="submit">Confirm Connect</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-
+              <div
+                onClick={handlerUnisat}
+                className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-between items-center txt-center cursor
+                    ${isUnisatConnect ? "bg-green-200" : "border-primary005"}
+                  `}
+              >
+                <img src="/unisat.png" width={24} height={24} />
+                <div>Unisat</div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              <div
+                className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-center items-center txt-center cursor
+                    ${isJoyIDConnect ? "bg-green-200" : "border-primary005"}
+                  `}
+                onClick={handlerJoyId}
+              >
+                <img src="/joyid.png" className="w-24" />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button disabled={isConnect} type="submit">
+                Confirm Connect
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

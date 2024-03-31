@@ -24,9 +24,12 @@ export function Send() {
   const handlerCancel = () => {};
 
   const handleSend = () => {
-    console.log(receiveAddress, amount, DataManager.instance.curWalletAddr);
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
 
-    if (DataManager.instance.curWalletType == "unisat") {
+    console.log(receiveAddress, amount, wallet.address);
+
+    if (wallet.type == "unisat") {
       BtcHepler.instance
         .transfer(receiveAddress.trim(), Number.parseFloat(amount.trim()))
         .then((rs) => {
@@ -44,13 +47,13 @@ export function Send() {
             variant: "destructive",
           });
         });
-    } else if (DataManager.instance.curWalletType == "joyid") {
+    } else if (wallet.type == "joyid") {
       const sendCkb = parseUnit(amount.trim(), "ckb");
       console.log(sendCkb);
 
       CkbHepler.instance
         .transfer_ckb({
-          from: DataManager.instance.curWalletAddr,
+          from: wallet.address,
           to: receiveAddress.trim(),
           amount: sendCkb,
         })
@@ -105,7 +108,7 @@ export function Send() {
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Send Address</Label>
                 <Label htmlFor="name">
-                  {sortStr(DataManager.instance.curWalletAddr, 6)}
+                  {sortStr(DataManager.instance.getCurAccount()?.addr, 6)}
                 </Label>
               </div>
             </div>

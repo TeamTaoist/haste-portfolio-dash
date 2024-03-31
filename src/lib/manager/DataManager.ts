@@ -1,7 +1,7 @@
 import {
   AccountData,
   AssetInfo,
-  WalletType,
+  WalletInfo,
   tokensInfo,
   txInfo,
 } from "../interface";
@@ -9,21 +9,7 @@ import {
 export class DataManager {
   private static _instance: DataManager;
   private constructor() {
-    // test
-    this._accounts = [
-      {
-        chain: "BTC",
-        addr: "tb1pnprtrusgvq9tsf7dsm7yfwxf7qsazpdguw6xkducu020pc0wlw4s4f6w3n",
-      },
-      {
-        chain: "CKB",
-        addr: "ckt1qrejnmlar3r452tcg57gvq8patctcgy8acync0hxfnyka35ywafvkqgpes90ptu3rh2qs5acer07ay9n97x3ajkkqqnm062a",
-      },
-      {
-        chain: "CKB",
-        addr: "ckt1qrfrwcdnvssswdwpn3s9v8fp87emat306ctjwsm3nmlkjg8qyza2cqgqqx7nj3mf8kj4m5p9gnwl7mlfttujm2wgnuqmprl9",
-      },
-    ];
+    this._accounts = [];
   }
 
   public static get instance() {
@@ -88,14 +74,6 @@ export class DataManager {
     this._tokens = v;
   }
 
-  private _curLiveCells: number = 0;
-  public get curLiveCells(): number {
-    return this._curLiveCells;
-  }
-  public set curLiveCells(v: number) {
-    this._curLiveCells = v;
-  }
-
   private _curPath: string = "";
   public get curPath(): string {
     return this._curPath;
@@ -104,35 +82,19 @@ export class DataManager {
     this._curPath = v;
   }
 
-  private _curWalletType: WalletType = "none";
-  public get curWalletType(): WalletType {
-    return this._curWalletType;
-  }
-  public set curWalletType(v: WalletType) {
-    this._curWalletType = v;
-  }
-
-  private _curWalletAddr: string = "";
-  public get curWalletAddr(): string {
-    return this._curWalletAddr;
-  }
-  public set curWalletAddr(v: string) {
-    this._curWalletAddr = v;
-  }
-
-  private _curWalletPubKey: string = "";
-  public get curWalletPubKey(): string {
-    return this._curWalletPubKey;
-  }
-  public set curWalletPubKey(v: string) {
-    this._curWalletPubKey = v;
-  }
-
   private _joyIdConnectionType: string = "";
   public get joyIdConnectionType(): string {
     return this._joyIdConnectionType;
   }
   public set joyIdConnectionType(v: string) {
     this._joyIdConnectionType = v;
+  }
+
+  private _walletInfo: { [key: string]: WalletInfo } = {};
+  public get walletInfo(): { [key: string]: WalletInfo } {
+    return this._walletInfo;
+  }
+  public set walletInfo(v: { [key: string]: WalletInfo }) {
+    this._walletInfo = v;
   }
 }

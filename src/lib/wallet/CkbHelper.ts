@@ -76,10 +76,13 @@ export class CkbHepler {
 
   // transfer ckb
   async transfer_ckb(options: ckb_TransferOptions) {
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (DataManager.instance.curWalletType == "joyid") {
+    if (wallet.type == "joyid") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
         options.from
@@ -97,10 +100,13 @@ export class CkbHepler {
 
   // transfer sudt
   async transfer_sudt(options: ckb_TransferOptions) {
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (DataManager.instance.curWalletType == "joyid") {
+    if (wallet.type == "joyid") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
         options.from
@@ -118,10 +124,13 @@ export class CkbHepler {
 
   // deploy new sudt token
   async deploy_sudt(issuer: string, amount: number) {
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+
     const unsigned = await this.sudt_buildIssueNewToken(issuer, amount);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (DataManager.instance.curWalletType == "joyid") {
+    if (wallet.address == "joyid") {
       const signed = await signRawTransaction(tx as CKBTransaction, issuer);
 
       console.log("[deploy_sudt]sign raw tx", signed);
@@ -139,7 +148,10 @@ export class CkbHepler {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (DataManager.instance.curWalletType == "joyid") {
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+
+    if (wallet.type == "joyid") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
         options.from

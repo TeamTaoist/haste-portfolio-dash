@@ -4,7 +4,7 @@ import * as React from "react";
 import {
   CaretSortIcon,
   CheckIcon,
-  PlusCircledIcon,
+  // PlusCircledIcon,
 } from "@radix-ui/react-icons";
 
 import { cn, sortStr } from "@/lib/utils";
@@ -26,7 +26,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  // DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,36 +44,10 @@ import {
 } from "@/components/ui/select";
 import { DataManager } from "@/lib/manager/DataManager";
 import { HttpManager } from "@/lib/api/HttpManager";
+import { EventManager } from "@/lib/manager/EventManager";
+import { EventType } from "@/lib/enum";
 
-const groups: { label: string; teams: { label: string; value: string }[] }[] =
-  [];
-
-for (let i = 0; i < DataManager.instance.accounts.length; i++) {
-  const element = DataManager.instance.accounts[i];
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let group: any = undefined;
-  for (let j = 0; j < groups.length; j++) {
-    const itemGroup = groups[j];
-    if (itemGroup.label == element.chain) {
-      group = itemGroup;
-      break;
-    }
-  }
-
-  if (!group) {
-    group = {
-      label: element.chain,
-      teams: [],
-    };
-    groups.push(group);
-  }
-
-  group.teams.push({
-    label: element.addr,
-    value: element.addr,
-  });
-}
+let groups: { label: string; teams: { label: string; value: string }[] }[] = [];
 
 type Team = (typeof groups)[number]["teams"][number];
 
@@ -108,6 +82,50 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
   }
 
   const [selectedTeam, setSelectedTeam] = React.useState<Team>(curTeam);
+
+  const reloadGroup = () => {
+    groups = [];
+    for (let i = 0; i < DataManager.instance.accounts.length; i++) {
+      const element = DataManager.instance.accounts[i];
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let group: any = undefined;
+      for (let j = 0; j < groups.length; j++) {
+        const itemGroup = groups[j];
+        if (itemGroup.label == element.chain) {
+          group = itemGroup;
+          break;
+        }
+      }
+
+      if (!group) {
+        group = {
+          label: element.chain,
+          teams: [],
+        };
+        groups.push(group);
+      }
+
+      group.teams.push({
+        label: element.addr,
+        value: element.addr,
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    EventManager.instance.subscribe(
+      EventType.team_switcher_reload,
+      reloadGroup
+    );
+
+    return () => {
+      EventManager.instance.unsubscribe(
+        EventType.team_switcher_reload,
+        reloadGroup
+      );
+    };
+  }, []);
 
   return (
     <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
@@ -185,7 +203,7 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
               ))}
             </CommandList>
             <CommandSeparator />
-            <CommandList>
+            {/* <CommandList>
               <CommandGroup>
                 <DialogTrigger asChild>
                   <CommandItem
@@ -199,7 +217,7 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
                   </CommandItem>
                 </DialogTrigger>
               </CommandGroup>
-            </CommandList>
+            </CommandList> */}
           </Command>
         </PopoverContent>
       </Popover>

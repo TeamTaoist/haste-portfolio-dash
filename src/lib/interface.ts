@@ -232,5 +232,12 @@ export interface ckb_TxInfo {
   };
 }
 
+export interface WalletInfo {
+  address: string;
+  pubkey: string;
+  type: WalletType;
+  chain: "BTC" | "CKB";
+}
+
 // type
 export type WalletType = "none" | "unisat" | "okx" | "joyid";

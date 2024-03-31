@@ -16,14 +16,12 @@ import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import {
   Select,
   SelectContent,
-  
   SelectGroup,
-  
   SelectItem,
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import { useState } from "react";
 
 export function SendSudt() {
@@ -31,10 +29,13 @@ export function SendSudt() {
   const [amount, setAmount] = useState("");
 
   const handlerDeployNewToken = () => {
-    console.log(DataManager.instance.curWalletAddr);
-    if (DataManager.instance.curWalletType == "joyid") {
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+
+    console.log(wallet.address);
+    if (wallet.type == "joyid") {
       CkbHepler.instance
-        .deploy_sudt(DataManager.instance.curWalletAddr, 1000000)
+        .deploy_sudt(wallet.address, 1000000)
         .then((rs) => {
           console.log("Success deploy", rs);
 
@@ -62,15 +63,18 @@ export function SendSudt() {
   };
 
   const handleSend = () => {
-    console.log(receiveAddress, amount, DataManager.instance.curWalletAddr);
+    const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[curAccount.addr];
 
-    if (DataManager.instance.curWalletType == "joyid") {
+    console.log(receiveAddress, amount, wallet.address);
+
+    if (wallet.type == "joyid") {
       const sendAmount = amount;
       console.log(sendAmount);
 
       CkbHepler.instance
         .transfer_sudt({
-          from: DataManager.instance.curWalletAddr,
+          from: wallet.address,
           to: receiveAddress.trim(),
           amount: sendAmount,
           typeScript: {
@@ -117,7 +121,9 @@ export function SendSudt() {
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name" className="text-left">Select UDT</Label>
+                <Label htmlFor="name" className="text-left">
+                  Select UDT
+                </Label>
                 <Select>
                   <SelectTrigger className="w-[100%]">
                     <SelectValue placeholder="Select a fruit" />
@@ -135,7 +141,9 @@ export function SendSudt() {
                 </Select>
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name" className="text-left">Receive Address</Label>
+                <Label htmlFor="name" className="text-left">
+                  Receive Address
+                </Label>
                 <Input
                   id="receiver"
                   placeholder="Receive Address"
@@ -144,7 +152,9 @@ export function SendSudt() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name" className="text-left">Amount</Label>
+                <Label htmlFor="name" className="text-left">
+                  Amount
+                </Label>
                 <Input
                   id="amount"
                   placeholder="Amount"
@@ -153,9 +163,11 @@ export function SendSudt() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name" className="text-left">Send Address</Label>
+                <Label htmlFor="name" className="text-left">
+                  Send Address
+                </Label>
                 <Label htmlFor="name">
-                  {sortStr(DataManager.instance.curWalletAddr, 6)}
+                  {sortStr(DataManager.instance.getCurAccount()?.addr, 6)}
                 </Label>
               </div>
             </div>

@@ -16,4 +16,7 @@ export enum EventType {
 
   // transfer
   transfer_reload_page = "transfer_reload_page",
+
+  // team switcher
+  team_switcher_reload = "team_switcher_reload",
 }
