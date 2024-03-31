@@ -129,7 +129,6 @@ export class CkbHepler {
   // deploy new sudt token
   async deploy_sudt(issuer: string, amount: number) {
     const curAccount = DataManager.instance.getCurAccount();
-
     if (!curAccount) {
       throw new Error("Please choose a wallet");
     }
