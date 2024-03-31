@@ -98,10 +98,10 @@ export class CkbHepler {
     throw new Error("Please connect wallet");
   }
 
-  // transfer sudt
-  async transfer_sudt(options: ckb_TransferOptions) {
-    const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+  // transfer udt
+  async transfer_udt(options: ckb_TransferOptions) {
+    // const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[options.from];
 
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
@@ -148,8 +148,8 @@ export class CkbHepler {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    // const curAccount = DataManager.instance.getCurAccount();
+    const wallet = DataManager.instance.walletInfo[options.from];
 
     if (wallet.type == "joyid") {
       const signed = await signRawTransaction(
@@ -715,13 +715,13 @@ export class CkbHepler {
     }
   }
 
-  // suggest_queries
-  async getSuggestQueries(hex: string) {
+  // send explore api
+  async sendExploreApi(url: string) {
     const rs = await superagent
       .post(`${backend}/api/explore`)
       .set("Content-Type", "application/json")
       .send({
-        req: `https://${ckb_explorer_api}/api/v1/suggest_queries?q=${hex}`,
+        req: url,
       })
       .catch((err) => {
         console.error(err);
@@ -733,7 +733,16 @@ export class CkbHepler {
   }
 
   async getAddressInfo(address: string): Promise<ckb_AddressInfo | undefined> {
-    const result = await this.getSuggestQueries(address);
+    const result = await this.sendExploreApi(
+      `https://${ckb_explorer_api}/api/v1/suggest_queries?q=${address}`
+    );
+    return result;
+  }
+
+  async getUDTInfo(type_hash: string) {
+    const result = await this.sendExploreApi(
+      `https://${ckb_explorer_api}/api/v1/udts/${type_hash}`
+    );
     return result;
   }
 }

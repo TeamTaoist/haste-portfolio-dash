@@ -73,7 +73,7 @@ export function SendSudt() {
       console.log(sendAmount);
 
       CkbHepler.instance
-        .transfer_sudt({
+        .transfer_udt({
           from: wallet.address,
           to: receiveAddress.trim(),
           amount: sendAmount,

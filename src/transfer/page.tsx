@@ -4,10 +4,10 @@ import { Receive } from "./components/receive";
 import { useEffect, useState } from "react";
 import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
-import { SendSudt } from "./components/send_sudt";
-import { SendSpore } from "./components/send_spore";
-import { CkbToBtc } from "./components/ckb_to_btc";
-import { BtcToCkb } from "./components/btc_to_ckb";
+// import { SendSudt } from "./components/send_sudt";
+// import { SendSpore } from "./components/send_spore";
+// import { CkbToBtc } from "./components/ckb_to_btc";
+// import { BtcToCkb } from "./components/btc_to_ckb";
 
 export function Transfer() {
   const [reload, setReload] = useState(false);
@@ -32,19 +32,19 @@ export function Transfer() {
           <TabsList>
             <TabsTrigger value="Send">Send</TabsTrigger>
             <TabsTrigger value="Receive">Receive</TabsTrigger>
-            <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
+            {/* <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
             <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
             <TabsTrigger value="CkbToBtc">CkbToBtc</TabsTrigger>
-            <TabsTrigger value="BtcToCkb">BtcToCkb</TabsTrigger>
+            <TabsTrigger value="BtcToCkb">BtcToCkb</TabsTrigger> */}
           </TabsList>
         </div>
         <div className="flex justify-center">
           <Send></Send>
           <Receive></Receive>
-          <SendSudt></SendSudt>
+          {/* <SendSudt></SendSudt>
           <SendSpore></SendSpore>
           <CkbToBtc></CkbToBtc>
-          <BtcToCkb></BtcToCkb>
+          <BtcToCkb></BtcToCkb> */}
         </div>
       </Tabs>
     </div>

@@ -56,7 +56,6 @@ export function UserNav() {
         setIsUnisatConnect(true);
         detectWallet();
         EventManager.instance.publish(EventType.transfer_reload_page, {});
-        EventManager.instance.publish(EventType.team_switcher_reload, {});
       })
       .catch((err) => {
         console.error(err);
@@ -99,7 +98,6 @@ export function UserNav() {
         setIsOKXConnect(true);
         detectWallet();
         EventManager.instance.publish(EventType.transfer_reload_page, {});
-        EventManager.instance.publish(EventType.team_switcher_reload, {});
       })
       .catch((err) => {
         console.error(err);
@@ -142,7 +140,6 @@ export function UserNav() {
         setIsJoyIDConnect(true);
         detectWallet();
         EventManager.instance.publish(EventType.transfer_reload_page, {});
-        EventManager.instance.publish(EventType.team_switcher_reload, {});
       })
       .catch((err) => {
         console.error(err);
@@ -168,10 +165,18 @@ export function UserNav() {
   //   setIsConnent(false);
   // };
 
+  const handleOpenChange = (e) => {
+    console.log(e);
+
+    if (!e) {
+      EventManager.instance.publish(EventType.team_switcher_reload, {});
+    }
+  };
+
   return (
     <div>
       <div className="">
-        <Dialog>
+        <Dialog onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button className="relative rounded-full border-none font-SourceSanPro">
               Connect Wallet

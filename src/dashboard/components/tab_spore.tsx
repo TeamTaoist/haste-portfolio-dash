@@ -1,16 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/use-toast";
 import { EventType } from "@/lib/enum";
+import { ckb_SporeInfo } from "@/lib/interface";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { sortStr } from "@/lib/utils";
+import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { BI } from "@ckb-lumos/lumos";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
+import { blockchain } from "@ckb-lumos/base";
 
 export function TabSpore() {
   const [reload, setReload] = useState(false);
@@ -31,6 +43,53 @@ export function TabSpore() {
       );
     };
   }, [reload]);
+
+  const handlerConfirm = (spore: ckb_SporeInfo) => {
+    if (toAddress.length <= 0) {
+      toast({
+        title: "Warning",
+        description: "to address is empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const sporeTypeScript = blockchain.Script.unpack(spore.type_hash);
+
+    console.log("spore type script:", sporeTypeScript);
+
+    const curAccount = DataManager.instance.getCurAccount();
+    CkbHepler.instance
+      .transfer_spore({
+        from: curAccount.addr,
+        to: toAddress,
+        amount: BI.from(0),
+        typeScript: sporeTypeScript,
+      })
+      .then((txHash) => {
+        console.log("transfer spore txHash", txHash);
+
+        toast({
+          title: "Success",
+          description: txHash,
+        });
+      })
+      .catch((err) => {
+        console.error(err.message);
+
+        toast({
+          title: "Warning",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
+  };
+
+  const handleDialogOpenChange = (e) => {
+    if (e) {
+      setToAddress("");
+    }
+  };
 
   return (
     <TabsContent value="SPORE" className="space-y-4">
@@ -57,13 +116,18 @@ export function TabSpore() {
               <CardContent>
                 <div className="flex flex-col justify-center">
                   <div className="w-32 h-32 overflow-hidden mx-auto">
-                    <img src={`https://a-simple-demo.spore.pro/api/media/${BI.from(spore.amount).toHexString()}`} className="w-full h-full object-cover object-center"/>
+                    <img
+                      src={`https://a-simple-demo.spore.pro/api/media/${BI.from(
+                        spore.amount
+                      ).toHexString()}`}
+                      className="w-full h-full object-cover object-center"
+                    />
                   </div>
                   <div className="text-2xl font-bold">
                     #{sortStr(spore.type_hash, 3)}
                   </div>
                 </div>
-                <Dialog>
+                <Dialog onOpenChange={handleDialogOpenChange}>
                   <DialogTrigger asChild>
                     <Button className="relative mt-2 border-none font-SourceSanPro">
                       Transfer Spore
@@ -78,18 +142,33 @@ export function TabSpore() {
                     </DialogHeader>
                     <Separator />
                     <div className="flex flex-col gap-4">
-                      <img src={`https://a-simple-demo.spore.pro/api/media/${BI.from(spore.amount).toHexString()}`} className="w-full h-full object-cover object-center"/>
+                      <img
+                        src={`https://a-simple-demo.spore.pro/api/media/${BI.from(
+                          spore.amount
+                        ).toHexString()}`}
+                        className="w-full h-full object-cover object-center"
+                      />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="username" className="text-right">
                         To Address
                       </Label>
-                      <Input id="toAddress" value={toAddress} onChange={(e) => {
-                        setToAddress(e.target.value)
-                      }} className="col-span-3" />
+                      <Input
+                        id="toAddress"
+                        value={toAddress}
+                        onChange={(e) => {
+                          setToAddress(e.target.value.trim());
+                        }}
+                        className="col-span-3"
+                      />
                     </div>
                     <DialogFooter>
-                      <Button type="submit">Confirm</Button>
+                      <Button
+                        type="submit"
+                        onClick={() => handlerConfirm(spore)}
+                      >
+                        Confirm
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>

@@ -5,15 +5,27 @@ import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { useEffect, useState } from "react";
 import { formatUnit } from "@ckb-lumos/bi";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { ckb_UDTInfo } from "@/lib/interface";
+import { CkbHepler } from "@/lib/wallet/CkbHelper";
+import { toast } from "@/components/ui/use-toast";
+import { parseUnit } from "@ckb-lumos/bi";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
   const [toAddress, setToAddress] = useState<string>("");
-  const [amount,setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<number>(0);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
@@ -31,6 +43,75 @@ export function TabUdt() {
   }, [reload]);
 
   const udts = DataManager.instance.tokens.udt;
+
+  const handlerTransfer = (udt: ckb_UDTInfo) => {
+    if (amount <= 0) {
+      toast({
+        title: "Warning",
+        description: "Amount is wrong",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (toAddress.length <= 0) {
+      toast({
+        title: "Warning",
+        description: "to address is empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log(udt);
+
+    CkbHepler.instance
+      .getUDTInfo(udt.type_hash)
+      .then((rs) => {
+        console.log(rs);
+
+        const curAccount = DataManager.instance.getCurAccount();
+        CkbHepler.instance
+          .transfer_udt({
+            from: curAccount.addr,
+            to: toAddress,
+            amount: parseUnit(amount.toString(), "ckb"),
+          })
+          .then((txHash) => {
+            console.log("transfer udt txHash", txHash);
+
+            toast({
+              title: "Success",
+              description: txHash,
+            });
+          })
+          .catch((err) => {
+            console.error(err.message);
+
+            toast({
+              title: "Warning",
+              description: err.message,
+              variant: "destructive",
+            });
+          });
+      })
+      .catch((err) => {
+        console.error(err.message);
+
+        toast({
+          title: "Warning",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
+  };
+
+  const handlerDialogOpenChange = (e) => {
+    if (e) {
+      setToAddress("");
+      setAmount(0);
+    }
+  };
 
   return (
     <TabsContent value="UDT" className="space-y-4">
@@ -60,40 +141,53 @@ export function TabUdt() {
                 {formatUnit(udt.amount, "ckb")}
               </div>
               <p className="text-xs text-muted-foreground">{udt.symbol}</p>
-              <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="relative mt-2 border-none font-SourceSanPro">
-                      Transfer {udt.symbol}
+              <Dialog onOpenChange={handlerDialogOpenChange}>
+                <DialogTrigger asChild>
+                  <Button className="relative mt-2 border-none font-SourceSanPro">
+                    Transfer {udt.symbol}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Transfer {udt.symbol}</DialogTitle>
+                    <DialogDescription>
+                      * Make sure type correct wallet address
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      Amount
+                    </Label>
+                    <Input
+                      id="toAddress"
+                      type="number"
+                      value={amount}
+                      onChange={(e) => {
+                        setAmount(parseFloat(e.target.value));
+                      }}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="username" className="text-right">
+                      To Address
+                    </Label>
+                    <Input
+                      id="toAddress"
+                      value={toAddress}
+                      onChange={(e) => {
+                        setToAddress(e.target.value);
+                      }}
+                      className="col-span-3"
+                    />
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" onClick={() => handlerTransfer(udt)}>
+                      Confirm
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Transfer {udt.symbol}</DialogTitle>
-                      <DialogDescription>
-                        * Make sure type correct wallet address
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="username" className="text-right">
-                        Amount
-                      </Label>
-                      <Input id="toAddress" type="number" value={amount} onChange={(e) => {
-                        setAmount(parseFloat(e.target.value))
-                      }} className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="username" className="text-right">
-                        To Address
-                      </Label>
-                      <Input id="toAddress" value={toAddress} onChange={(e) => {
-                        setToAddress(e.target.value)
-                      }} className="col-span-3" />
-                    </div>
-                    <DialogFooter>
-                      <Button type="submit">Confirm</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         ))}
