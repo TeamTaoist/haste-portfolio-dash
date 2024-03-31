@@ -112,19 +112,21 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
       });
     }
 
-    const selectOne = groups[0].teams[0];
-    setSelectedTeam(selectOne);
-    setOpen(false);
+    if (groups.length > 0 && groups[0].teams.length > 0) {
+      const selectOne = groups[0].teams[0];
+      setSelectedTeam(selectOne);
+      setOpen(false);
 
-    const idx = DataManager.instance.accounts.findIndex(
-      (v) => v.addr == selectOne.value
-    );
-    DataManager.instance.curAccount = idx;
+      const idx = DataManager.instance.accounts.findIndex(
+        (v) => v.addr == selectOne.value
+      );
+      DataManager.instance.curAccount = idx;
 
-    if (DataManager.instance.curMenu == "asset") {
-      HttpManager.instance.getAsset(selectOne.value);
-    } else if (DataManager.instance.curMenu == "transaction") {
-      HttpManager.instance.getTransactions(selectOne.value);
+      if (DataManager.instance.curMenu == "asset") {
+        HttpManager.instance.getAsset(selectOne.value);
+      } else if (DataManager.instance.curMenu == "transaction") {
+        HttpManager.instance.getTransactions(selectOne.value);
+      }
     }
   };
 

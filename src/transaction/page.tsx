@@ -16,7 +16,9 @@ export default function Transaction() {
     if (location.pathname != DataManager.instance.curPath) {
       DataManager.instance.curPath = location.pathname;
       const curAccount = DataManager.instance.getCurAccount();
-      HttpManager.instance.getTransactions(curAccount.addr);
+      if (curAccount) {
+        HttpManager.instance.getTransactions(curAccount.addr);
+      }
     }
   }, [location]);
 
@@ -39,7 +41,9 @@ export default function Transaction() {
     <div className="flex flex-col flex-1 space-y-4 p-8 pt-6">
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight text-white001 font-Montserrat">Transactions</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-white001 font-Montserrat">
+          Transactions
+        </h2>
       </div>
       <TransactionItem />
     </div>

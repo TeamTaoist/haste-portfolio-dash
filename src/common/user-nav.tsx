@@ -19,10 +19,14 @@ import {
 import { Separator } from "@radix-ui/react-select";
 
 export function UserNav() {
-  const [isConnect, setIsConnent] = useState(false);
+  // const [isConnect, setIsConnent] = useState(false);
   const [isUnisatConnect, setIsUnisatConnect] = useState(false);
   const [isJoyIDConnect, setIsJoyIDConnect] = useState(false);
   const [isOKXConnect, setIsOKXConnect] = useState(false);
+  const [isOpen, setIsOpen] = useState(
+    DataManager.instance.accounts.length <= 0 ? true : false
+  );
+
   const { toast } = useToast();
 
   const handlerUnisat = () => {
@@ -154,9 +158,9 @@ export function UserNav() {
   // detect BTC and CKB wallet is both connected
 
   const detectWallet = () => {
-    setIsConnent(
-      (isJoyIDConnect && isOKXConnect) || (isJoyIDConnect && isUnisatConnect)
-    );
+    // setIsConnent(
+    //   (isJoyIDConnect && isOKXConnect) || (isJoyIDConnect && isUnisatConnect)
+    // );
   };
 
   // const handleDisconnect = () => {
@@ -169,14 +173,32 @@ export function UserNav() {
     console.log(e);
 
     if (!e) {
+      handleConfirmConnect();
+    } else {
+      setIsOpen(true);
+    }
+  };
+
+  const handleConfirmConnect = () => {
+    if (DataManager.instance.accounts.length > 0) {
+      setIsOpen(false);
+
       EventManager.instance.publish(EventType.team_switcher_reload, {});
+    } else {
+      toast({
+        title: "Warning",
+        description: "Must connect a wallet",
+        variant: "destructive",
+      });
+
+      setIsOpen(true);
     }
   };
 
   return (
     <div>
       <div className="">
-        <Dialog onOpenChange={handleOpenChange}>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button className="relative rounded-full border-none font-SourceSanPro">
               Connect Wallet
@@ -221,9 +243,7 @@ export function UserNav() {
               </div>
             </div>
             <DialogFooter>
-              <Button disabled={isConnect} type="submit">
-                Confirm Connect
-              </Button>
+              <Button onClick={handleConfirmConnect}>Confirm Connect</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
