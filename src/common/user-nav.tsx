@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 
 import { useToast } from "@/components/ui/use-toast";
 import { EventType } from "@/lib/enum";
-import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { BtcHepler } from "@/lib/wallet/BtcHelper";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
@@ -25,7 +24,10 @@ export const UserNav = observer(() => {
   const [isUnisatConnect, setIsUnisatConnect] = useState(false);
   const [isJoyIDConnect, setIsJoyIDConnect] = useState(false);
   const [isOKXConnect, setIsOKXConnect] = useState(false);
-  const [isOpen, setIsOpen] = useState(accountStore.accounts ? false : true);
+  const [isBtcJoyIDConnect, setIsBtcJoyIDConnect] = useState(false);
+  const [isOpen, setIsOpen] = useState(
+    accountStore.totalAddress() > 0 ? false : true
+  );
 
   const { toast } = useToast();
 
@@ -36,17 +38,6 @@ export const UserNav = observer(() => {
         const { accounts, pubkey } = rs;
         console.log(accounts);
 
-        // DataManager.instance.curWalletType = "unisat";
-        // DataManager.instance.curWalletAddr = accounts[0];
-        // DataManager.instance.curWalletPubKey = pubkey;
-
-        DataManager.instance.walletInfo[accounts[0]] = {
-          address: accounts[0],
-          type: "unisat",
-          pubkey: pubkey,
-          chain: "BTC",
-        };
-
         accountStore.addAccount({
           address: accounts[0],
           type: "unisat",
@@ -54,19 +45,8 @@ export const UserNav = observer(() => {
           chain: "BTC",
         });
 
-        const canFind = DataManager.instance.accounts.find(
-          (v) => v.addr == accounts[0]
-        );
-        if (!canFind) {
-          DataManager.instance.accounts.push({
-            chain: "BTC",
-            addr: accounts[0],
-          });
-        }
-
         setIsUnisatConnect(true);
         setDefaultAddress(accounts[0]);
-        EventManager.instance.publish(EventType.transfer_reload_page, {});
       })
       .catch((err) => {
         console.error(err);
@@ -129,17 +109,38 @@ export const UserNav = observer(() => {
       });
   };
 
+  const handlerBtcJoyId = () => {
+    BtcHepler.instance
+      .joyId_onConnect()
+      .then((rs) => {
+        const { address, publicKey } = rs;
+        console.log(address, publicKey);
+
+        accountStore.addAccount({
+          address: address,
+          type: "joyid",
+          pubkey: publicKey as string,
+          chain: "BTC",
+        });
+
+        setIsBtcJoyIDConnect(true);
+        setDefaultAddress(address);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast({
+          title: "Warning",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
+  };
+
   // detect BTC and CKB wallet is both connected
 
   const setDefaultAddress = (address: string) => {
     accountStore.setCurrentAddress(address);
   };
-
-  // const handleDisconnect = () => {
-  //   DataManager.instance.curWalletType = "none";
-  //   DataManager.instance.curWalletAddr = "";
-  //   setIsConnent(false);
-  // };
 
   const handleOpenChange = (e) => {
     // console.log(e);
@@ -152,7 +153,7 @@ export const UserNav = observer(() => {
   };
 
   const handleConfirmConnect = () => {
-    if (DataManager.instance.accounts.length > 0) {
+    if (accountStore.totalAddress() > 0) {
       setIsOpen(false);
 
       EventManager.instance.publish(EventType.team_switcher_reload, {});
@@ -184,6 +185,7 @@ export const UserNav = observer(() => {
               </DialogDescription>
             </DialogHeader>
             <Separator />
+            <h1>BTC</h1>
             <div className="flex flex-col gap-4">
               <div
                 onClick={handleOKX}
@@ -203,7 +205,19 @@ export const UserNav = observer(() => {
                 <img src="/unisat.png" width={24} height={24} />
                 <div>Unisat</div>
               </div>
+              <div className="flex flex-col gap-4">
+                <div
+                  className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-center items-center txt-center cursor
+                    ${isBtcJoyIDConnect ? "bg-green-200" : "border-primary005"}
+                  `}
+                  onClick={handlerBtcJoyId}
+                >
+                  <img src="/joyid.png" className="w-24" />
+                </div>
+              </div>
             </div>
+            <Separator />
+            <h1>CKB</h1>
             <div className="flex flex-col gap-4">
               <div
                 className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-center items-center txt-center cursor

@@ -2,6 +2,12 @@ import { DataManager } from "../manager/DataManager";
 import superagent from "superagent";
 import { isMainnet } from "./constants";
 import { WalletType, btc_AddressInfo, btc_TxInfo } from "../interface";
+import { initConfig } from "@joyid/bitcoin";
+import {
+  requestAccounts,
+  getPublicKey,
+  signPsbt as joyID_signPsbt,
+} from "@joyid/bitcoin";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -51,6 +57,23 @@ export class BtcHepler {
     } else {
       throw new Error("OKX Wallet is no installed!");
     }
+  }
+
+  async joyId_onConnect() {
+    initConfig({
+      // your app name
+      name: "JoyID demo",
+      // your app logo
+      logo: "https://fav.farm/🆔",
+      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
+      joyidAppURL: "https://testnet.joyid.dev",
+    });
+
+    const [address] = await requestAccounts();
+    const publicKey = getPublicKey();
+    console.log(address, publicKey);
+
+    return { address, publicKey };
   }
 
   // TODO:transfer btc
@@ -135,6 +158,9 @@ export class BtcHepler {
       } else {
         throw new Error("OKX Wallet is no installed!");
       }
+    } else if (walletType == "joyid") {
+      const result = await joyID_signPsbt(hex);
+      return result;
     }
 
     throw new Error("Please connect btc wallet");
@@ -175,6 +201,8 @@ export class BtcHepler {
       } else {
         throw new Error("OKX Wallet is no installed!");
       }
+    } else if (walletType == "joyid") {
+      console.log("TODO: joyid pushTx");
     }
 
     throw new Error("Please connect btc wallet");
@@ -252,6 +280,8 @@ export class BtcHepler {
       } else {
         throw new Error("OKX Wallet is no installed!");
       }
+    } else if (walletType == "joyid") {
+      console.log("TODO: joyid push psbt");
     }
 
     throw new Error("Please connect btc wallet");

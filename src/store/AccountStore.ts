@@ -1,14 +1,14 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable } from "mobx";
 
 export interface AccountType {
-    address: string;
-    pubkey: string;
-    type: string;
-    chain: string
+  address: string;
+  pubkey: string;
+  type: string;
+  chain: string;
 }
 
 class AccountStore {
-  accounts:AccountType[] = []; 
+  accounts: AccountType[] = [];
   currentAddress: string | null = null;
 
   constructor() {
@@ -17,7 +17,7 @@ class AccountStore {
   }
 
   loadAccounts() {
-    const accountsFromStorage = localStorage.getItem('accounts');
+    const accountsFromStorage = localStorage.getItem("accounts");
     if (accountsFromStorage) {
       this.accounts = JSON.parse(accountsFromStorage);
       this.setCurrentAddress(this.accounts[0].address);
@@ -25,30 +25,36 @@ class AccountStore {
   }
 
   saveAccounts() {
-    localStorage.setItem('accounts', JSON.stringify(this.accounts));
+    localStorage.setItem("accounts", JSON.stringify(this.accounts));
   }
 
   addAccount(account: AccountType) {
-    const index = this.accounts.findIndex(existingAccount => existingAccount.address === account.address);
+    const index = this.accounts.findIndex(
+      (existingAccount) => existingAccount.address === account.address
+    );
     if (index === -1) {
       this.accounts.push(account);
       this.saveAccounts();
-    } 
+    }
   }
 
   removeAccount(address) {
-    const index = this.accounts.findIndex(account => account === address);
+    const index = this.accounts.findIndex((account) => account === address);
     if (index > -1) {
-      this.accounts.splice(index, 1); 
-      this.saveAccounts(); 
+      this.accounts.splice(index, 1);
+      this.saveAccounts();
     }
   }
-  
+
   setCurrentAddress(address: string) {
-    const exists = this.accounts.some(account => account.address === address);
+    const exists = this.accounts.some((account) => account.address === address);
     if (exists) {
       this.currentAddress = address;
-    } 
+    }
+  }
+
+  totalAddress() {
+    return this.accounts.length;
   }
 }
 
