@@ -1,6 +1,10 @@
-import { DataManager } from "../manager/DataManager";
 import superagent from "superagent";
-import { isMainnet } from "./constants";
+import {
+  BTC_ASSETS_API_URL,
+  BTC_ASSETS_ORGIN,
+  BTC_ASSETS_TOKEN,
+  isMainnet,
+} from "./constants";
 import { WalletType, btc_AddressInfo, btc_TxInfo } from "../interface";
 import { initConfig } from "@joyid/bitcoin";
 import {
@@ -8,7 +12,7 @@ import {
   getPublicKey,
   signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
-import { accountStore } from "@/store/AccountStore";
+import { BtcAssetsApi } from "@rgbpp-sdk/service";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -77,41 +81,6 @@ export class BtcHepler {
     return { address, publicKey };
   }
 
-  // TODO:transfer btc
-  async transfer(toAddress: string, satoshis: number, feeRate?: number) {
-    const curAccount = DataManager.instance.getCurAccount();
-
-    if (!curAccount) {
-      throw new Error("Please choose a wallet");
-    }
-
-    const wallet = accountStore.getWallet(curAccount);
-    if (!wallet) {
-      throw new Error("Please choose a wallet");
-    }
-
-    switch (wallet.type) {
-      case "unisat":
-        // eslint-disable-next-line no-case-declarations, @typescript-eslint/no-explicit-any
-        const unisat = (window as any)["unisat"];
-        if (typeof unisat !== "undefined") {
-          console.log("UniSat Wallet is installed!");
-
-          const curNetwork = await unisat.getNetwork();
-          if (curNetwork == this._network) {
-            return unisat.sendBitcoin(toAddress, satoshis, { feeRate });
-          } else {
-            await unisat.switchNetwork(this._network);
-          }
-        }
-        break;
-      case "okx":
-        break;
-      default:
-        break;
-    }
-  }
-
   async getUtxo(address: string) {
     const result = await superagent
       .get(
@@ -165,48 +134,6 @@ export class BtcHepler {
     } else if (walletType == "joyid") {
       const result = await joyID_signPsbt(hex);
       return result;
-    }
-
-    throw new Error("Please connect btc wallet");
-  }
-
-  async pushTx(rawtx: string, walletType: WalletType) {
-    if (walletType == "unisat") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const unisat = (window as any)["unisat"];
-      if (typeof unisat !== "undefined") {
-        console.log("UniSat Wallet is installed!");
-
-        const curNetwork = await unisat.getNetwork();
-        if (curNetwork != this._network) {
-          await unisat.switchNetwork(this._network);
-        }
-
-        return unisat.pushTx({
-          rawtx: rawtx,
-        });
-      } else {
-        throw new Error("UniSat Wallet is no installed!");
-      }
-    } else if (walletType == "okx") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const okxwallet = (window as any)["okxwallet"];
-      if (typeof okxwallet !== "undefined") {
-        console.log("OKX is installed!");
-
-        // {address publicKey}
-        if (isMainnet) {
-          const result = await okxwallet.bitcoin.pushTx(rawtx);
-          return result;
-        } else {
-          const result = await okxwallet.bitcoinTestnet.pushTx(rawtx);
-          return result;
-        }
-      } else {
-        throw new Error("OKX Wallet is no installed!");
-      }
-    } else if (walletType == "joyid") {
-      console.log("TODO: joyid pushTx");
     }
 
     throw new Error("Please connect btc wallet");
@@ -285,7 +212,13 @@ export class BtcHepler {
         throw new Error("OKX Wallet is no installed!");
       }
     } else if (walletType == "joyid") {
-      console.log("TODO: joyid push psbt");
+      const service = BtcAssetsApi.fromToken(
+        BTC_ASSETS_API_URL,
+        BTC_ASSETS_TOKEN,
+        BTC_ASSETS_ORGIN
+      );
+      const { txid: btcTxId } = await service.sendBtcTransaction(psbtHex);
+      return btcTxId;
     }
 
     throw new Error("Please connect btc wallet");

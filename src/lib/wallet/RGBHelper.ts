@@ -1,4 +1,4 @@
-import { Script, helpers, utils } from "@ckb-lumos/lumos";
+import { BI, Script, helpers, utils } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -24,6 +24,7 @@ import { bytes } from "@ckb-lumos/codec";
 import { blockchain } from "@ckb-lumos/base";
 import {
   BTC_ASSETS_API_URL,
+  BTC_ASSETS_ORGIN,
   BTC_ASSETS_TOKEN,
   CKB_INDEX_URL,
   CKB_RPC_URL,
@@ -32,7 +33,7 @@ import {
   isMainnet,
   rgb_networkType,
 } from "./constants";
-import { DataSource, sendRgbppUtxos } from "@rgbpp-sdk/btc";
+import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { accountStore } from "@/store/AccountStore";
 
@@ -45,6 +46,58 @@ export class RGBHelper {
       RGBHelper._instance = new RGBHelper();
     }
     return this._instance;
+  }
+
+  // transfer btc
+  async transferBTC(toAddress: string, amount: BI) {
+    const curAccount = DataManager.instance.getCurAccount();
+
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const txHash = await this.buildSendBTC(
+      wallet as WalletInfo,
+      toAddress,
+      amount
+    );
+
+    return txHash;
+  }
+
+  async buildSendBTC(wallet: WalletInfo, toAddress: string, amount: BI) {
+    const networkType = rgb_networkType;
+    const service = BtcAssetsApi.fromToken(
+      BTC_ASSETS_API_URL,
+      BTC_ASSETS_TOKEN,
+      BTC_ASSETS_ORGIN
+    );
+    const source = new DataSource(service, networkType);
+
+    const psbt = await sendBtc({
+      tos: [
+        {
+          address: toAddress,
+          value: amount.toNumber(),
+        },
+      ],
+      source,
+      from: wallet.address,
+      fromPubkey: wallet.pubkey,
+    });
+
+    const psbtHex = await BtcHepler.instance.signPsdt(
+      psbt.toHex(),
+      wallet.type
+    );
+    const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, wallet.type);
+
+    return btcTxId;
   }
 
   async transfer_btc_to_btc(
@@ -160,7 +213,7 @@ export class RGBHelper {
     const service = BtcAssetsApi.fromToken(
       BTC_ASSETS_API_URL,
       BTC_ASSETS_TOKEN,
-      "http://localhost"
+      BTC_ASSETS_ORGIN
     );
     const source = new DataSource(service, networkType);
 
@@ -308,7 +361,7 @@ export class RGBHelper {
     const service = BtcAssetsApi.fromToken(
       BTC_ASSETS_API_URL,
       BTC_ASSETS_TOKEN,
-      "http://localhost"
+      BTC_ASSETS_ORGIN
     );
     const source = new DataSource(service, networkType);
 

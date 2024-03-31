@@ -12,13 +12,13 @@ import { TabsContent } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { DataManager } from "@/lib/manager/DataManager";
 import { sortStr } from "@/lib/utils";
-import { BtcHepler } from "@/lib/wallet/BtcHelper";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { parseUnit } from "@ckb-lumos/bi";
 import { observer } from "mobx-react";
 import { autorun } from "mobx";
 import { useEffect, useState } from "react";
 import { accountStore } from "@/store/AccountStore";
+import { RGBHelper } from "@/lib/wallet/RGBHelper";
 
 export const Send = observer(() => {
   const [receiveAddress, setReceiverAddress] = useState("");
@@ -71,9 +71,11 @@ export const Send = observer(() => {
           });
         });
     } else {
-      BtcHepler.instance
-        .transfer(receiveAddress.trim(), Number.parseFloat(amount.trim()))
+      RGBHelper.instance
+        .transferBTC(receiveAddress.trim(), parseUnit(amount.trim(), "ckb"))
         .then((rs) => {
+          console.log("Send BTC txHash", rs);
+
           toast({
             title: "Success",
             description: rs,
