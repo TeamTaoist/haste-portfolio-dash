@@ -22,13 +22,12 @@ import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { toast } from "@/components/ui/use-toast";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { BI } from "@ckb-lumos/lumos";
-// import { CkbHepler } from "@/lib/wallet/CkbHelper";
-// import { toast } from "@/components/ui/use-toast";
-// import { parseUnit } from "@ckb-lumos/bi";
+import { accountStore } from "@/store/AccountStore";
 
 export function TabRgb() {
   const [reload, setReload] = useState(false);
   const [toAddress, setToAddress] = useState<string>("");
+  const [isRgb, setIsRgb] = useState(true);
   // const [amount, setAmount] = useState<number>(0);
 
   useEffect(() => {
@@ -83,35 +82,41 @@ export function TabRgb() {
           return;
         }
 
-        RGBHelper.instance
-          .transfer_btc_to_ckb(
-            toAddress,
-            {
-              codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
-              hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
-              args: rs["data"]["attributes"]["type_script"]["args"],
-            },
-            BI.from(rgb.ckbCellInfo?.amount).toBigInt(),
-            rgb.txHash,
-            rgb.idx
-          )
-          .then((rs) => {
-            console.log("ckb to btc tx hash:", rs);
+        if (!isRgb) {
+          // transfer to other btc
+        } else {
+          RGBHelper.instance
+            .transfer_btc_to_ckb(
+              toAddress,
+              {
+                codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
+                hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
+                args: rs["data"]["attributes"]["type_script"]["args"],
+              },
+              BI.from(rgb.ckbCellInfo?.amount).toBigInt(),
+              rgb.txHash,
+              rgb.idx
+            )
+            .then((rs) => {
+              console.log("ckb to btc tx hash:", rs);
 
-            toast({
-              title: "Transfer Success",
-              description: rs,
-            });
-          })
-          .catch((err) => {
-            console.error(err.message);
+              toast({
+                title: "Success",
+                description: rs,
+              });
 
-            toast({
-              title: "Warning",
-              description: err.message,
-              variant: "destructive",
+              accountStore.setCurrentAddress(curAccount);
+            })
+            .catch((err) => {
+              console.error(err.message);
+
+              toast({
+                title: "Warning",
+                description: err.message,
+                variant: "destructive",
+              });
             });
-          });
+        }
       })
       .catch((err) => {
         console.error(err.message);
@@ -172,12 +177,17 @@ export function TabRgb() {
                   <DialogContent className="sm:max-w-[425px]">
                     <Tabs defaultValue="rgb++" className="w-[100%]">
                       <TabsList className="w-[100%]">
-                        <TabsTrigger value="rgb++" className="w-[50%]">
+                        <TabsTrigger
+                          value="rgb++"
+                          className="w-[50%]"
+                          onClick={() => setIsRgb(true)}
+                        >
                           RGB++
                         </TabsTrigger>
                         <TabsTrigger
                           value={rgb.ckbCellInfo.symbol}
                           className="w-[50%]"
+                          onClick={() => setIsRgb(false)}
                         >
                           {rgb.ckbCellInfo.symbol}
                         </TabsTrigger>

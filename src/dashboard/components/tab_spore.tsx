@@ -23,6 +23,7 @@ import { BI } from "@ckb-lumos/lumos";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
 import { blockchain } from "@ckb-lumos/base";
+import { accountStore } from "@/store/AccountStore";
 
 export function TabSpore() {
   const [reload, setReload] = useState(false);
@@ -82,6 +83,8 @@ export function TabSpore() {
           title: "Success",
           description: txHash,
         });
+
+        accountStore.setCurrentAddress(curAccount);
       })
       .catch((err) => {
         console.error(err.message);

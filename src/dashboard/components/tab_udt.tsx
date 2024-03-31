@@ -23,6 +23,7 @@ import { toast } from "@/components/ui/use-toast";
 import { parseUnit } from "@ckb-lumos/bi";
 import { TabsList } from "@radix-ui/react-tabs";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
+import { accountStore } from "@/store/AccountStore";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
@@ -127,9 +128,11 @@ export function TabUdt() {
                     console.log("ckb to btc tx hash:", rs);
 
                     toast({
-                      title: "Transfer Success",
+                      title: "Success",
                       description: rs,
                     });
+
+                    accountStore.setCurrentAddress(curAccount);
                   })
                   .catch((err) => {
                     console.error(err.message);
@@ -195,6 +198,8 @@ export function TabUdt() {
                 title: "Success",
                 description: txHash,
               });
+
+              accountStore.setCurrentAddress(curAccount);
             })
             .catch((err) => {
               console.error(err.message);
