@@ -12,6 +12,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function sortStr(input: string, len: number) {
+  if (!input) {
+    return "...";
+  }
+
   return (
     input.substring(0, len) +
     "..." +
