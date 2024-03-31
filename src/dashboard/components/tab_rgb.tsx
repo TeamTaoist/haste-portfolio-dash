@@ -18,6 +18,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RgbAssert } from "@/lib/interface";
+import { CkbHepler } from "@/lib/wallet/CkbHelper";
+import { toast } from "@/components/ui/use-toast";
+import { RGBHelper } from "@/lib/wallet/RGBHelper";
+import { BI } from "@ckb-lumos/lumos";
 // import { CkbHepler } from "@/lib/wallet/CkbHelper";
 // import { toast } from "@/components/ui/use-toast";
 // import { parseUnit } from "@ckb-lumos/bi";
@@ -45,7 +49,79 @@ export function TabRgb() {
   const rgbs = DataManager.instance.curRgbAssert;
 
   const handlerTransfer = (rgb: RgbAssert) => {
+    if (toAddress.length <= 0) {
+      toast({
+        title: "Warning",
+        description: "to address is empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
     console.log(rgb);
+    if (!rgb.ckbCellInfo) {
+      toast({
+        title: "Warning",
+        description: "No cell info",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    CkbHepler.instance
+      .getUDTInfo(rgb.ckbCellInfo.type_hash)
+      .then((rs) => {
+        console.log(rs);
+
+        const curAccount = DataManager.instance.getCurAccount();
+        if (!curAccount) {
+          toast({
+            title: "Warning",
+            description: "Please choose a wallet",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        RGBHelper.instance
+          .transfer_btc_to_ckb(
+            toAddress,
+            {
+              codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
+              hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
+              args: rs["data"]["attributes"]["type_script"]["args"],
+            },
+            BI.from(rgb.ckbCellInfo?.amount).toBigInt(),
+            rgb.txHash,
+            rgb.idx
+          )
+          .then((rs) => {
+            console.log("ckb to btc tx hash:", rs);
+
+            toast({
+              title: "Transfer Success",
+              description: rs,
+            });
+          })
+          .catch((err) => {
+            console.error(err.message);
+
+            toast({
+              title: "Warning",
+              description: err.message,
+              variant: "destructive",
+            });
+          });
+      })
+      .catch((err) => {
+        console.error(err.message);
+
+        toast({
+          title: "Warning",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
   };
 
   const handlerDialogOpenChange = (e) => {

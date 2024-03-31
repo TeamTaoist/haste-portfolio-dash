@@ -267,9 +267,9 @@ export class RGBHelper {
     );
     const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, btcWallet.type);
 
-    console.log("BTC Tx bytes: ", psbtHex);
-    console.log("BTC TxId: ", btcTxId);
-    console.log("ckbRawTx", JSON.stringify(ckbRawTx));
+    // console.log("BTC Tx bytes: ", psbtHex);
+    // console.log("BTC TxId: ", btcTxId);
+    // console.log("ckbRawTx", JSON.stringify(ckbRawTx));
 
     const rgbppState = await service.sendRgbppCkbTransaction({
       btc_txid: btcTxId,
