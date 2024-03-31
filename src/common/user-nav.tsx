@@ -170,7 +170,7 @@ export function UserNav() {
   // };
 
   const handleOpenChange = (e) => {
-    console.log(e);
+    // console.log(e);
 
     if (!e) {
       handleConfirmConnect();
