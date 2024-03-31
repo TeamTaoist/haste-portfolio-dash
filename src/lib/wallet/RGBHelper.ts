@@ -26,12 +26,13 @@ import {
   BTC_ASSETS_TOKEN,
   CKB_INDEX_URL,
   CKB_RPC_URL,
-  getSporeDep,
-  getSporeTypeScript,
+  // getSporeDep,
+  // getSporeTypeScript,
   isMainnet,
 } from "./constants";
 import { DataSource, NetworkType, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
+import { accountStore } from "@/store/AccountStore";
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -44,8 +45,11 @@ export class RGBHelper {
     return this._instance;
   }
 
+  async transfer_btc_to_btc() {}
+
   async transfer_ckb_to_btc(
-    btc_address: string,
+    btcTxHash: string,
+    btcTxIdx: number,
     typeScript: Script,
     amount: bigint = 0n
   ) {
@@ -54,11 +58,16 @@ export class RGBHelper {
       throw new Error("Please choose a wallet");
     }
 
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+
+    console.log("cur wallet", curAccount, wallet);
 
     const unsignedRawTx = await this.ckb_to_btc_buildTx(
-      btc_address,
-      wallet,
+      buildRgbppLockArgs(btcTxIdx, btcTxHash),
+      wallet as WalletInfo,
       typeScript,
       amount
     );
@@ -78,47 +87,40 @@ export class RGBHelper {
   async transfer_btc_to_ckb(
     toCkbAddress: string,
     typeScript: Script,
-    transferAmount: bigint
+    transferAmount: bigint,
+    btcTxHash: string,
+    btcTxIdx: number
   ) {
     const curAccount = DataManager.instance.getCurAccount();
     if (!curAccount) {
       throw new Error("Please choose a wallet");
     }
 
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     if (wallet.chain != "BTC") return;
 
     const txHash = await this.btc_to_ckb_buildTx(
-      [
-        buildRgbppLockArgs(
-          1,
-          "e68477d85e80bbdd66985d3f774f6674eb8b9d40df4a04eb07ba5dd3ab644636"
-        ),
-      ],
+      [buildRgbppLockArgs(btcTxIdx, btcTxHash)],
       toCkbAddress,
       transferAmount,
       typeScript,
-      wallet
+      wallet as WalletInfo
     );
 
     return txHash;
   }
 
   async ckb_to_btc_buildTx(
-    btc_address: string,
+    toRgbppLockArgs: string,
     ckb_wallet: WalletInfo,
     typeScript: Script,
     amount: bigint = 0n
   ) {
     if (ckb_wallet.chain == "BTC") return;
-
-    await this.getCanUseUtxo(btc_address);
-    // if (!utxo) {
-    //   throw new Error("No can use utxo");
-    // }
-
-    // console.log(utxo);
 
     const sudtBalance = await CkbHepler.instance.sudtBalance(
       ckb_wallet.address,
@@ -131,23 +133,16 @@ export class RGBHelper {
       ckbIndexerUrl: CKB_INDEX_URL,
     });
 
-    const toRgbppLockArgs = buildRgbppLockArgs(
-      1,
-      "e68477d85e80bbdd66985d3f774f6674eb8b9d40df4a04eb07ba5dd3ab644636"
-    );
-
-    console.log(toRgbppLockArgs);
-
-    let assertCellDeps = helpers.locateCellDep(typeScript);
-    if (assertCellDeps == null) {
-      const sporeScript = getSporeTypeScript(isMainnet);
-      if (sporeScript.codeHash == typeScript.codeHash) {
-        assertCellDeps = getSporeDep(isMainnet);
-      }
-      if (assertCellDeps == null) {
-        throw new Error("No cell deps");
-      }
-    }
+    // let assertCellDeps = helpers.locateCellDep(typeScript);
+    // if (assertCellDeps == null) {
+    //   const sporeScript = getSporeTypeScript(isMainnet);
+    //   if (sporeScript.codeHash == typeScript.codeHash) {
+    //     assertCellDeps = getSporeDep(isMainnet);
+    //   }
+    //   if (assertCellDeps == null) {
+    //     throw new Error("No cell deps");
+    //   }
+    // }
 
     const ckbRawTx = await genCkbJumpBtcVirtualTx({
       collector,
@@ -197,7 +192,7 @@ export class RGBHelper {
         cellDeps: [
           ...ckbRawTx.cellDeps,
           getJoyIDCellDep(isMainnet),
-          assertCellDeps,
+          // assertCellDeps,
         ],
         witnesses: [witness, ...ckbRawTx.witnesses.slice(1)],
       };
@@ -231,16 +226,16 @@ export class RGBHelper {
     );
     const source = new DataSource(service, networkType);
 
-    let assertCellDeps = helpers.locateCellDep(typeScript);
-    if (assertCellDeps == null) {
-      const sporeScript = getSporeTypeScript(isMainnet);
-      if (sporeScript.codeHash == typeScript.codeHash) {
-        assertCellDeps = getSporeDep(isMainnet);
-      }
-      if (assertCellDeps == null) {
-        throw new Error("No cell deps");
-      }
-    }
+    // let assertCellDeps = helpers.locateCellDep(typeScript);
+    // if (assertCellDeps == null) {
+    //   const sporeScript = getSporeTypeScript(isMainnet);
+    //   if (sporeScript.codeHash == typeScript.codeHash) {
+    //     assertCellDeps = getSporeDep(isMainnet);
+    //   }
+    //   if (assertCellDeps == null) {
+    //     throw new Error("No cell deps");
+    //   }
+    // }
 
     const ckbVirtualTxResult = await genBtcJumpCkbVirtualTx({
       collector,
@@ -253,7 +248,7 @@ export class RGBHelper {
 
     const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
-    ckbRawTx.cellDeps.push(assertCellDeps);
+    // ckbRawTx.cellDeps.push(assertCellDeps);
 
     // Send BTC tx
     const psbt = await sendRgbppUtxos({
@@ -266,8 +261,11 @@ export class RGBHelper {
       source,
     });
     // psbt.signAllInputs(keyPair);
-    const psbtHex = await BtcHepler.instance.signPsdt(psbt.toHex(), "unisat");
-    const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, "unisat");
+    const psbtHex = await BtcHepler.instance.signPsdt(
+      psbt.toHex(),
+      btcWallet.type
+    );
+    const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, btcWallet.type);
 
     console.log("BTC Tx bytes: ", psbtHex);
     console.log("BTC TxId: ", btcTxId);
@@ -327,8 +325,12 @@ export class RGBHelper {
     const rgbAssertList: RgbAssert[] = [];
 
     if (result) {
-      const rgbppLockArgsList: { args: string; txHash: string; idx: number }[] =
-        [];
+      const rgbppLockArgsList: {
+        args: string;
+        txHash: string;
+        idx: number;
+        value: number;
+      }[] = [];
       for (let i = 0; i < result.length; i++) {
         const element = result[i];
         const rgbArgs = buildRgbppLockArgs(element.vout, element.txid);
@@ -336,6 +338,7 @@ export class RGBHelper {
           args: rgbArgs,
           txHash: element.txid,
           idx: element.vout,
+          value: element.value,
         });
       }
       const rgbppLocks = rgbppLockArgsList.map((item) => {
@@ -345,12 +348,14 @@ export class RGBHelper {
           lock,
           txHash: item.txHash,
           idx: item.idx,
+          value: item.value,
         };
       });
       // const xudtTypeScript = getXudtTypeScript(isMainnet);
       for await (const rgbppLock of rgbppLocks) {
         const address = helpers.encodeToAddress(rgbppLock.lock);
         const addressInfo = await CkbHepler.instance.getAddressInfo(address);
+        let findCell = false;
         if (addressInfo) {
           if (addressInfo.data.attributes.udt_accounts) {
             for (
@@ -363,9 +368,18 @@ export class RGBHelper {
                 txHash: rgbppLock.txHash,
                 idx: rgbppLock.idx,
                 ckbCellInfo: udt,
+                value: rgbppLock.value,
               });
+              findCell = true;
             }
           }
+        }
+        if (!findCell) {
+          rgbAssertList.push({
+            txHash: rgbppLock.txHash,
+            idx: rgbppLock.idx,
+            value: rgbppLock.value,
+          });
         }
       }
     }

@@ -242,7 +242,8 @@ export interface WalletInfo {
 export interface RgbAssert {
   txHash: string;
   idx: number;
-  ckbCellInfo: ckb_UDTInfo;
+  ckbCellInfo?: ckb_UDTInfo;
+  value: number;
 }
 
 // type

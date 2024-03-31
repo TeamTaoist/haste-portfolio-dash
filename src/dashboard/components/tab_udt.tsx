@@ -17,16 +17,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ckb_UDTInfo } from "@/lib/interface";
+import { RgbAssert, ckb_UDTInfo } from "@/lib/interface";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { toast } from "@/components/ui/use-toast";
 import { parseUnit } from "@ckb-lumos/bi";
 import { TabsList } from "@radix-ui/react-tabs";
+import { RGBHelper } from "@/lib/wallet/RGBHelper";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
   const [toAddress, setToAddress] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
+  const [isRgb, setIsRgb] = useState(true);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
@@ -66,54 +68,154 @@ export function TabUdt() {
 
     console.log(udt);
 
-    CkbHepler.instance
-      .getUDTInfo(udt.type_hash)
-      .then((rs) => {
-        console.log(rs);
-
-        const curAccount = DataManager.instance.getCurAccount();
-        if (!curAccount) {
-          toast({
-            title: "Warning",
-            description: "Please choose a wallet",
-            variant: "destructive",
+    if (isRgb) {
+      RGBHelper.instance
+        .getRgbppAssert(toAddress)
+        .then((rs) => {
+          rs.sort((a, b) => {
+            return a > b ? 1 : -1;
           });
-          return;
-        }
 
-        CkbHepler.instance
-          .transfer_udt({
-            from: curAccount,
-            to: toAddress,
-            amount: parseUnit(amount.toString(), "ckb"),
-          })
-          .then((txHash) => {
-            console.log("transfer udt txHash", txHash);
+          let findUtxo: RgbAssert | undefined = undefined;
+          for (let i = 0; i < rs.length; i++) {
+            const utxo = rs[i];
+            if (!utxo.ckbCellInfo) {
+              findUtxo = utxo;
+              break;
+            }
+          }
 
-            toast({
-              title: "Success",
-              description: txHash,
-            });
-          })
-          .catch((err) => {
-            console.error(err.message);
-
+          if (!findUtxo) {
             toast({
               title: "Warning",
-              description: err.message,
+              description: "No can use utxo",
               variant: "destructive",
             });
-          });
-      })
-      .catch((err) => {
-        console.error(err.message);
+            return;
+          }
 
-        toast({
-          title: "Warning",
-          description: err.message,
-          variant: "destructive",
+          CkbHepler.instance
+            .getUDTInfo(udt.type_hash)
+            .then((rs) => {
+              console.log(rs);
+
+              const curAccount = DataManager.instance.getCurAccount();
+              if (!curAccount) {
+                toast({
+                  title: "Warning",
+                  description: "Please choose a wallet",
+                  variant: "destructive",
+                });
+                return;
+              }
+
+              if (findUtxo) {
+                RGBHelper.instance
+                  .transfer_ckb_to_btc(
+                    findUtxo.txHash,
+                    findUtxo.idx,
+                    {
+                      codeHash:
+                        rs["data"]["attributes"]["type_script"]["code_hash"],
+                      hashType:
+                        rs["data"]["attributes"]["type_script"]["hash_type"],
+                      args: rs["data"]["attributes"]["type_script"]["args"],
+                    },
+                    parseUnit(amount.toString(), "ckb").toBigInt()
+                  )
+                  .then((rs) => {
+                    console.log("ckb to btc tx hash:", rs);
+
+                    toast({
+                      title: "Transfer Success",
+                      description: rs,
+                    });
+                  })
+                  .catch((err) => {
+                    console.error(err.message);
+
+                    toast({
+                      title: "Warning",
+                      description: err.message,
+                      variant: "destructive",
+                    });
+                  });
+              }
+            })
+            .catch((err) => {
+              console.error(err.message);
+
+              toast({
+                title: "Warning",
+                description: err.message,
+                variant: "destructive",
+              });
+            });
+        })
+        .catch((err) => {
+          console.error(err.message);
+
+          toast({
+            title: "Warning",
+            description: err.message,
+            variant: "destructive",
+          });
         });
-      });
+    } else {
+      CkbHepler.instance
+        .getUDTInfo(udt.type_hash)
+        .then((rs) => {
+          console.log(rs);
+
+          const curAccount = DataManager.instance.getCurAccount();
+          if (!curAccount) {
+            toast({
+              title: "Warning",
+              description: "Please choose a wallet",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          CkbHepler.instance
+            .transfer_udt({
+              from: curAccount,
+              to: toAddress,
+              amount: parseUnit(amount.toString(), "ckb"),
+              typeScript: {
+                codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
+                hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
+                args: rs["data"]["attributes"]["type_script"]["args"],
+              },
+            })
+            .then((txHash) => {
+              console.log("transfer udt txHash", txHash);
+
+              toast({
+                title: "Success",
+                description: txHash,
+              });
+            })
+            .catch((err) => {
+              console.error(err.message);
+
+              toast({
+                title: "Warning",
+                description: err.message,
+                variant: "destructive",
+              });
+            });
+        })
+        .catch((err) => {
+          console.error(err.message);
+
+          toast({
+            title: "Warning",
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    }
   };
 
   const handlerDialogOpenChange = (e) => {
@@ -160,16 +262,24 @@ export function TabUdt() {
                 <DialogContent className="bg-primary006 !border-none">
                   <Tabs defaultValue="rgb++" className="w-[100%]">
                     <TabsList className="w-[100%]">
-                      <TabsTrigger value="rgb++" className="w-[50%]">
+                      <TabsTrigger
+                        value="rgb++"
+                        className="w-[50%]"
+                        onClick={() => setIsRgb(true)}
+                      >
                         RGB++
                       </TabsTrigger>
-                      <TabsTrigger value={udt.symbol} className="w-[50%]">
+                      <TabsTrigger
+                        value={udt.symbol}
+                        className="w-[50%]"
+                        onClick={() => setIsRgb(false)}
+                      >
                         {udt.symbol}
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="rgb++">
                       <DialogHeader>
-                        <DialogTitle>Transfer RGB++</DialogTitle>
+                        <DialogTitle>Transfer to BTC use RGB++</DialogTitle>
                         <DialogDescription className="!text-white001">
                           * Make sure type correct wallet address
                         </DialogDescription>
@@ -178,7 +288,7 @@ export function TabUdt() {
                     <TabsContent value={udt.symbol}>
                       <DialogHeader>
                         <DialogTitle>Transfer {udt.symbol}</DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className="!text-white001">
                           * Make sure type correct wallet address
                         </DialogDescription>
                       </DialogHeader>

@@ -56,6 +56,13 @@ class AccountStore {
   totalAddress() {
     return this.accounts.length;
   }
+
+  getWallet(address) {
+    const exists = this.accounts.find((account) => account.address === address);
+    if (exists) {
+      return exists;
+    }
+  }
 }
 
 export const accountStore = new AccountStore();

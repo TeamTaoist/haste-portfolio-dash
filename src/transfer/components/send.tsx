@@ -18,6 +18,7 @@ import { parseUnit } from "@ckb-lumos/bi";
 import { observer } from "mobx-react";
 import { autorun } from "mobx";
 import { useEffect, useState } from "react";
+import { accountStore } from "@/store/AccountStore";
 
 export const Send = observer(() => {
   const [receiveAddress, setReceiverAddress] = useState("");
@@ -35,7 +36,10 @@ export const Send = observer(() => {
       });
       return;
     }
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     console.log(receiveAddress, amount, wallet.address);
 

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
@@ -46,65 +46,11 @@ export function TabRgb() {
 
   const handlerTransfer = (rgb: RgbAssert) => {
     console.log(rgb);
-
-    // if (amount <= 0) {
-    //   toast({
-    //     title: "Warning",
-    //     description: "Amount is wrong",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-    // if (toAddress.length <= 0) {
-    //   toast({
-    //     title: "Warning",
-    //     description: "to address is empty",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-    // console.log(udt);
-    // CkbHepler.instance
-    //   .getUDTInfo(udt.type_hash)
-    //   .then((rs) => {
-    //     console.log(rs);
-    //     const curAccount = DataManager.instance.getCurAccount();
-    //     CkbHepler.instance
-    //       .transfer_udt({
-    //         from: curAccount.addr,
-    //         to: toAddress,
-    //         amount: parseUnit(amount.toString(), "ckb"),
-    //       })
-    //       .then((txHash) => {
-    //         console.log("transfer udt txHash", txHash);
-    //         toast({
-    //           title: "Success",
-    //           description: txHash,
-    //         });
-    //       })
-    //       .catch((err) => {
-    //         console.error(err.message);
-    //         toast({
-    //           title: "Warning",
-    //           description: err.message,
-    //           variant: "destructive",
-    //         });
-    //       });
-    //   })
-    //   .catch((err) => {
-    //     console.error(err.message);
-    //     toast({
-    //       title: "Warning",
-    //       description: err.message,
-    //       variant: "destructive",
-    //     });
-    //   });
   };
 
   const handlerDialogOpenChange = (e) => {
     if (e) {
       setToAddress("");
-      // setAmount(0);
     }
   };
 
@@ -112,68 +58,100 @@ export function TabRgb() {
     <TabsContent value="RGB++" className="space-y-4">
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {rgbs.map((rgb) => (
-          <Card key={rgb.ckbCellInfo.type_hash}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {rgb.ckbCellInfo.udt_type}
-              </CardTitle>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="h-4 w-4 text-muted-foreground"
-              >
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatUnit(rgb.ckbCellInfo.amount, "ckb")}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {rgb.ckbCellInfo.symbol}
-              </p>
-              <Dialog onOpenChange={handlerDialogOpenChange}>
-                <DialogTrigger asChild>
-                  <Button className="relative mt-2 border-none font-SourceSanPro">
-                    Transfer {rgb.ckbCellInfo.symbol}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Transfer {rgb.ckbCellInfo.symbol}</DialogTitle>
-                    <DialogDescription>
-                      * Make sure type correct wallet address
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right">
-                      To Address
-                    </Label>
-                    <Input
-                      id="toAddress"
-                      value={toAddress}
-                      onChange={(e) => {
-                        setToAddress(e.target.value);
-                      }}
-                      className="col-span-3"
-                    />
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit" onClick={() => handlerTransfer(rgb)}>
-                      Confirm
+        {rgbs.map((rgb) =>
+          !rgb.ckbCellInfo ? (
+            ""
+          ) : (
+            <Card key={rgb.ckbCellInfo.type_hash}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {rgb.ckbCellInfo.udt_type}
+                </CardTitle>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  className="h-4 w-4 text-muted-foreground"
+                >
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatUnit(rgb.ckbCellInfo.amount, "ckb")}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {rgb.ckbCellInfo.symbol}
+                </p>
+                <Dialog onOpenChange={handlerDialogOpenChange}>
+                  <DialogTrigger asChild>
+                    <Button className="relative mt-2 border-none font-SourceSanPro">
+                      Transfer {rgb.ckbCellInfo.symbol}
                     </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </CardContent>
-          </Card>
-        ))}
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <Tabs defaultValue="rgb++" className="w-[100%]">
+                      <TabsList className="w-[100%]">
+                        <TabsTrigger value="rgb++" className="w-[50%]">
+                          RGB++
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value={rgb.ckbCellInfo.symbol}
+                          className="w-[50%]"
+                        >
+                          {rgb.ckbCellInfo.symbol}
+                        </TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="rgb++">
+                        <DialogHeader>
+                          <DialogTitle>Transfer to CKB use RGB++</DialogTitle>
+                          <DialogDescription className="!text-white001">
+                            * Make sure type correct wallet address
+                          </DialogDescription>
+                        </DialogHeader>
+                      </TabsContent>
+                      <TabsContent value={rgb.ckbCellInfo.symbol}>
+                        <DialogHeader>
+                          <DialogTitle>
+                            Transfer {rgb.ckbCellInfo.symbol}
+                          </DialogTitle>
+                          <DialogDescription className="!text-white001">
+                            * Make sure type correct wallet address
+                          </DialogDescription>
+                        </DialogHeader>
+                      </TabsContent>
+                    </Tabs>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="username" className="text-right">
+                        To Address
+                      </Label>
+                      <Input
+                        id="toAddress"
+                        value={toAddress}
+                        onChange={(e) => {
+                          setToAddress(e.target.value);
+                        }}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        type="submit"
+                        onClick={() => handlerTransfer(rgb)}
+                      >
+                        Confirm
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+          )
+        )}
       </div>
     </TabsContent>
   );

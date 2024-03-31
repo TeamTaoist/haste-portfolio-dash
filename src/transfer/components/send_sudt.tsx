@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { accountStore } from "@/store/AccountStore";
 
 export function SendSudt() {
   const [receiveAddress, setReceiverAddress] = useState("");
@@ -38,7 +39,10 @@ export function SendSudt() {
       });
       return;
     }
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     console.log(wallet.address);
     if (wallet.type == "joyid") {
@@ -80,7 +84,10 @@ export function SendSudt() {
       });
       return;
     }
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     console.log(receiveAddress, amount, wallet.address);
 

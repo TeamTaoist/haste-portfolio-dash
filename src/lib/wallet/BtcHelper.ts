@@ -8,6 +8,7 @@ import {
   getPublicKey,
   signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
+import { accountStore } from "@/store/AccountStore";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -84,7 +85,10 @@ export class BtcHepler {
       throw new Error("Please choose a wallet");
     }
 
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     switch (wallet.type) {
       case "unisat":

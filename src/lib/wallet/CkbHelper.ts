@@ -35,6 +35,7 @@ import { number, bytes } from "@ckb-lumos/codec";
 import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
 import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
+import { accountStore } from "@/store/AccountStore";
 
 config.initializeConfig(CONFIG);
 
@@ -81,7 +82,10 @@ export class CkbHepler {
       throw new Error("Please choose a wallet");
     }
 
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
@@ -105,7 +109,10 @@ export class CkbHepler {
   // transfer udt
   async transfer_udt(options: ckb_TransferOptions) {
     // const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[options.from];
+    const wallet = accountStore.getWallet(options.from);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
@@ -133,7 +140,10 @@ export class CkbHepler {
       throw new Error("Please choose a wallet");
     }
 
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     const unsigned = await this.sudt_buildIssueNewToken(issuer, amount);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
@@ -157,7 +167,10 @@ export class CkbHepler {
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
     // const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[options.from];
+    const wallet = accountStore.getWallet(options.from);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     if (wallet.type == "joyid") {
       const signed = await signRawTransaction(

@@ -13,6 +13,7 @@ import { toast } from "@/components/ui/use-toast";
 import { DataManager } from "@/lib/manager/DataManager";
 import { sortStr } from "@/lib/utils";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
+import { accountStore } from "@/store/AccountStore";
 import { useState } from "react";
 
 export function SendSpore() {
@@ -29,7 +30,10 @@ export function SendSpore() {
       return;
     }
 
-    const wallet = DataManager.instance.walletInfo[curAccount];
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
 
     console.log(receiveAddress, wallet.address);
 
