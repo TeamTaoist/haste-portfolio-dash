@@ -19,4 +19,7 @@ export enum EventType {
 
   // team switcher
   team_switcher_reload = "team_switcher_reload",
+
+  // main nav reload
+  main_nav_reload = "main_nav_reload",
 }

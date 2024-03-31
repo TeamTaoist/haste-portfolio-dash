@@ -1,12 +1,22 @@
+import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
+import { EventManager } from "@/lib/manager/EventManager";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 export function MainNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
+  const location = useLocation();
+
+  if (location.pathname == "/transfer") {
+    DataManager.instance.curMenu = "send&receive";
+  } else if (location.pathname == "/tx") {
+    DataManager.instance.curMenu = "transaction";
+  }
+
   const [menuType, setMenuType] = useState(DataManager.instance.curMenu);
 
   const handleClick = () => {
@@ -14,6 +24,16 @@ export function MainNav({
   };
 
   console.log(menuType);
+
+  const reload = () => {
+    setMenuType(DataManager.instance.curMenu);
+  };
+
+  useEffect(() => {
+    EventManager.instance.subscribe(EventType.main_nav_reload, reload);
+
+    return EventManager.instance.unsubscribe(EventType.main_nav_reload, reload);
+  }, []);
 
   return (
     <nav
@@ -24,7 +44,7 @@ export function MainNav({
         to="/"
         className={cn(
           "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
-          menuType == "asset" ? "text-primary004" : "",
+          menuType == "asset" ? "text-primary004" : ""
         )}
         onClick={() => {
           DataManager.instance.curMenu = "asset";
@@ -37,7 +57,7 @@ export function MainNav({
         to="/tx"
         className={cn(
           "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
-          menuType == "transaction" ? "text-primary004" : "",
+          menuType == "transaction" ? "text-primary004" : ""
         )}
         onClick={() => {
           DataManager.instance.curMenu = "transaction";
@@ -50,8 +70,7 @@ export function MainNav({
         to="/transfer"
         className={cn(
           "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
-          menuType == "send&receive" ? "text-primary004" : "",
-          "text-white001"
+          menuType == "send&receive" ? "text-primary004" : ""
         )}
         onClick={() => {
           DataManager.instance.curMenu = "send&receive";

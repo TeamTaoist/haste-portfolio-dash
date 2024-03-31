@@ -12,6 +12,9 @@ export default function Transaction() {
   const location = useLocation();
 
   useEffect(() => {
+    DataManager.instance.curMenu = "transaction";
+    EventManager.instance.publish(EventType.main_nav_reload, {});
+
     console.log("Location changed!", location.pathname);
     if (location.pathname != DataManager.instance.curPath) {
       DataManager.instance.curPath = location.pathname;

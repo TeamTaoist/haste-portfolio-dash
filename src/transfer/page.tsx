@@ -4,6 +4,8 @@ import { Receive } from "./components/receive";
 import { useEffect, useState } from "react";
 import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
+import { DataManager } from "@/lib/manager/DataManager";
+import { useLocation } from "react-router-dom";
 // import { SendSudt } from "./components/send_sudt";
 // import { SendSpore } from "./components/send_spore";
 // import { CkbToBtc } from "./components/ckb_to_btc";
@@ -11,6 +13,18 @@ import { EventType } from "@/lib/enum";
 
 export function Transfer() {
   const [reload, setReload] = useState(false);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    DataManager.instance.curMenu = "send&receive";
+    EventManager.instance.publish(EventType.main_nav_reload, {});
+
+    console.log("Location changed!", location.pathname);
+    if (location.pathname != DataManager.instance.curPath) {
+      DataManager.instance.curPath = location.pathname;
+    }
+  }, [location]);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.transfer_reload_page, () => {
