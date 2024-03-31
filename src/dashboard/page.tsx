@@ -6,34 +6,36 @@ import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
 import { TabUdt } from "./components/tab_udt";
 import { TabSpore } from "./components/tab_spore";
-import { useLocation } from "react-router-dom";
-import { DataManager } from "@/lib/manager/DataManager";
+// import { useLocation } from "react-router-dom";
+// import { DataManager } from "@/lib/manager/DataManager";
 import { HttpManager } from "@/lib/api/HttpManager";
 import { TabRgb } from "./components/tab_rgb";
 import { observer } from "mobx-react";
+import { autorun } from "mobx";
+import { accountStore } from "@/store/AccountStore";
 
 const Dashboard = observer(() => {
   const [hideTab, setHideTab] = useState(true);
 
-  const location = useLocation();
+  // const location = useLocation();
 
   const [hide, setHide] = useState(false);
 
   const [tabValue, setTabValue] = useState<string>("");
 
-  useEffect(() => {
-    DataManager.instance.curMenu = "asset";
-    EventManager.instance.publish(EventType.main_nav_reload, {});
+  // useEffect(() => {
+  //   DataManager.instance.curMenu = "asset";
+  //   EventManager.instance.publish(EventType.main_nav_reload, {});
 
-    console.log("Location changed!", location.pathname);
-    if (location.pathname != DataManager.instance.curPath) {
-      DataManager.instance.curPath = location.pathname;
-      const curAccount = DataManager.instance.getCurAccount();
-      if (curAccount) {
-        HttpManager.instance.getAsset(curAccount.addr);
-      }
-    }
-  }, [location]);
+  //   console.log("Location changed!", location.pathname);
+  //   if (location.pathname != DataManager.instance.curPath) {
+  //     DataManager.instance.curPath = location.pathname;
+  //     const curAccount = DataManager.instance.getCurAccount();
+  //     if (curAccount) {
+  //       HttpManager.instance.getAsset(curAccount);
+  //     }
+  //   }
+  // }, [location]);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_page_show_tabs, () => {
@@ -79,6 +81,22 @@ const Dashboard = observer(() => {
     };
   }, []);
 
+  const getAssetData = async () => {
+    if (accountStore.currentAddress) {
+      await HttpManager.instance.getAsset(accountStore.currentAddress);
+    }
+  };
+
+  useEffect(() => {
+    const disposer = autorun(() => {
+      console.log(accountStore.currentAddress);
+      if (accountStore.currentAddress) {
+        getAssetData();
+      }
+    });
+    return () => disposer();
+  }, []);
+
   return (
     <>
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -121,6 +139,6 @@ const Dashboard = observer(() => {
       </div>
     </>
   );
-})
+});
 
-export default Dashboard
+export default Dashboard;

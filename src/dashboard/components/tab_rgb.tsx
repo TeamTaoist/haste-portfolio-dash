@@ -151,20 +151,6 @@ export function TabRgb() {
                       * Make sure type correct wallet address
                     </DialogDescription>
                   </DialogHeader>
-                  {/* <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="username" className="text-right">
-                      Amount
-                    </Label>
-                    <Input
-                      id="toAddress"
-                      type="number"
-                      value={amount}
-                      onChange={(e) => {
-                        setAmount(parseFloat(e.target.value));
-                      }}
-                      className="col-span-3"
-                    />
-                  </div> */}
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="username" className="text-right">
                       To Address

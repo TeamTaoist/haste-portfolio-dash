@@ -77,7 +77,11 @@ export class CkbHepler {
   // transfer ckb
   async transfer_ckb(options: ckb_TransferOptions) {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
@@ -125,7 +129,12 @@ export class CkbHepler {
   // deploy new sudt token
   async deploy_sudt(issuer: string, amount: number) {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     const unsigned = await this.sudt_buildIssueNewToken(issuer, amount);
     const tx = helpers.createTransactionFromSkeleton(unsigned);

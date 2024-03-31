@@ -57,7 +57,11 @@ export class BtcHepler {
   async transfer(toAddress: string, satoshis: number, feeRate?: number) {
     const curAccount = DataManager.instance.getCurAccount();
 
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     switch (wallet.type) {
       case "unisat":

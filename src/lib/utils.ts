@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function sortStr(input: string, len: number) {
+export function sortStr(input: string | null | undefined, len: number) {
   if (!input) {
     return "...";
   }

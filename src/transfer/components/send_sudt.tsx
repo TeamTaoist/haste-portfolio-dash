@@ -30,7 +30,15 @@ export function SendSudt() {
 
   const handlerDeployNewToken = () => {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      toast({
+        title: "Warning",
+        description: "Please choose a wallet",
+        variant: "destructive",
+      });
+      return;
+    }
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     console.log(wallet.address);
     if (wallet.type == "joyid") {
@@ -64,7 +72,15 @@ export function SendSudt() {
 
   const handleSend = () => {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      toast({
+        title: "Warning",
+        description: "Please choose a wallet",
+        variant: "destructive",
+      });
+      return;
+    }
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     console.log(receiveAddress, amount, wallet.address);
 
@@ -167,7 +183,7 @@ export function SendSudt() {
                   Send Address
                 </Label>
                 <Label htmlFor="name">
-                  {sortStr(DataManager.instance.getCurAccount()?.addr, 6)}
+                  {sortStr(DataManager.instance.getCurAccount(), 6)}
                 </Label>
               </div>
             </div>

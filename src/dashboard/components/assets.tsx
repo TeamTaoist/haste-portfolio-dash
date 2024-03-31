@@ -4,12 +4,8 @@ import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { useEffect, useState } from "react";
 import { formatUnit } from "@ckb-lumos/bi";
-import { observer } from "mobx-react";
-import { accountStore } from "@/store/AccountStore";
-import { HttpManager } from "@/lib/api/HttpManager";
-import { autorun } from "mobx";
 
-export const Assets = observer(() => {
+export const Assets = () => {
   const assetList = DataManager.instance.curAsset;
   const [hide, setHide] = useState(false);
 
@@ -30,30 +26,35 @@ export const Assets = observer(() => {
       });
     };
   }, []);
-  
-  const getAssetData = async () => {
-    if (accountStore.currentAddress) {
-      await HttpManager.instance.getAsset(accountStore.currentAddress)
-    }
-  }
-
-  useEffect(() => {
-    const disposer = autorun(() => {
-      console.log(accountStore.currentAddress)
-      if (accountStore.currentAddress) {
-        getAssetData();
-      }
-    })
-    return () => disposer();
-  }, [])
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 ">
       {assetList.map((asset) => (
-        <Card key={asset.chain} hidden={hide} className="bg-primary004 border-2 border-primary006">
+        <Card
+          key={asset.chain}
+          hidden={hide}
+          className="bg-primary004 border-2 border-primary006"
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white001 font-Montserrat">{asset.chain}</CardTitle>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#faf9f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>          </CardHeader>
+            <CardTitle className="text-sm font-medium text-white001 font-Montserrat">
+              {asset.chain}
+            </CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#faf9f9"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              className="lucide lucide-dollar-sign"
+            >
+              <line x1="12" x2="12" y1="2" y2="22" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>{" "}
+          </CardHeader>
           <CardContent className="pb-4 text-left">
             <div className="text-2xl font-bold text-white">
               {formatUnit(asset.balance, "ckb")}
@@ -63,5 +64,4 @@ export const Assets = observer(() => {
       ))}
     </div>
   );
-}
-)
+};

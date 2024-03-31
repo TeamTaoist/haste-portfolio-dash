@@ -72,9 +72,18 @@ export function TabUdt() {
         console.log(rs);
 
         const curAccount = DataManager.instance.getCurAccount();
+        if (!curAccount) {
+          toast({
+            title: "Warning",
+            description: "Please choose a wallet",
+            variant: "destructive",
+          });
+          return;
+        }
+
         CkbHepler.instance
           .transfer_udt({
-            from: curAccount.addr,
+            from: curAccount,
             to: toAddress,
             amount: parseUnit(amount.toString(), "ckb"),
           })
@@ -149,28 +158,32 @@ export function TabUdt() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-primary006 !border-none">
-                <Tabs defaultValue="rgb++" className="w-[100%]">
-                  <TabsList className="w-[100%]">
-                    <TabsTrigger value="rgb++" className="w-[50%]">RGB++</TabsTrigger>
-                    <TabsTrigger value={udt.symbol} className="w-[50%]">{udt.symbol}</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="rgb++">
-                    <DialogHeader>
-                      <DialogTitle>Transfer RGB++</DialogTitle>
-                      <DialogDescription className="!text-white001">
-                        * Make sure type correct wallet address
-                      </DialogDescription>
-                    </DialogHeader>
-                  </TabsContent>
-                  <TabsContent value={udt.symbol}>
-                    <DialogHeader>
-                      <DialogTitle>Transfer {udt.symbol}</DialogTitle>
-                      <DialogDescription>
-                        * Make sure type correct wallet address
-                      </DialogDescription>
-                    </DialogHeader>
-                  </TabsContent>
-                </Tabs>
+                  <Tabs defaultValue="rgb++" className="w-[100%]">
+                    <TabsList className="w-[100%]">
+                      <TabsTrigger value="rgb++" className="w-[50%]">
+                        RGB++
+                      </TabsTrigger>
+                      <TabsTrigger value={udt.symbol} className="w-[50%]">
+                        {udt.symbol}
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="rgb++">
+                      <DialogHeader>
+                        <DialogTitle>Transfer RGB++</DialogTitle>
+                        <DialogDescription className="!text-white001">
+                          * Make sure type correct wallet address
+                        </DialogDescription>
+                      </DialogHeader>
+                    </TabsContent>
+                    <TabsContent value={udt.symbol}>
+                      <DialogHeader>
+                        <DialogTitle>Transfer {udt.symbol}</DialogTitle>
+                        <DialogDescription>
+                          * Make sure type correct wallet address
+                        </DialogDescription>
+                      </DialogHeader>
+                    </TabsContent>
+                  </Tabs>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="username" className="text-right">
                       Amount

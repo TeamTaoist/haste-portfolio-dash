@@ -20,7 +20,16 @@ export function SendSpore() {
 
   const handleSend = () => {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      toast({
+        title: "Warning",
+        description: "Please choose a wallet",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     console.log(receiveAddress, wallet.address);
 
@@ -88,7 +97,7 @@ export function SendSpore() {
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Send Address</Label>
                 <Label htmlFor="name">
-                  {sortStr(DataManager.instance.getCurAccount()?.addr, 6)}
+                  {sortStr(DataManager.instance.getCurAccount(), 6)}
                 </Label>
               </div>
             </div>

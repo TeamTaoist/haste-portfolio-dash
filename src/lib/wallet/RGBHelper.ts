@@ -50,7 +50,11 @@ export class RGBHelper {
     amount: bigint = 0n
   ) {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     const unsignedRawTx = await this.ckb_to_btc_buildTx(
       btc_address,
@@ -77,7 +81,11 @@ export class RGBHelper {
     transferAmount: bigint
   ) {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     if (wallet.chain != "BTC") return;
 

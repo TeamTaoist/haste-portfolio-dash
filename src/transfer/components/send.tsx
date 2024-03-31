@@ -15,9 +15,11 @@ import { sortStr } from "@/lib/utils";
 import { BtcHepler } from "@/lib/wallet/BtcHelper";
 import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { parseUnit } from "@ckb-lumos/bi";
-import { useState } from "react";
+import { observer } from "mobx-react";
+import { autorun } from "mobx";
+import { useEffect, useState } from "react";
 
-export function Send() {
+export const Send = observer(() => {
   const [receiveAddress, setReceiverAddress] = useState("");
   const [amount, setAmount] = useState("");
 
@@ -25,7 +27,15 @@ export function Send() {
 
   const handleSend = () => {
     const curAccount = DataManager.instance.getCurAccount();
-    const wallet = DataManager.instance.walletInfo[curAccount.addr];
+    if (!curAccount) {
+      toast({
+        title: "Warning",
+        description: "Please choose a wallet",
+        variant: "destructive",
+      });
+      return;
+    }
+    const wallet = DataManager.instance.walletInfo[curAccount];
 
     console.log(receiveAddress, amount, wallet.address);
 
@@ -77,6 +87,11 @@ export function Send() {
     }
   };
 
+  useEffect(() => {
+    const disposer = autorun(() => {});
+    return () => disposer();
+  }, []);
+
   return (
     <TabsContent value="Send" className="space-y-4">
       <Card className="w-[350px]">
@@ -108,7 +123,7 @@ export function Send() {
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Send Address</Label>
                 <Label htmlFor="name">
-                  {sortStr(DataManager.instance.getCurAccount()?.addr, 6)}
+                  {sortStr(DataManager.instance.getCurAccount(), 6)}
                 </Label>
               </div>
             </div>
@@ -123,4 +138,4 @@ export function Send() {
       </Card>
     </TabsContent>
   );
-}
+});

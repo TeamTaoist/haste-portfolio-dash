@@ -1,3 +1,4 @@
+import { accountStore } from "@/store/AccountStore";
 import {
   AccountData,
   AssetInfo,
@@ -21,7 +22,7 @@ export class DataManager {
   }
 
   public getCurAccount() {
-    return this._accounts[this._curAccount];
+    return accountStore.currentAddress;
   }
 
   private _accounts: AccountData[] = [];

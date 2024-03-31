@@ -59,9 +59,18 @@ export function TabSpore() {
     console.log("spore type script:", sporeTypeScript);
 
     const curAccount = DataManager.instance.getCurAccount();
+    if (!curAccount) {
+      toast({
+        title: "Warning",
+        description: "Please choose a wallet",
+        variant: "destructive",
+      });
+      return;
+    }
+
     CkbHepler.instance
       .transfer_spore({
-        from: curAccount.addr,
+        from: curAccount,
         to: toAddress,
         amount: BI.from(0),
         typeScript: sporeTypeScript,

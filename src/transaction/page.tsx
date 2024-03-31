@@ -2,28 +2,28 @@ import { TransactionItem } from "./components/transactionItem";
 import { useEffect, useState } from "react";
 import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
-import { useLocation } from "react-router-dom";
-import { DataManager } from "@/lib/manager/DataManager";
-import { HttpManager } from "@/lib/api/HttpManager";
+// import { useLocation } from "react-router-dom";
+// import { DataManager } from "@/lib/manager/DataManager";
+// import { HttpManager } from "@/lib/api/HttpManager";
 
 export default function Transaction() {
   const [reload, setReload] = useState(false);
 
-  const location = useLocation();
+  // const location = useLocation();
 
-  useEffect(() => {
-    DataManager.instance.curMenu = "transaction";
-    EventManager.instance.publish(EventType.main_nav_reload, {});
+  // useEffect(() => {
+  //   DataManager.instance.curMenu = "transaction";
+  //   EventManager.instance.publish(EventType.main_nav_reload, {});
 
-    console.log("Location changed!", location.pathname);
-    if (location.pathname != DataManager.instance.curPath) {
-      DataManager.instance.curPath = location.pathname;
-      const curAccount = DataManager.instance.getCurAccount();
-      if (curAccount) {
-        HttpManager.instance.getTransactions(curAccount.addr);
-      }
-    }
-  }, [location]);
+  //   console.log("Location changed!", location.pathname);
+  //   if (location.pathname != DataManager.instance.curPath) {
+  //     DataManager.instance.curPath = location.pathname;
+  //     const curAccount = DataManager.instance.getCurAccount();
+  //     if (curAccount) {
+  //       HttpManager.instance.getTransactions(curAccount);
+  //     }
+  //   }
+  // }, [location]);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.transaction_reload_page, () => {

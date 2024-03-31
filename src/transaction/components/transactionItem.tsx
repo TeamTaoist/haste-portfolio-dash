@@ -49,12 +49,12 @@ export const TransactionItem = observer(() => {
 
   useEffect(() => {
     const disposer = autorun(() => {
-      if(accountStore.currentAddress) {
-        HttpManager.instance.getTransactions(accountStore.currentAddress)
-      }  
-    })
+      if (accountStore.currentAddress) {
+        HttpManager.instance.getTransactions(accountStore.currentAddress);
+      }
+    });
     return () => disposer();
-  }, [])
+  }, []);
 
   return (
     <>
@@ -104,5 +104,4 @@ export const TransactionItem = observer(() => {
       </ScrollArea>
     </>
   );
-}
-)
+});
