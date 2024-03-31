@@ -21,8 +21,6 @@ import { RgbAssert } from "@/lib/interface";
 // import { CkbHepler } from "@/lib/wallet/CkbHelper";
 // import { toast } from "@/components/ui/use-toast";
 // import { parseUnit } from "@ckb-lumos/bi";
-import { Script, utils } from "@ckb-lumos/lumos";
-import { number } from "@ckb-lumos/codec";
 
 export function TabRgb() {
   const [reload, setReload] = useState(false);
@@ -115,12 +113,10 @@ export function TabRgb() {
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {rgbs.map((rgb) => (
-          <Card
-            key={utils.computeScriptHash(rgb.ckbCell.cellOutput.type as Script)}
-          >
+          <Card key={rgb.ckbCellInfo.type_hash}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {utils.computeScriptHash(rgb.ckbCell.cellOutput.type as Script)}
+                {rgb.ckbCellInfo.udt_type}
               </CardTitle>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -137,28 +133,20 @@ export function TabRgb() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {formatUnit(number.Uint128LE.unpack(rgb.ckbCell.data), "ckb")}
+                {formatUnit(rgb.ckbCellInfo.amount, "ckb")}
               </div>
               <p className="text-xs text-muted-foreground">
-                {utils.computeScriptHash(rgb.ckbCell.cellOutput.type as Script)}
+                {rgb.ckbCellInfo.symbol}
               </p>
               <Dialog onOpenChange={handlerDialogOpenChange}>
                 <DialogTrigger asChild>
                   <Button className="relative mt-2 border-none font-SourceSanPro">
-                    Transfer{" "}
-                    {utils.computeScriptHash(
-                      rgb.ckbCell.cellOutput.type as Script
-                    )}
+                    Transfer {rgb.ckbCellInfo.symbol}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>
-                    <DialogTitle>
-                      Transfer{" "}
-                      {utils.computeScriptHash(
-                        rgb.ckbCell.cellOutput.type as Script
-                      )}
-                    </DialogTitle>
+                    <DialogTitle>Transfer {rgb.ckbCellInfo.symbol}</DialogTitle>
                     <DialogDescription>
                       * Make sure type correct wallet address
                     </DialogDescription>

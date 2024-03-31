@@ -1,4 +1,4 @@
-import { Indexer, Script, config, helpers, utils } from "@ckb-lumos/lumos";
+import { Script, helpers, utils } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -8,7 +8,6 @@ import {
   genBtcJumpCkbVirtualTx,
   isBtcTimeCellsSpent,
   genRgbppLockScript,
-  getXudtTypeScript,
 } from "@rgbpp-sdk/ckb";
 import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
 import {
@@ -27,17 +26,12 @@ import {
   BTC_ASSETS_TOKEN,
   CKB_INDEX_URL,
   CKB_RPC_URL,
-  CONFIG,
   getSporeDep,
   getSporeTypeScript,
   isMainnet,
 } from "./constants";
 import { DataSource, NetworkType, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
-
-config.initializeConfig(CONFIG);
-
-const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -345,26 +339,25 @@ export class RGBHelper {
           idx: item.idx,
         };
       });
-      const xudtTypeScript = getXudtTypeScript(isMainnet);
+      // const xudtTypeScript = getXudtTypeScript(isMainnet);
       for await (const rgbppLock of rgbppLocks) {
-        const xudtCollector = indexer.collector({
-          lock: rgbppLock.lock,
-          type: {
-            script: {
-              codeHash: xudtTypeScript.codeHash,
-              hashType: xudtTypeScript.hashType,
-              args: "0x",
-            },
-            searchMode: "prefix",
-          },
-        });
-
-        for await (const xudt of xudtCollector.collect()) {
-          rgbAssertList.push({
-            txHash: rgbppLock.txHash,
-            idx: rgbppLock.idx,
-            ckbCell: xudt,
-          });
+        const address = helpers.encodeToAddress(rgbppLock.lock);
+        const addressInfo = await CkbHepler.instance.getAddressInfo(address);
+        if (addressInfo) {
+          if (addressInfo.data.attributes.udt_accounts) {
+            for (
+              let i = 0;
+              i < addressInfo.data.attributes.udt_accounts.length;
+              i++
+            ) {
+              const udt = addressInfo.data.attributes.udt_accounts[i];
+              rgbAssertList.push({
+                txHash: rgbppLock.txHash,
+                idx: rgbppLock.idx,
+                ckbCellInfo: udt,
+              });
+            }
+          }
         }
       }
     }
