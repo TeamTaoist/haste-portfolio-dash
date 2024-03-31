@@ -21,8 +21,9 @@ import { Separator } from "@radix-ui/react-select";
 
 export function UserNav() {
   const [isConnect, setIsConnent] = useState(false);
-  const [isWalletConnectWallet, setIsWalletConnect] = useState(true);
+  const [isUnisatConnect, setIsUnisatConnect] = useState(false);
   const [isJoyIDConnect, setIsJoyIDConnect] = useState(false);
+  const [isOKXConnect, setIsOKXConnect] = useState(false);
   const { toast } = useToast();
 
   const handlerUnisat = () => {
@@ -36,8 +37,8 @@ export function UserNav() {
         DataManager.instance.curWalletAddr = accounts[0];
         DataManager.instance.curWalletPubKey = pubkey;
 
-        setIsConnent(true);
-
+        setIsUnisatConnect(true)
+        detectWallet();
         EventManager.instance.publish(EventType.transfer_reload_page, {});
       })
       .catch((err) => {
@@ -50,6 +51,31 @@ export function UserNav() {
       });
   };
 
+  const handleOKX = () => {
+    BtcHepler.instance
+    .okx_onConnect()
+    .then((rs) => {
+      const { address, publicKey } = rs;
+      console.log(address, publicKey);
+
+      DataManager.instance.curWalletType = "okx";
+      DataManager.instance.curWalletAddr = address;
+      DataManager.instance.curWalletPubKey = publicKey;
+
+      setIsOKXConnect(true);
+      detectWallet()
+      EventManager.instance.publish(EventType.transfer_reload_page, {});
+    })
+    .catch((err) => {
+      console.error(err);
+      toast({
+        title: "Warning",
+        description: err.message,
+        variant: "destructive",
+      });
+    });
+  }
+
   const handlerJoyId = () => {
     CkbHepler.instance
       .joyid_onConnect()
@@ -61,8 +87,8 @@ export function UserNav() {
         DataManager.instance.curWalletAddr = account;
         DataManager.instance.curWalletPubKey = pubkey;
 
-        setIsConnent(true);
         setIsJoyIDConnect(true);
+        detectWallet();
         RGBHelper.instance.btc_connect();
 
         EventManager.instance.publish(EventType.transfer_reload_page, {});
@@ -77,11 +103,17 @@ export function UserNav() {
       });
   };
 
-  const handleDisconnect = () => {
-    DataManager.instance.curWalletType = "none";
-    DataManager.instance.curWalletAddr = "";
-    setIsConnent(false);
-  };
+  // detect BTC and CKB wallet is both connected 
+
+  const detectWallet = () => {
+    setIsConnent((isJoyIDConnect && isOKXConnect) || (isJoyIDConnect && isUnisatConnect))
+  }
+
+  // const handleDisconnect = () => {
+  //   DataManager.instance.curWalletType = "none";
+  //   DataManager.instance.curWalletAddr = "";
+  //   setIsConnent(false);
+  // };
 
   return (
     <div>
@@ -101,13 +133,21 @@ export function UserNav() {
               </DialogHeader>
               <Separator />
               <div className="flex flex-col gap-4">
-                <div className="flex px-4 w-[100%] h-12 border rounded-md border-primary005 font-Montserrat justify-between items-center text-center cursor">
+                <div 
+                  onClick={handleOKX}
+                  className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-between items-center txt-center cursor
+                  ${isOKXConnect ? 'bg-green-200' : 'border-primary005'}
+                  `}    
+                >
                   <img src="/okx.png" width={24} height={24}/>
                   <div>
                     OKX Wallet
                   </div>
                 </div>
-                <div className="flex px-4 w-[100%] h-12 border rounded-md border-primary005 font-Montserrat justify-between items-center text-center cursor">
+                <div onClick={handlerUnisat} 
+                  className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-between items-center txt-center cursor
+                    ${isUnisatConnect ? 'bg-green-200' : 'border-primary005'}
+                  `}                >
                   <img src="/unisat.png" width={24} height={24}/>
                   <div>
                     Unisat
@@ -125,7 +165,7 @@ export function UserNav() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit">Save changes</Button>
+                <Button disabled={isConnect} type="submit">Confirm Connect</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
