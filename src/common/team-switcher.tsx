@@ -46,20 +46,18 @@ import { DataManager } from "@/lib/manager/DataManager";
 import { HttpManager } from "@/lib/api/HttpManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
+import { observer } from "mobx-react";
+import { accountStore, AccountType } from "@/store/AccountStore";
+import { autorun } from "mobx";
 
 let groups: { label: string; teams: { label: string; value: string }[] }[] = [];
 
 type Team = (typeof groups)[number]["teams"][number];
 
-type PopoverTriggerProps = React.ComponentPropsWithoutRef<
-  typeof PopoverTrigger
->;
-
-interface TeamSwitcherProps extends PopoverTriggerProps {}
-
-export default function TeamSwitcher({ className }: TeamSwitcherProps) {
+const TeamSwitcher = observer(() => {
   const [open, setOpen] = React.useState(false);
   const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
+  const [walletData, setWalletData] = React.useState<Record<string, AccountType[]>>();
 
   let curTeam: Team = {
     label: "",
@@ -130,6 +128,19 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
     }
   };
 
+  const splitAccountsByChain = (accounts: AccountType[]) => {
+    const groupedByChain = {};
+      accounts.forEach(wallet => {
+      const { chain } = wallet;
+      if (!groupedByChain[chain]) {
+        groupedByChain[chain] = [];
+      }
+      groupedByChain[chain].push(wallet);
+    });
+    setWalletData(groupedByChain);
+    return groupedByChain
+  }
+
   React.useEffect(() => {
     EventManager.instance.subscribe(
       EventType.team_switcher_reload,
@@ -144,6 +155,13 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
     };
   }, []);
 
+  React.useEffect(() => {
+    const disposer = autorun(() => {
+      splitAccountsByChain(accountStore.accounts)
+    })
+    return () => disposer();
+  }, [])
+
   return (
     <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
       <Popover open={open} onOpenChange={setOpen}>
@@ -153,7 +171,7 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
             role="combobox"
             aria-expanded={open}
             aria-label="Select a account"
-            className={cn("w-[200px] justify-between", className)}
+            className="bg-primary008 ml-4 !border-white001 text-white001 relative rounded-full border-none font-SourceSanPro"
           >
             <Avatar className="mr-2 h-5 w-5">
               <AvatarImage
@@ -172,69 +190,37 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
             <CommandList>
               <CommandInput placeholder="Search account..." />
               <CommandEmpty>No account found.</CommandEmpty>
-              {groups.map((group) => (
-                <CommandGroup key={group.label} heading={group.label}>
-                  {group.teams.map((team) => (
-                    <CommandItem
-                      key={team.value}
-                      value={team.value}
-                      onSelect={() => {
-                        setSelectedTeam(team);
-                        setOpen(false);
-
-                        const idx = DataManager.instance.accounts.findIndex(
-                          (v) => v.addr == team.value
-                        );
-                        DataManager.instance.curAccount = idx;
-
-                        if (DataManager.instance.curMenu == "asset") {
-                          HttpManager.instance.getAsset(team.value);
-                        } else if (
-                          DataManager.instance.curMenu == "transaction"
-                        ) {
-                          HttpManager.instance.getTransactions(team.value);
-                        }
-                      }}
-                      className="text-sm"
-                    >
-                      <Avatar className="mr-2 h-5 w-5">
-                        <AvatarImage
-                          src={`https://avatar.vercel.sh/${team.value}.png`}
-                          alt={team.label}
-                          className="grayscale"
-                        />
-                        <AvatarFallback>SC</AvatarFallback>
-                      </Avatar>
-                      {sortStr(team.label, 6)}
-                      <CheckIcon
-                        className={cn(
-                          "ml-auto h-4 w-4",
-                          selectedTeam.value == team.value
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              ))}
+              {
+                walletData && Object.keys(walletData).map(v => 
+                  <CommandGroup heading={v} key={v}> 
+                    {walletData[v].map(accounts => 
+                      <CommandItem
+                        onSelect={() => {
+                          accountStore.setCurrentAddress(accounts.address);
+                          setOpen(false);
+                        }}
+                      >
+                        <Avatar className="mr-2 h-5 w-5">
+                          <AvatarImage
+                              src={`/${v.toLocaleLowerCase()}.png`}
+                              alt={v}
+                            />
+                            <AvatarFallback>SC</AvatarFallback>
+                          </Avatar>
+                          {sortStr(accounts.address, 6)}
+                          <CheckIcon
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              accountStore.currentAddress == accounts.address
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                      </CommandItem>)}
+                  </CommandGroup>)
+              }
             </CommandList>
             <CommandSeparator />
-            {/* <CommandList>
-              <CommandGroup>
-                <DialogTrigger asChild>
-                  <CommandItem
-                    onSelect={() => {
-                      setOpen(false);
-                      setShowNewTeamDialog(true);
-                    }}
-                  >
-                    <PlusCircledIcon className="mr-2 h-5 w-5" />
-                    Add account
-                  </CommandItem>
-                </DialogTrigger>
-              </CommandGroup>
-            </CommandList> */}
           </Command>
         </PopoverContent>
       </Popover>
@@ -284,4 +270,6 @@ export default function TeamSwitcher({ className }: TeamSwitcherProps) {
       </DialogContent>
     </Dialog>
   );
-}
+})
+
+export default TeamSwitcher

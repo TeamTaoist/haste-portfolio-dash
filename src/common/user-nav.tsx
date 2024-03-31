@@ -17,8 +17,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@radix-ui/react-select";
+import { observer } from 'mobx-react';
+import { accountStore } from "@/store/AccountStore";
 
-export function UserNav() {
+export const UserNav = observer(() => {
   // const [isConnect, setIsConnent] = useState(false);
   const [isUnisatConnect, setIsUnisatConnect] = useState(false);
   const [isJoyIDConnect, setIsJoyIDConnect] = useState(false);
@@ -47,6 +49,13 @@ export function UserNav() {
           chain: "BTC",
         };
 
+        accountStore.addAccount({
+          address: accounts[0],
+          type: "unisat",
+          pubkey: pubkey,
+          chain: "BTC"
+        });
+        
         const canFind = DataManager.instance.accounts.find(
           (v) => v.addr == accounts[0]
         );
@@ -58,7 +67,7 @@ export function UserNav() {
         }
 
         setIsUnisatConnect(true);
-        detectWallet();
+        setDefaultAddress(accounts[0]);
         EventManager.instance.publish(EventType.transfer_reload_page, {});
       })
       .catch((err) => {
@@ -78,30 +87,15 @@ export function UserNav() {
         const { address, publicKey } = rs;
         console.log(address, publicKey);
 
-        // DataManager.instance.curWalletType = "okx";
-        // DataManager.instance.curWalletAddr = address;
-        // DataManager.instance.curWalletPubKey = publicKey;
-
-        DataManager.instance.walletInfo[address] = {
+        accountStore.addAccount({
           address: address,
           type: "okx",
           pubkey: publicKey,
           chain: "BTC",
-        };
-
-        const canFind = DataManager.instance.accounts.find(
-          (v) => v.addr == address
-        );
-        if (!canFind) {
-          DataManager.instance.accounts.push({
-            chain: "BTC",
-            addr: address,
-          });
-        }
+        });
 
         setIsOKXConnect(true);
-        detectWallet();
-        EventManager.instance.publish(EventType.transfer_reload_page, {});
+        setDefaultAddress(address);
       })
       .catch((err) => {
         console.error(err);
@@ -118,32 +112,14 @@ export function UserNav() {
       .joyid_onConnect()
       .then((rs) => {
         const { account, pubkey } = rs;
-        console.log(account);
-
-        // DataManager.instance.curWalletType = "joyid";
-        // DataManager.instance.curWalletAddr = account;
-        // DataManager.instance.curWalletPubKey = pubkey;
-
-        DataManager.instance.walletInfo[account] = {
+        accountStore.addAccount({
           address: account,
           type: "joyid",
           pubkey: pubkey,
           chain: "CKB",
-        };
-
-        const canFind = DataManager.instance.accounts.find(
-          (v) => v.addr == account
-        );
-        if (!canFind) {
-          DataManager.instance.accounts.push({
-            chain: "CKB",
-            addr: account,
-          });
-        }
-
+        });
         setIsJoyIDConnect(true);
-        detectWallet();
-        EventManager.instance.publish(EventType.transfer_reload_page, {});
+        setDefaultAddress(account);
       })
       .catch((err) => {
         console.error(err);
@@ -157,11 +133,9 @@ export function UserNav() {
 
   // detect BTC and CKB wallet is both connected
 
-  const detectWallet = () => {
-    // setIsConnent(
-    //   (isJoyIDConnect && isOKXConnect) || (isJoyIDConnect && isUnisatConnect)
-    // );
-  };
+  const setDefaultAddress = (address: string) => {
+    accountStore.setCurrentAddress(address);
+  }
 
   // const handleDisconnect = () => {
   //   DataManager.instance.curWalletType = "none";
@@ -201,12 +175,12 @@ export function UserNav() {
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button className="relative rounded-full border-none font-SourceSanPro">
-              Connect Wallet
+              Add Wallet
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Connect Wallet</DialogTitle>
+              <DialogTitle>Add Wallet</DialogTitle>
               <DialogDescription>
                 At least connect a BTC wallet and a CKB wallet
               </DialogDescription>
@@ -250,4 +224,4 @@ export function UserNav() {
       </div>
     </div>
   );
-}
+})

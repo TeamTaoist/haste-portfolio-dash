@@ -1,0 +1,54 @@
+import { makeAutoObservable } from 'mobx';
+
+export interface AccountType {
+    address: string;
+    pubkey: string;
+    type: string;
+    chain: string
+}
+
+class AccountStore {
+  accounts:AccountType[] = []; 
+  currentAddress: string | null = null;
+
+  constructor() {
+    makeAutoObservable(this);
+    this.loadAccounts();
+  }
+
+  loadAccounts() {
+    const accountsFromStorage = localStorage.getItem('accounts');
+    if (accountsFromStorage) {
+      this.accounts = JSON.parse(accountsFromStorage);
+    }
+  }
+
+  saveAccounts() {
+    localStorage.setItem('accounts', JSON.stringify(this.accounts));
+  }
+
+  addAccount(account: AccountType) {
+    const index = this.accounts.findIndex(existingAccount => existingAccount.address === account.address);
+    if (index === -1) {
+      this.accounts.push(account);
+      this.saveAccounts();
+    } 
+  }
+
+  removeAccount(address) {
+    const index = this.accounts.findIndex(account => account === address);
+    if (index > -1) {
+      this.accounts.splice(index, 1); 
+      this.saveAccounts(); 
+    }
+  }
+  
+  setCurrentAddress(address: string) {
+    const exists = this.accounts.some(account => account.address === address);
+    if (exists) {
+      this.currentAddress = address;
+    } 
+  }
+}
+
+export const accountStore = new AccountStore();
