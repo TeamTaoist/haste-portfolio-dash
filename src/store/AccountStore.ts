@@ -20,6 +20,7 @@ class AccountStore {
     const accountsFromStorage = localStorage.getItem('accounts');
     if (accountsFromStorage) {
       this.accounts = JSON.parse(accountsFromStorage);
+      this.setCurrentAddress(this.accounts[0].address);
     }
   }
 

@@ -1,12 +1,16 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { HttpManager } from "@/lib/api/HttpManager";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { isMainnet } from "@/lib/wallet/constants";
+import { accountStore } from "@/store/AccountStore";
+import { autorun } from "mobx";
+import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 
-export function TransactionItem() {
+export const TransactionItem = observer(() => {
   const txList = DataManager.instance.curTxList;
 
   const [hide, setHide] = useState(false);
@@ -42,6 +46,15 @@ export function TransactionItem() {
       );
     };
   }, [loadmore]);
+
+  useEffect(() => {
+    const disposer = autorun(() => {
+      if(accountStore.currentAddress) {
+        HttpManager.instance.getTransactions(accountStore.currentAddress)
+      }  
+    })
+    return () => disposer();
+  }, [])
 
   return (
     <>
@@ -92,3 +105,4 @@ export function TransactionItem() {
     </>
   );
 }
+)

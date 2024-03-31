@@ -172,7 +172,7 @@ export const UserNav = observer(() => {
   return (
     <div>
       <div className="">
-        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <Dialog open={accountStore.accounts ? false: true} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button className="relative rounded-full border-none font-SourceSanPro">
               Add Wallet

@@ -11,7 +11,6 @@ import { autorun } from "mobx";
 
 export const Assets = observer(() => {
   const assetList = DataManager.instance.curAsset;
-
   const [hide, setHide] = useState(false);
 
   useEffect(() => {
