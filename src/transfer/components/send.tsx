@@ -39,10 +39,19 @@ export const Send = observer(() => {
 
     console.log(receiveAddress, amount, wallet.address);
 
-    if (wallet.type == "unisat") {
-      BtcHepler.instance
-        .transfer(receiveAddress.trim(), Number.parseFloat(amount.trim()))
+    if (wallet.type == "joyid" && wallet.chain == "CKB") {
+      const sendCkb = parseUnit(amount.trim(), "ckb");
+      console.log(sendCkb);
+
+      CkbHepler.instance
+        .transfer_ckb({
+          from: wallet.address,
+          to: receiveAddress.trim(),
+          amount: sendCkb,
+        })
         .then((rs) => {
+          console.log(rs);
+
           toast({
             title: "Success",
             description: rs,
@@ -57,19 +66,10 @@ export const Send = observer(() => {
             variant: "destructive",
           });
         });
-    } else if (wallet.type == "joyid") {
-      const sendCkb = parseUnit(amount.trim(), "ckb");
-      console.log(sendCkb);
-
-      CkbHepler.instance
-        .transfer_ckb({
-          from: wallet.address,
-          to: receiveAddress.trim(),
-          amount: sendCkb,
-        })
+    } else {
+      BtcHepler.instance
+        .transfer(receiveAddress.trim(), Number.parseFloat(amount.trim()))
         .then((rs) => {
-          console.log(rs);
-
           toast({
             title: "Success",
             description: rs,
