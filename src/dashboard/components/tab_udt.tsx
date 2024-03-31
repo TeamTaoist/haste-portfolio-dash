@@ -148,7 +148,7 @@ export function TabUdt() {
                     Transfer {udt.symbol}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="bg-primary006 !border-none">
                 <Tabs defaultValue="rgb++" className="w-[100%]">
                   <TabsList className="w-[100%]">
                     <TabsTrigger value="rgb++" className="w-[50%]">RGB++</TabsTrigger>
@@ -157,7 +157,7 @@ export function TabUdt() {
                   <TabsContent value="rgb++">
                     <DialogHeader>
                       <DialogTitle>Transfer RGB++</DialogTitle>
-                      <DialogDescription>
+                      <DialogDescription className="!text-white001">
                         * Make sure type correct wallet address
                       </DialogDescription>
                     </DialogHeader>

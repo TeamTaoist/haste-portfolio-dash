@@ -74,3 +74,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+div[role="tablist"] {
+  padding: 5px 10px;
+  margin-top: 20px;
+  background-color: #737AAB;
+  border-radius: 5px;
+}
+
+button[role="tab"][aria-selected="false"] {
+  background-color: #737AAB !important;
+  color: #ffffff;
+}
+
+.tab:hover {
+  background-color: #383D5D !important;
+}
+
+button[role="tab"][aria-selected="true"] {
+  background-color: #1C203B !important;
+  color: #ffffff;
+}
