@@ -35,6 +35,7 @@ import {
   getSporeDep,
   getSporeTypeScript,
   getSudtTypeScript,
+  getXudtDep,
   getXudtTypeScript,
   isMainnet,
 } from "./constants";
@@ -56,6 +57,8 @@ export class CkbHepler {
   public static get instance() {
     if (!CkbHepler._instance) {
       CkbHepler._instance = new CkbHepler();
+
+      commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()]);
     }
     return this._instance;
   }
@@ -72,14 +75,14 @@ export class CkbHepler {
 
     const connection = await connect();
 
-    commons.common.registerCustomLockScriptInfos([
-      createJoyIDScriptInfo({ connection }),
-    ]);
-
     console.log("JoyId connect", connection);
 
     DataManager.instance.joyIdConnectionType = connection.keyType;
-    return { account: connection.address, pubkey: connection.pubkey };
+    return {
+      account: connection.address,
+      pubkey: connection.pubkey,
+      keyType: connection.keyType,
+    };
   }
 
   // transfer ckb
@@ -410,9 +413,13 @@ export class CkbHepler {
 
     // console.log(sudt_from.toString(), sudt_to.toString(), ckb_from.toString());
 
-    const sudt_cellDeps = helpers.locateCellDep(sudtToken);
+    let sudt_cellDeps = helpers.locateCellDep(sudtToken);
     if (sudt_cellDeps == null) {
-      throw new Error("No sudt cell deps");
+      if (isXUDT) {
+        sudt_cellDeps = getXudtDep(isMainnet);
+      } else {
+        throw new Error("No sudt cell deps");
+      }
     }
 
     txSkeleton = addCellDep(txSkeleton, sudt_cellDeps);
@@ -432,8 +439,25 @@ export class CkbHepler {
     const inputs_sudt: Cell[] = [];
     let sudt_sumCapacity = BI.from(0);
     let sudt_sumAmount = BI.from(0);
+    let otherData: Uint8Array | undefined;
+    let flag = false;
     for await (const collect of collect_sudt.collect()) {
       inputs_sudt.push(collect);
+
+      if (!otherData && !flag) {
+        const data = collect.data;
+        const dataArray = bytes.bytifyRawString(data);
+        const len = 16;
+        if (dataArray.length >= len) {
+          const extraDataArray = new ArrayBuffer(dataArray.length - len);
+          for (let i = len, k = 0; i < dataArray.length; i++, k++) {
+            const element = dataArray[i];
+            extraDataArray[k] = element;
+          }
+          otherData = new Uint8Array(extraDataArray);
+        }
+        flag = true;
+      }
 
       sudt_sumCapacity = sudt_sumCapacity.add(collect.cellOutput.capacity);
       sudt_sumAmount = sudt_sumAmount.add(
@@ -457,13 +481,28 @@ export class CkbHepler {
 
     let outputCapacity = BI.from(0);
 
+    const outputData = number.Uint128LE.pack(options.amount);
+    let newOutputData = outputData;
+    if (otherData) {
+      const buffer = new ArrayBuffer(outputData.length + otherData.length);
+      for (let i = 0; i < outputData.length; i++) {
+        const element = outputData[i];
+        buffer[i] = element;
+      }
+      for (let i = 0; i < otherData.length; i++) {
+        const element = otherData[i];
+        buffer[outputData.length + i] = element;
+      }
+      newOutputData = new Uint8Array(buffer);
+    }
+
     const outputs_sudt: Cell = {
       cellOutput: {
         capacity: "0x0",
         lock: toScript,
         type: options.typeScript,
       },
-      data: bytes.hexify(number.Uint128LE.pack(options.amount)),
+      data: bytes.hexify(newOutputData),
     };
     const outputs_sudt_capacity = BI.from(
       helpers.minimalCellCapacity(outputs_sudt)
@@ -473,13 +512,27 @@ export class CkbHepler {
 
     const change_amount = sudt_sumAmount.sub(options.amount);
     if (change_amount.gt(0)) {
+      const changeData = number.Uint128LE.pack(change_amount);
+      let newChangeData = changeData;
+      if (otherData) {
+        const buffer = new ArrayBuffer(changeData.length + otherData.length);
+        for (let i = 0; i < changeData.length; i++) {
+          const element = changeData[i];
+          buffer[i] = element;
+        }
+        for (let i = 0; i < otherData.length; i++) {
+          const element = otherData[i];
+          buffer[changeData.length + i] = element;
+        }
+        newChangeData = new Uint8Array(buffer);
+      }
       const outputs_sudt_change: Cell = {
         cellOutput: {
           capacity: "0x0",
           lock: fromScript,
           type: options.typeScript,
         },
-        data: bytes.hexify(number.Uint128LE.pack(change_amount)),
+        data: bytes.hexify(newChangeData),
       };
       const outputs_sudt_change_capacity = BI.from(
         helpers.minimalCellCapacity(outputs_sudt_change)

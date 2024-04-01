@@ -172,7 +172,7 @@ export function TabUdt() {
           accountStore.setCurrentAddress(curAccount);
         })
         .catch((err) => {
-          console.error(err.message);
+          console.error(err);
 
           toast({
             title: "Warning",

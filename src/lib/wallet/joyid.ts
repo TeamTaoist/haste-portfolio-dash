@@ -15,10 +15,11 @@ import {
   getJoyIDCellDep,
   Aggregator,
   getConfig,
-  connect,
+  // connect,
 } from "@joyid/ckb";
 import { getCotaTypeScript } from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
+import { accountStore } from "@/store/AccountStore";
 
 const isMainnet = false;
 
@@ -66,11 +67,9 @@ class JoyIDCellCollector {
   }
 }
 
-type Connection = Awaited<ReturnType<typeof connect>>;
+// type Connection = Awaited<ReturnType<typeof connect>>;
 
-export function createJoyIDScriptInfo(config: {
-  connection: Connection;
-}): commons.LockScriptInfo {
+export function createJoyIDScriptInfo(): commons.LockScriptInfo {
   return {
     codeHash: getJoyIDLockScript(isMainnet).codeHash,
     hashType: "type",
@@ -137,24 +136,32 @@ export function createJoyIDScriptInfo(config: {
             );
           }
 
-          const connection = config.connection;
+          // const connection = config.connection;
+          const walletAddr = accountStore.currentAddress;
+          if (!walletAddr) {
+            throw new Error("[joyid] No wallet addr");
+          }
+          const wallet = accountStore.getWallet(walletAddr);
+          if (!wallet) {
+            throw new Error("[joyid] No wallet");
+          }
           console.log("JoyID config: ", getConfig());
-          console.log("JoyID connection: ", connection);
+          // console.log("JoyID connection: ", connection);
 
-          const lock = helpers.parseAddress(connection.address);
+          const lock = helpers.parseAddress(wallet.address);
 
           // will change if the connection.keyType is a sub_key
           let newWitnessArgs: WitnessArgs = {
             lock: "0x",
           };
 
-          if (connection.keyType === "sub_key") {
+          if (wallet.keyType === "sub_key") {
             const aggregator = new Aggregator(
               "https://cota.nervina.dev/aggregator"
             );
 
             const pubkeyHash = bytes
-              .bytify(utils.ckbHash("0x" + connection.pubkey))
+              .bytify(utils.ckbHash("0x" + wallet.pubkey))
               .slice(0, 20);
 
             const { unlock_entry: unlockEntry } =

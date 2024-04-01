@@ -89,12 +89,13 @@ export const UserNav = observer(() => {
     CkbHepler.instance
       .joyid_onConnect()
       .then((rs) => {
-        const { account, pubkey } = rs;
+        const { account, pubkey, keyType } = rs;
         accountStore.addAccount({
           address: account,
           type: "joyid",
           pubkey: pubkey,
           chain: "CKB",
+          keyType,
         });
         setIsJoyIDConnect(true);
         setDefaultAddress(account);

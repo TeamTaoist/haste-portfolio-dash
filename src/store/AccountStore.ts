@@ -5,6 +5,7 @@ export interface AccountType {
   pubkey: string;
   type: string;
   chain: string;
+  keyType?: string;
 }
 
 class AccountStore {
@@ -20,7 +21,11 @@ class AccountStore {
     const accountsFromStorage = localStorage.getItem("accounts");
     if (accountsFromStorage) {
       this.accounts = JSON.parse(accountsFromStorage);
-      this.setCurrentAddress(this.accounts[0] && this.accounts[0].address ? this.accounts[0].address : '');
+      this.setCurrentAddress(
+        this.accounts[0] && this.accounts[0].address
+          ? this.accounts[0].address
+          : ""
+      );
     }
   }
 
@@ -39,7 +44,9 @@ class AccountStore {
   }
 
   removeAccount(address: string) {
-    const index = this.accounts.findIndex((account) => account.address === address);
+    const index = this.accounts.findIndex(
+      (account) => account.address === address
+    );
     if (index > -1) {
       this.accounts.splice(index, 1);
       this.saveAccounts();
