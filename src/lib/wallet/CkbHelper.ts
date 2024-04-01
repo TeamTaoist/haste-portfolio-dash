@@ -444,12 +444,20 @@ export class CkbHepler {
       inputs_sudt.push(collect);
 
       sudt_sumCapacity = sudt_sumCapacity.add(collect.cellOutput.capacity);
-      sudt_sumAmount = sudt_sumAmount.add(
-        number.Uint128LE.unpack(collect.data)
-      );
+      let addNum: BI | undefined = undefined;
+      try {
+        addNum = number.Uint128LE.unpack(collect.data);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.warn(error.message);
+      }
 
-      if (sudt_sumAmount.gte(options.amount)) {
-        break;
+      if (addNum) {
+        sudt_sumAmount = sudt_sumAmount.add(addNum);
+
+        if (sudt_sumAmount.gte(options.amount)) {
+          break;
+        }
       }
     }
     // >>
@@ -682,9 +690,18 @@ export class CkbHepler {
             balance: BI.from(0),
           };
         }
-        udtMap[typeScriptHex].balance = udtMap[typeScriptHex].balance.add(
-          number.Uint128LE.unpack(sudtCell.data)
-        );
+
+        let addNum: BI | undefined = undefined;
+        try {
+          addNum = number.Uint128LE.unpack(sudtCell.data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          console.warn(error.message);
+        }
+
+        if (addNum)
+          udtMap[typeScriptHex].balance =
+            udtMap[typeScriptHex].balance.add(addNum);
       }
     }
 
@@ -701,9 +718,19 @@ export class CkbHepler {
             balance: BI.from(0),
           };
         }
-        udtMap[typeScriptHex].balance = udtMap[typeScriptHex].balance.add(
-          number.Uint128LE.unpack(xudtCell.data)
-        );
+
+        let addNum: BI | undefined = undefined;
+        try {
+          addNum = number.Uint128LE.unpack(xudtCell.data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          console.warn(error.message);
+        }
+
+        if (addNum)
+          udtMap[typeScriptHex].balance = udtMap[typeScriptHex].balance.add(
+            number.Uint128LE.unpack(xudtCell.data)
+          );
       }
     }
 
@@ -844,9 +871,18 @@ export class CkbHepler {
           xudtList.push(ckbUDTInfo);
         }
 
-        xudtMap[typeHash].amount = BI.from(xudtMap[typeHash].amount)
-          .add(number.Uint128LE.unpack(xudtCell.data))
-          .toString();
+        let addNum: BI | undefined = undefined;
+        try {
+          addNum = number.Uint128LE.unpack(xudtCell.data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          console.warn(error.message);
+        }
+
+        if (addNum)
+          xudtMap[typeHash].amount = BI.from(xudtMap[typeHash].amount)
+            .add(addNum)
+            .toString();
       }
     }
 
