@@ -902,4 +902,73 @@ export class CkbHepler {
 
     return { xudtList, sporeList };
   }
+
+  async withDrawXUDT(sudtToken: Script) {
+    let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+
+    let isXUDT = false;
+    const xudtScript = getXudtTypeScript(isMainnet);
+    if (sudtToken.codeHash == xudtScript.codeHash) {
+      isXUDT = true;
+    }
+    console.log("script is xudt", isXUDT);
+
+    let sudt_cellDeps = helpers.locateCellDep(sudtToken);
+    if (sudt_cellDeps == null) {
+      if (isXUDT) {
+        sudt_cellDeps = getXudtDep(isMainnet);
+      } else {
+        throw new Error("No sudt cell deps");
+      }
+    }
+
+    txSkeleton = addCellDep(txSkeleton, sudt_cellDeps);
+
+    const curAccount = DataManager.instance.getCurAccount();
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const collect_sudt = indexer.collector({
+      lock: {
+        script: helpers.parseAddress(wallet.address),
+        searchMode: "exact",
+      },
+      type: {
+        script: sudtToken,
+        searchMode: "exact",
+      },
+    });
+
+    for await (const collect of collect_sudt.collect()) {
+      collect.cellOutput = {
+        lock: collect.cellOutput.lock,
+        capacity: BI.from(collect.cellOutput.capacity).sub(1000).toHexString(),
+      };
+
+      txSkeleton = await commons.common.setupInputCell(
+        txSkeleton,
+        collect,
+        undefined,
+        { config: CONFIG }
+      );
+    }
+
+    const tx = helpers.createTransactionFromSkeleton(txSkeleton);
+
+    const signed = await signRawTransaction(
+      tx as CKBTransaction,
+      wallet.address
+    );
+
+    const txHash = await this.sendTransaction(signed);
+    console.log("withDraw txHash:", txHash);
+
+    return txHash;
+  }
 }
