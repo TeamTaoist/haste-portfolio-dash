@@ -4,10 +4,24 @@ import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { useEffect, useState } from "react";
 import { formatUnit } from "@ckb-lumos/bi";
+import { observer } from "mobx-react";
+import { accountStore } from "@/store/AccountStore";
+import { RGBHelper } from "@/lib/wallet/RGBHelper";
+import { RgbAssert } from "@/lib/interface";
 
-export const Assets = () => {
+export const Assets = observer(() => {
   const assetList = DataManager.instance.curAsset;
   const [hide, setHide] = useState(false);
+  const [rgbAssetList, setRgbAssetList] = useState<RgbAssert[]>(); 
+
+  const getRgbAsset = async() => {
+    if(accountStore.currentAddress) {
+      const RgbAssetListRlt = await RGBHelper.instance.getRgbppAssert(accountStore.currentAddress);
+      setRgbAssetList(RgbAssetListRlt);
+
+    }
+  }
+
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_assets_show, () => {
@@ -26,6 +40,10 @@ export const Assets = () => {
       });
     };
   }, []);
+
+  useEffect(() => {
+    getRgbAsset()
+  }, [])
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 ">
@@ -64,4 +82,4 @@ export const Assets = () => {
       ))}
     </div>
   );
-};
+})

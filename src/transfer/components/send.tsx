@@ -27,7 +27,7 @@ export const Send = observer(() => {
   const handlerCancel = () => {};
 
   const handleSend = () => {
-    const curAccount = DataManager.instance.getCurAccount();
+    const curAccount = accountStore.currentAddress;
     if (!curAccount) {
       toast({
         title: "Warning",
@@ -75,7 +75,6 @@ export const Send = observer(() => {
         .transferBTC(receiveAddress.trim(), parseUnit(amount.trim(), "ckb"))
         .then((rs) => {
           console.log("Send BTC txHash", rs);
-
           toast({
             title: "Success",
             description: rs,

@@ -218,6 +218,7 @@ const TeamSwitcher = observer(() => {
                     {walletData[v].map((accounts) => (
                       <>
                         <CommandItem
+                          key={accounts.address}
                           onSelect={() => {
                             accountStore.setCurrentAddress(accounts.address);
                             setOpen(false);
