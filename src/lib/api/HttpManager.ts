@@ -29,13 +29,11 @@ export class HttpManager {
       // ckb chain
       hasTabs = true;
 
-      const ckbAddressInfo = await CkbHepler.instance.getAddressInfo(address);
-      if (ckbAddressInfo) {
+      const ckbBalance = await CkbHepler.instance.capacityOf(address);
+      if (ckbBalance) {
         assetList.push({
           chain: "CKB",
-          balance: BI.from(ckbAddressInfo.data.attributes.balance).sub(
-            ckbAddressInfo.data.attributes.balance_occupied
-          ),
+          balance: BI.from(ckbBalance),
         });
 
         const { xudtList, sporeList } =
