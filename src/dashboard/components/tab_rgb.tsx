@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RgbAssert } from "@/lib/interface";
-import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { toast } from "@/components/ui/use-toast";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { BI } from "@ckb-lumos/lumos";
@@ -67,97 +66,74 @@ export function TabRgb() {
       return;
     }
 
-    CkbHepler.instance
-      .getUDTInfo(rgb.ckbCellInfo.type_hash)
-      .then((rs) => {
-        console.log(rs);
+    const curAccount = DataManager.instance.getCurAccount();
+    if (!curAccount) {
+      toast({
+        title: "Warning",
+        description: "Please choose a wallet",
+        variant: "destructive",
+      });
+      return;
+    }
 
-        const curAccount = DataManager.instance.getCurAccount();
-        if (!curAccount) {
+    if (!isRgb) {
+      // transfer to other btc
+      RGBHelper.instance
+        .transfer_btc_to_btc(
+          rgb.txHash,
+          rgb.idx,
+          toAddress,
+          rgb.ckbCellInfo.type_script,
+          BI.from(rgb.ckbCellInfo?.amount).toBigInt()
+        )
+        .then((rs) => {
+          console.log("btc to btc tx hash:", rs);
+
+          toast({
+            title: "Success",
+            description: rs,
+          });
+
+          accountStore.setCurrentAddress(curAccount);
+        })
+        .catch((err) => {
+          console.error(err.message);
+
           toast({
             title: "Warning",
-            description: "Please choose a wallet",
+            description: err.message,
             variant: "destructive",
           });
-          return;
-        }
-
-        if (!isRgb) {
-          // transfer to other btc
-          RGBHelper.instance
-            .transfer_btc_to_btc(
-              rgb.txHash,
-              rgb.idx,
-              toAddress,
-              {
-                codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
-                hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
-                args: rs["data"]["attributes"]["type_script"]["args"],
-              },
-              BI.from(rgb.ckbCellInfo?.amount).toBigInt()
-            )
-            .then((rs) => {
-              console.log("btc to btc tx hash:", rs);
-
-              toast({
-                title: "Success",
-                description: rs,
-              });
-
-              accountStore.setCurrentAddress(curAccount);
-            })
-            .catch((err) => {
-              console.error(err.message);
-
-              toast({
-                title: "Warning",
-                description: err.message,
-                variant: "destructive",
-              });
-            });
-        } else {
-          RGBHelper.instance
-            .transfer_btc_to_ckb(
-              toAddress,
-              {
-                codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
-                hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
-                args: rs["data"]["attributes"]["type_script"]["args"],
-              },
-              BI.from(rgb.ckbCellInfo?.amount).toBigInt(),
-              rgb.txHash,
-              rgb.idx
-            )
-            .then((rs) => {
-              console.log("ckb to btc tx hash:", rs);
-
-              toast({
-                title: "Success",
-                description: rs,
-              });
-
-              accountStore.setCurrentAddress(curAccount);
-            })
-            .catch((err) => {
-              console.error(err.message);
-
-              toast({
-                title: "Warning",
-                description: err.message,
-                variant: "destructive",
-              });
-            });
-        }
-      })
-      .catch((err) => {
-        console.error(err.message);
-
-        toast({
-          title: "Warning",
-          description: err.message,
-          variant: "destructive",
         });
-      });
+    } else {
+      RGBHelper.instance
+        .transfer_btc_to_ckb(
+          toAddress,
+          rgb.ckbCellInfo.type_script,
+          BI.from(rgb.ckbCellInfo?.amount).toBigInt(),
+          rgb.txHash,
+          rgb.idx
+        )
+        .then((rs) => {
+          console.log("ckb to btc tx hash:", rs);
+
+          toast({
+            title: "Success",
+            description: rs,
+          });
+
+          accountStore.setCurrentAddress(curAccount);
+        })
+        .catch((err) => {
+          console.error(err.message);
+
+          toast({
+            title: "Warning",
+            description: err.message,
+            variant: "destructive",
+          });
+        });
+    }
   };
 
   const handlerDialogOpenChange = (e) => {

@@ -95,65 +95,44 @@ export function TabUdt() {
             return;
           }
 
-          CkbHepler.instance
-            .getUDTInfo(udt.type_hash)
-            .then((rs) => {
-              console.log(rs);
+          const curAccount = DataManager.instance.getCurAccount();
+          if (!curAccount) {
+            toast({
+              title: "Warning",
+              description: "Please choose a wallet",
+              variant: "destructive",
+            });
+            return;
+          }
 
-              const curAccount = DataManager.instance.getCurAccount();
-              if (!curAccount) {
+          if (findUtxo) {
+            RGBHelper.instance
+              .transfer_ckb_to_btc(
+                findUtxo.txHash,
+                findUtxo.idx,
+                udt.type_script,
+                parseUnit(amount.toString(), "ckb").toBigInt()
+              )
+              .then((rs) => {
+                console.log("ckb to btc tx hash:", rs);
+
+                toast({
+                  title: "Success",
+                  description: rs,
+                });
+
+                accountStore.setCurrentAddress(curAccount);
+              })
+              .catch((err) => {
+                console.error(err.message);
+
                 toast({
                   title: "Warning",
-                  description: "Please choose a wallet",
+                  description: err.message,
                   variant: "destructive",
                 });
-                return;
-              }
-
-              if (findUtxo) {
-                RGBHelper.instance
-                  .transfer_ckb_to_btc(
-                    findUtxo.txHash,
-                    findUtxo.idx,
-                    {
-                      codeHash:
-                        rs["data"]["attributes"]["type_script"]["code_hash"],
-                      hashType:
-                        rs["data"]["attributes"]["type_script"]["hash_type"],
-                      args: rs["data"]["attributes"]["type_script"]["args"],
-                    },
-                    parseUnit(amount.toString(), "ckb").toBigInt()
-                  )
-                  .then((rs) => {
-                    console.log("ckb to btc tx hash:", rs);
-
-                    toast({
-                      title: "Success",
-                      description: rs,
-                    });
-
-                    accountStore.setCurrentAddress(curAccount);
-                  })
-                  .catch((err) => {
-                    console.error(err.message);
-
-                    toast({
-                      title: "Warning",
-                      description: err.message,
-                      variant: "destructive",
-                    });
-                  });
-              }
-            })
-            .catch((err) => {
-              console.error(err.message);
-
-              toast({
-                title: "Warning",
-                description: err.message,
-                variant: "destructive",
               });
-            });
+          }
         })
         .catch((err) => {
           console.error(err.message);
@@ -165,51 +144,32 @@ export function TabUdt() {
           });
         });
     } else {
+      const curAccount = DataManager.instance.getCurAccount();
+      if (!curAccount) {
+        toast({
+          title: "Warning",
+          description: "Please choose a wallet",
+          variant: "destructive",
+        });
+        return;
+      }
+
       CkbHepler.instance
-        .getUDTInfo(udt.type_hash)
-        .then((rs) => {
-          console.log(rs);
+        .transfer_udt({
+          from: curAccount,
+          to: toAddress,
+          amount: parseUnit(amount.toString(), "ckb"),
+          typeScript: udt.type_script,
+        })
+        .then((txHash) => {
+          console.log("transfer udt txHash", txHash);
 
-          const curAccount = DataManager.instance.getCurAccount();
-          if (!curAccount) {
-            toast({
-              title: "Warning",
-              description: "Please choose a wallet",
-              variant: "destructive",
-            });
-            return;
-          }
+          toast({
+            title: "Success",
+            description: txHash,
+          });
 
-          CkbHepler.instance
-            .transfer_udt({
-              from: curAccount,
-              to: toAddress,
-              amount: parseUnit(amount.toString(), "ckb"),
-              typeScript: {
-                codeHash: rs["data"]["attributes"]["type_script"]["code_hash"],
-                hashType: rs["data"]["attributes"]["type_script"]["hash_type"],
-                args: rs["data"]["attributes"]["type_script"]["args"],
-              },
-            })
-            .then((txHash) => {
-              console.log("transfer udt txHash", txHash);
-
-              toast({
-                title: "Success",
-                description: txHash,
-              });
-
-              accountStore.setCurrentAddress(curAccount);
-            })
-            .catch((err) => {
-              console.error(err.message);
-
-              toast({
-                title: "Warning",
-                description: err.message,
-                variant: "destructive",
-              });
-            });
+          accountStore.setCurrentAddress(curAccount);
         })
         .catch((err) => {
           console.error(err.message);

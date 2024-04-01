@@ -127,6 +127,7 @@ export interface ckb_SporeInfo {
   decimal?: string;
   display_name?: string;
   uan?: string;
+  type_script: Script;
 }
 
 export interface ckb_UDTInfo {
@@ -135,6 +136,7 @@ export interface ckb_UDTInfo {
   type_hash: string;
   udt_icon_file?: string;
   udt_type: "xudt";
+  type_script: Script;
 }
 
 export interface ckb_AddressInfo {

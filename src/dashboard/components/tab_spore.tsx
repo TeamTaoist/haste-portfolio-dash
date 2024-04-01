@@ -22,7 +22,6 @@ import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { BI } from "@ckb-lumos/lumos";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
-import { blockchain } from "@ckb-lumos/base";
 import { accountStore } from "@/store/AccountStore";
 
 export function TabSpore() {
@@ -55,7 +54,7 @@ export function TabSpore() {
       return;
     }
 
-    const sporeTypeScript = blockchain.Script.unpack(spore.type_hash);
+    const sporeTypeScript = spore.type_script;
 
     console.log("spore type script:", sporeTypeScript);
 

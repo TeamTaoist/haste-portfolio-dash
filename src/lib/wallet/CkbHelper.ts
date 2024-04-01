@@ -823,6 +823,7 @@ export class CkbHepler {
             amount: BI.from(0).toString(),
             type_hash: typeHash,
             udt_type: "xudt",
+            type_script: xudtCell.cellOutput.type,
           };
 
           xudtMap[typeHash] = ckbUDTInfo;
@@ -844,6 +845,7 @@ export class CkbHepler {
           amount: sporeCell.cellOutput.type.args,
           type_hash: typeHash,
           udt_type: "spore_cell",
+          type_script: sporeCell.cellOutput.type,
         });
       }
     }
