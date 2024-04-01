@@ -18,7 +18,7 @@ export const Assets = observer(() => {
     if(accountStore.currentAddress) {
       const RgbAssetListRlt = await RGBHelper.instance.getRgbppAssert(accountStore.currentAddress);
       setRgbAssetList(RgbAssetListRlt);
-
+      console.log('====>', rgbAssetList)
     }
   }
 
