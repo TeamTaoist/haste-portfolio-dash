@@ -181,7 +181,7 @@ export function TabRgb() {
                       Transfer {rgb.ckbCellInfo.symbol}
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className=" bg-primary007 !border-none">
                     <Tabs defaultValue="rgb++" className="w-[100%]">
                       <TabsList className="w-[100%]">
                         <TabsTrigger
