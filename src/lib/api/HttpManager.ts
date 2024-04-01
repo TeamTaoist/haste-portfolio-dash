@@ -1,10 +1,4 @@
-import {
-  AssetInfo,
-  ckb_SporeInfo,
-  ckb_TxInfo,
-  ckb_UDTInfo,
-  txInfo,
-} from "../interface";
+import { AssetInfo, ckb_TxInfo, txInfo } from "../interface";
 import { EventManager } from "../manager/EventManager";
 import { EventType } from "../enum";
 import { DataManager } from "../manager/DataManager";
@@ -44,24 +38,12 @@ export class HttpManager {
           ),
         });
 
-        const ckbSporeInfoList: ckb_SporeInfo[] = [];
-        const udtInfoList: ckb_UDTInfo[] = [];
-        for (
-          let i = 0;
-          i < ckbAddressInfo.data.attributes.udt_accounts.length;
-          i++
-        ) {
-          const udt_accounts = ckbAddressInfo.data.attributes.udt_accounts[i];
-          if (udt_accounts.udt_type == "spore_cell") {
-            ckbSporeInfoList.push(udt_accounts);
-          } else {
-            udtInfoList.push(udt_accounts);
-          }
-        }
+        const { xudtList, sporeList } =
+          await CkbHepler.instance.getXudtAndSpore(address);
 
         DataManager.instance.tokens = {
-          udt: udtInfoList,
-          spore: ckbSporeInfoList,
+          udt: xudtList,
+          spore: sporeList,
         };
       } else {
         assetList.push({

@@ -129,9 +129,7 @@ export function TabSpore() {
                 <div className="flex flex-col justify-center">
                   <div className="w-32 h-32 overflow-hidden mx-auto">
                     <img
-                      src={`https://a-simple-demo.spore.pro/api/media/${BI.from(
-                        spore.amount
-                      ).toHexString()}`}
+                      src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
                       className="w-full h-full object-cover object-center"
                     />
                   </div>
@@ -155,9 +153,7 @@ export function TabSpore() {
                     <Separator />
                     <div className="flex flex-col gap-4">
                       <img
-                        src={`https://a-simple-demo.spore.pro/api/media/${BI.from(
-                          spore.amount
-                        ).toHexString()}`}
+                        src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
                         className="w-full h-full object-cover object-center"
                       />
                     </div>

@@ -493,27 +493,30 @@ export class RGBHelper {
       // const xudtTypeScript = getXudtTypeScript(isMainnet);
       for await (const rgbppLock of rgbppLocks) {
         const address = helpers.encodeToAddress(rgbppLock.lock);
-        const addressInfo = await CkbHepler.instance.getAddressInfo(address);
-        let findCell = false;
-        if (addressInfo) {
-          if (addressInfo.data.attributes.udt_accounts) {
-            for (
-              let i = 0;
-              i < addressInfo.data.attributes.udt_accounts.length;
-              i++
-            ) {
-              const udt = addressInfo.data.attributes.udt_accounts[i];
-              rgbAssertList.push({
-                txHash: rgbppLock.txHash,
-                idx: rgbppLock.idx,
-                ckbCellInfo: udt,
-                value: rgbppLock.value,
-              });
-              findCell = true;
-            }
+        const { xudtList, sporeList } =
+          await CkbHepler.instance.getXudtAndSpore(address);
+
+        if (xudtList.length > 0) {
+          for (let i = 0; i < xudtList.length; i++) {
+            const xudt = xudtList[i];
+            rgbAssertList.push({
+              txHash: rgbppLock.txHash,
+              idx: rgbppLock.idx,
+              ckbCellInfo: xudt,
+              value: rgbppLock.value,
+            });
           }
-        }
-        if (!findCell) {
+        } else if (sporeList.length > 0) {
+          for (let i = 0; i < sporeList.length; i++) {
+            const spore = sporeList[i];
+            rgbAssertList.push({
+              txHash: rgbppLock.txHash,
+              idx: rgbppLock.idx,
+              ckbCellInfo: spore,
+              value: rgbppLock.value,
+            });
+          }
+        } else {
           rgbAssertList.push({
             txHash: rgbppLock.txHash,
             idx: rgbppLock.idx,

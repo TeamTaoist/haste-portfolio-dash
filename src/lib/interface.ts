@@ -122,8 +122,8 @@ export interface ckb_SporeInfo {
   symbol: string;
   amount: string;
   type_hash: string;
-  udt_icon_file: string;
-  udt_type: "spore_cell" | "sudt";
+  udt_icon_file?: string;
+  udt_type: "spore_cell";
   decimal?: string;
   display_name?: string;
   uan?: string;
@@ -133,8 +133,8 @@ export interface ckb_UDTInfo {
   symbol: string;
   amount: string;
   type_hash: string;
-  udt_icon_file: string;
-  udt_type: "spore_cell" | "sudt";
+  udt_icon_file?: string;
+  udt_type: "xudt";
 }
 
 export interface ckb_AddressInfo {
@@ -242,8 +242,38 @@ export interface WalletInfo {
 export interface RgbAssert {
   txHash: string;
   idx: number;
-  ckbCellInfo?: ckb_UDTInfo;
+  ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
   value: number;
+}
+
+export interface ckb_LiveCell {
+  id: string;
+  type: string;
+  attributes: {
+    cell_type: string;
+    tx_hash: string;
+    cell_index: string;
+    type_hash: string;
+    data: string;
+    block_number: string;
+    capacity: string;
+    occupied_capacity: string;
+    block_timestamp: string;
+    type_script: {
+      args: string;
+      code_hash: string;
+      hash_type: string;
+    };
+    lock_script: {
+      args: string;
+      code_hash: string;
+      hash_type: string;
+    };
+    extra_info: {
+      type: string;
+      capacity: string;
+    };
+  };
 }
 
 // type

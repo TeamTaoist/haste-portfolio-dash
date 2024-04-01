@@ -8,9 +8,16 @@ import {
   commons,
   config,
   helpers,
+  utils,
 } from "@ckb-lumos/lumos";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
-import { UdtInfo, ckb_AddressInfo, ckb_TransferOptions } from "../interface";
+import {
+  UdtInfo,
+  ckb_AddressInfo,
+  ckb_SporeInfo,
+  ckb_TransferOptions,
+  ckb_UDTInfo,
+} from "../interface";
 import { DataManager } from "../manager/DataManager";
 import {
   CKBTransaction,
@@ -772,5 +779,75 @@ export class CkbHepler {
       `https://${ckb_explorer_api}/api/v1/addresses?q=${address}`
     );
     return result;
+  }
+
+  async getXudtAndSpore(address: string) {
+    const xudtTypeScript = getXudtTypeScript(isMainnet);
+    const sporeTypeScript = getSporeTypeScript(isMainnet);
+
+    const xudt_collector = indexer.collector({
+      lock: helpers.parseAddress(address),
+      type: {
+        script: {
+          codeHash: xudtTypeScript.codeHash,
+          hashType: xudtTypeScript.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    const spore_collector = indexer.collector({
+      lock: helpers.parseAddress(address),
+      type: {
+        script: {
+          codeHash: sporeTypeScript.codeHash,
+          hashType: sporeTypeScript.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    const xudtList: ckb_UDTInfo[] = [];
+    const sporeList: ckb_SporeInfo[] = [];
+
+    const xudtMap: { [key: string]: ckb_UDTInfo } = {};
+
+    for await (const xudtCell of xudt_collector.collect()) {
+      if (xudtCell.cellOutput.type) {
+        const typeHash = utils.computeScriptHash(xudtCell.cellOutput.type);
+        if (!xudtMap[typeHash]) {
+          const ckbUDTInfo: ckb_UDTInfo = {
+            symbol: "UNKNOWN",
+            amount: BI.from(0).toString(),
+            type_hash: typeHash,
+            udt_type: "xudt",
+          };
+
+          xudtMap[typeHash] = ckbUDTInfo;
+          xudtList.push(ckbUDTInfo);
+        }
+
+        xudtMap[typeHash].amount = BI.from(xudtMap[typeHash].amount)
+          .add(number.Uint128LE.unpack(xudtCell.data))
+          .toString();
+      }
+    }
+
+    for await (const sporeCell of spore_collector.collect()) {
+      if (sporeCell.cellOutput.type) {
+        const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
+
+        sporeList.push({
+          symbol: "DOBs",
+          amount: sporeCell.cellOutput.type.args,
+          type_hash: typeHash,
+          udt_type: "spore_cell",
+        });
+      }
+    }
+
+    return { xudtList, sporeList };
   }
 }
