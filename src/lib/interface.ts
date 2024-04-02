@@ -61,6 +61,7 @@ export interface ckb_TxInfo {
     cells: string[][];
   }[];
   lastCursor: string;
+  attributes?: any;
 }
 
 export interface txInfo {
