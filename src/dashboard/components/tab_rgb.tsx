@@ -21,13 +21,13 @@ import { RgbAssert } from "@/lib/interface";
 import { toast } from "@/components/ui/use-toast";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { BI } from "@ckb-lumos/lumos";
-import { accountStore } from "@/store/AccountStore";
 import { getSymbol } from "@/lib/utils";
 
 export function TabRgb() {
   const [reload, setReload] = useState(false);
   const [toAddress, setToAddress] = useState<string>("");
   const [isRgb, setIsRgb] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   // const [amount, setAmount] = useState<number>(0);
 
   useEffect(() => {
@@ -95,7 +95,7 @@ export function TabRgb() {
             description: rs,
           });
 
-          accountStore.setCurrentAddress(curAccount);
+          handleCloseDialog();
         })
         .catch((err) => {
           console.error(err);
@@ -123,7 +123,7 @@ export function TabRgb() {
             description: rs,
           });
 
-          accountStore.setCurrentAddress(curAccount);
+          handleCloseDialog();
         })
         .catch((err) => {
           console.error(err);
@@ -138,9 +138,19 @@ export function TabRgb() {
   };
 
   const handlerDialogOpenChange = (e) => {
-    if (e) {
-      setToAddress("");
+    if (!e) {
+      handleCloseDialog();
     }
+  };
+
+  const handleOpenDialog = () => {
+    setIsRgb(true);
+    setToAddress("");
+    setIsOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsOpen(false);
   };
 
   return (
@@ -176,9 +186,12 @@ export function TabRgb() {
                 <p className="text-xs text-muted-foreground">
                   {getSymbol(rgb.ckbCellInfo.type_script)}
                 </p>
-                <Dialog onOpenChange={handlerDialogOpenChange}>
+                <Dialog open={isOpen} onOpenChange={handlerDialogOpenChange}>
                   <DialogTrigger asChild>
-                    <Button className="relative mt-2 border-none font-SourceSanPro">
+                    <Button
+                      className="relative mt-2 border-none font-SourceSanPro"
+                      onClick={handleOpenDialog}
+                    >
                       Transfer {getSymbol(rgb.ckbCellInfo.type_script)}
                     </Button>
                   </DialogTrigger>
@@ -190,14 +203,15 @@ export function TabRgb() {
                           className="w-[50%]"
                           onClick={() => setIsRgb(true)}
                         >
-                          RGB++
+                          Swap to CKB
                         </TabsTrigger>
                         <TabsTrigger
                           value={getSymbol(rgb.ckbCellInfo.type_script)}
                           className="w-[50%]"
                           onClick={() => setIsRgb(false)}
                         >
-                          {getSymbol(rgb.ckbCellInfo.type_script)}
+                          Transfer {getSymbol(rgb.ckbCellInfo.type_script)} on
+                          BTC
                         </TabsTrigger>
                       </TabsList>
                       <TabsContent value="rgb++">
@@ -223,7 +237,7 @@ export function TabRgb() {
                     </Tabs>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="username" className="text-right">
-                        To Address
+                        {isRgb ? "CKB" : "BTC"} Address
                       </Label>
                       <Input
                         id="toAddress"

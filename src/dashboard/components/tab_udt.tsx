@@ -23,7 +23,6 @@ import { toast } from "@/components/ui/use-toast";
 import { parseUnit } from "@ckb-lumos/bi";
 import { TabsList } from "@radix-ui/react-tabs";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
-import { accountStore } from "@/store/AccountStore";
 import { getSymbol } from "@/lib/utils";
 
 export function TabUdt() {
@@ -31,6 +30,7 @@ export function TabUdt() {
   const [toAddress, setToAddress] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [isRgb, setIsRgb] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
@@ -122,7 +122,7 @@ export function TabUdt() {
                   description: rs,
                 });
 
-                accountStore.setCurrentAddress(curAccount);
+                handleCloseDialog();
               })
               .catch((err) => {
                 console.error(err);
@@ -170,7 +170,7 @@ export function TabUdt() {
             description: txHash,
           });
 
-          accountStore.setCurrentAddress(curAccount);
+          handleCloseDialog();
         })
         .catch((err) => {
           console.error(err);
@@ -185,10 +185,20 @@ export function TabUdt() {
   };
 
   const handlerDialogOpenChange = (e) => {
-    if (e) {
-      setToAddress("");
-      setAmount(0);
+    if (!e) {
+      handleCloseDialog();
     }
+  };
+
+  const handleOpenDialog = () => {
+    setIsRgb(true);
+    setAmount(0);
+    setToAddress("");
+    setIsOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsOpen(false);
   };
 
   return (
@@ -221,9 +231,12 @@ export function TabUdt() {
               <p className="text-xs text-muted-foreground">
                 {getSymbol(udt.type_script)}
               </p>
-              <Dialog onOpenChange={handlerDialogOpenChange}>
+              <Dialog open={isOpen} onOpenChange={handlerDialogOpenChange}>
                 <DialogTrigger asChild>
-                  <Button className="relative mt-2 border-none font-SourceSanPro">
+                  <Button
+                    className="relative mt-2 border-none font-SourceSanPro"
+                    onClick={handleOpenDialog}
+                  >
                     Transfer {getSymbol(udt.type_script)}
                   </Button>
                 </DialogTrigger>
@@ -235,14 +248,14 @@ export function TabUdt() {
                         className="w-[50%]"
                         onClick={() => setIsRgb(true)}
                       >
-                        RGB++
+                        Transfer to BTC
                       </TabsTrigger>
                       <TabsTrigger
                         value={getSymbol(udt.type_script)}
                         className="w-[50%]"
                         onClick={() => setIsRgb(false)}
                       >
-                        {getSymbol(udt.type_script)}
+                        Transfer {getSymbol(udt.type_script)} on CKB
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="rgb++">
@@ -280,7 +293,7 @@ export function TabUdt() {
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="username" className="text-right">
-                      To Address
+                      {isRgb ? "BTC" : "CKB"} Address
                     </Label>
                     <Input
                       id="toAddress"
