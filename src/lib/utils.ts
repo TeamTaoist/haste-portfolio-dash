@@ -13,6 +13,7 @@ import {
   serializeInput,
 } from "@nervosnetwork/ckb-sdk-utils";
 import { u64ToLe, u8ToHex, utf8ToHex } from "@rgbpp-sdk/ckb";
+import { assetInfoMgr } from "./manager/AssetInfoManager";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -138,4 +139,10 @@ export const serializeInscriptionXudtInfo = (info: {
   ret = ret.concat(u8ToHex(symbol.length / 2) + symbol);
   ret = ret.concat(remove0x(info.xudtHash));
   return ret;
+};
+
+export const getSymbol = (udtTypeScript: Script) => {
+  const info = assetInfoMgr.getXUDTInfo(udtTypeScript);
+
+  return info ? info.symbol : "...";
 };

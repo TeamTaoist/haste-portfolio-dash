@@ -16,6 +16,7 @@ import {
   ckb_AddressInfo,
   ckb_SporeInfo,
   ckb_TransferOptions,
+  ckb_TxInfo_new,
   ckb_UDTInfo,
 } from "../interface";
 import { DataManager } from "../manager/DataManager";
@@ -47,8 +48,8 @@ import { accountStore } from "@/store/AccountStore";
 
 config.initializeConfig(CONFIG);
 
-const rpc = new RPC(CKB_RPC_URL);
-const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
+export const rpc = new RPC(CKB_RPC_URL);
+export const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
 
 export class CkbHepler {
   private static _instance: CkbHepler;
@@ -818,6 +819,20 @@ export class CkbHepler {
   async getAddress(address: string) {
     const result = await this.sendExploreApi(
       `https://${ckb_explorer_api}/api/v1/addresses?q=${address}`
+    );
+    return result;
+  }
+
+  async getCellOutPutData(id: string) {
+    const result = await this.sendExploreApi(
+      `https://${ckb_explorer_api}/api/v1/cell_output_data/${id}`
+    );
+    return result;
+  }
+
+  async getTxInfo(txHash: string): Promise<ckb_TxInfo_new | undefined> {
+    const result = await this.sendExploreApi(
+      `https://${ckb_explorer_api}/api/v1/transactions/${txHash}`
     );
     return result;
   }

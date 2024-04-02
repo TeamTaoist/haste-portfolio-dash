@@ -24,6 +24,7 @@ import { parseUnit } from "@ckb-lumos/bi";
 import { TabsList } from "@radix-ui/react-tabs";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { accountStore } from "@/store/AccountStore";
+import { getSymbol } from "@/lib/utils";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
@@ -217,11 +218,13 @@ export function TabUdt() {
               <div className="text-2xl font-bold">
                 {formatUnit(udt.amount, "ckb")}
               </div>
-              <p className="text-xs text-muted-foreground">{udt.symbol}</p>
+              <p className="text-xs text-muted-foreground">
+                {getSymbol(udt.type_script)}
+              </p>
               <Dialog onOpenChange={handlerDialogOpenChange}>
                 <DialogTrigger asChild>
                   <Button className="relative mt-2 border-none font-SourceSanPro">
-                    Transfer {udt.symbol}
+                    Transfer {getSymbol(udt.type_script)}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-primary006 !border-none">
@@ -235,11 +238,11 @@ export function TabUdt() {
                         RGB++
                       </TabsTrigger>
                       <TabsTrigger
-                        value={udt.symbol}
+                        value={getSymbol(udt.type_script)}
                         className="w-[50%]"
                         onClick={() => setIsRgb(false)}
                       >
-                        {udt.symbol}
+                        {getSymbol(udt.type_script)}
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="rgb++">
@@ -250,9 +253,11 @@ export function TabUdt() {
                         </DialogDescription>
                       </DialogHeader>
                     </TabsContent>
-                    <TabsContent value={udt.symbol}>
+                    <TabsContent value={getSymbol(udt.type_script)}>
                       <DialogHeader>
-                        <DialogTitle>Transfer {udt.symbol}</DialogTitle>
+                        <DialogTitle>
+                          Transfer {getSymbol(udt.type_script)}
+                        </DialogTitle>
                         <DialogDescription className="!text-white001">
                           * Make sure type correct wallet address
                         </DialogDescription>

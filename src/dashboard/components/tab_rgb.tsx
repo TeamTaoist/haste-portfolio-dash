@@ -22,6 +22,7 @@ import { toast } from "@/components/ui/use-toast";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { BI } from "@ckb-lumos/lumos";
 import { accountStore } from "@/store/AccountStore";
+import { getSymbol } from "@/lib/utils";
 
 export function TabRgb() {
   const [reload, setReload] = useState(false);
@@ -150,7 +151,7 @@ export function TabRgb() {
           !rgb.ckbCellInfo ? (
             ""
           ) : (
-            <Card key={rgb.ckbCellInfo.type_hash}>
+            <Card key={rgb.ckbCellInfo.type_hash + rgb.txHash}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   {rgb.ckbCellInfo.udt_type}
@@ -173,12 +174,12 @@ export function TabRgb() {
                   {formatUnit(rgb.ckbCellInfo.amount, "ckb")}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {rgb.ckbCellInfo.symbol}
+                  {getSymbol(rgb.ckbCellInfo.type_script)}
                 </p>
                 <Dialog onOpenChange={handlerDialogOpenChange}>
                   <DialogTrigger asChild>
                     <Button className="relative mt-2 border-none font-SourceSanPro">
-                      Transfer {rgb.ckbCellInfo.symbol}
+                      Transfer {getSymbol(rgb.ckbCellInfo.type_script)}
                     </Button>
                   </DialogTrigger>
                   <DialogContent className=" bg-primary007 !border-none">
@@ -192,11 +193,11 @@ export function TabRgb() {
                           RGB++
                         </TabsTrigger>
                         <TabsTrigger
-                          value={rgb.ckbCellInfo.symbol}
+                          value={getSymbol(rgb.ckbCellInfo.type_script)}
                           className="w-[50%]"
                           onClick={() => setIsRgb(false)}
                         >
-                          {rgb.ckbCellInfo.symbol}
+                          {getSymbol(rgb.ckbCellInfo.type_script)}
                         </TabsTrigger>
                       </TabsList>
                       <TabsContent value="rgb++">
@@ -207,10 +208,12 @@ export function TabRgb() {
                           </DialogDescription>
                         </DialogHeader>
                       </TabsContent>
-                      <TabsContent value={rgb.ckbCellInfo.symbol}>
+                      <TabsContent
+                        value={getSymbol(rgb.ckbCellInfo.type_script)}
+                      >
                         <DialogHeader>
                           <DialogTitle>
-                            Transfer {rgb.ckbCellInfo.symbol}
+                            Transfer {getSymbol(rgb.ckbCellInfo.type_script)}
                           </DialogTitle>
                           <DialogDescription className="!text-white001">
                             * Make sure type correct wallet address

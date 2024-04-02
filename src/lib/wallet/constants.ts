@@ -7,15 +7,15 @@ export const CKB_RPC_URL = "https://testnet.ckb.dev";
 export const CKB_INDEX_URL = "https://testnet.ckb.dev";
 
 export const BTC_ASSETS_API_URL = "https://btc-assets-api.testnet.mibao.pro";
-// export const BTC_ASSETS_TOKEN =
-//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU";
-// export const BTC_ASSETS_ORGIN = "http://localhost";
+export const BTC_ASSETS_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU";
+export const BTC_ASSETS_ORGIN = "http://localhost";
 export const ckb_explorer_api = "testnet-api.explorer.nervos.org";
 
 // main config
-export const BTC_ASSETS_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4";
-export const BTC_ASSETS_ORGIN = "https://caboroca.xyz";
+// export const BTC_ASSETS_TOKEN =
+//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4";
+// export const BTC_ASSETS_ORGIN = "https://caboroca.xyz";
 
 export const backend: string = "https://blockchain-serverless.vercel.app";
 
@@ -133,6 +133,38 @@ const TestnetInfo = {
     },
     depType: "code",
   } as CellDep,
+
+  UniqueCellTypeScript: {
+    codeHash:
+      "0x8e341bcfec6393dcd41e635733ff2dca00a6af546949f70c57a706c0f344df8b",
+    hashType: "type",
+    args: "",
+  } as Script,
+
+  UniqueCellTypeDep: {
+    outPoint: {
+      txHash:
+        "0x2415ee81413fa9dd82245db054c19eb1ae2191185e2cb18ed1262947aec323c3",
+      index: "0x0",
+    },
+    depType: "code",
+  } as CellDep,
+
+  InscriptionInfoTypeScript: {
+    codeHash:
+      "0x50fdea2d0030a8d0b3d69f883b471cab2a29cae6f01923f19cecac0f27fdaaa6",
+    hashType: "type",
+    args: "",
+  } as CKBComponents.Script,
+
+  InscriptionInfoDep: {
+    outPoint: {
+      txHash:
+        "0x7bf3899cf41879ed0319bf5312c9db5bf5620fff9ebe59556c261c48f0369054",
+      index: "0x0",
+    },
+    depType: "code",
+  } as CKBComponents.CellDep,
 };
 
 const MainnetInfo = {
@@ -247,7 +279,53 @@ const MainnetInfo = {
     },
     depType: "code",
   } as CellDep,
+
+  UniqueCellTypeScript: {
+    codeHash:
+      "0xcc2518c2c1384f2473c96f63c4e74074984296f358512ee7f54c848d4c135040",
+    hashType: "data1",
+    args: "",
+  } as Script,
+
+  UniqueCellTypeDep: {
+    outPoint: {
+      txHash:
+        "0x9c344c947fc7c31221774c3cc03af3ef5a0e472497305f7da796216696bee4c8",
+      index: "0x0",
+    },
+    depType: "code",
+  } as CellDep,
+
+  InscriptionInfoTypeScript: {
+    codeHash:
+      "0x5c33fc69bd72e895a63176147c6ab0bb5758d1c7a32e0914f99f9ec1bed90d41",
+    hashType: "type",
+    args: "",
+  } as CKBComponents.Script,
+
+  InscriptionInfoDep: {
+    outPoint: {
+      txHash:
+        "0x1ae1ba691d00525c17b262126576ca5d41b9c6bc09e94038ec26570d0b3f0219",
+      index: "0x0",
+    },
+    depType: "code",
+  } as CKBComponents.CellDep,
 };
+
+export const getInscriptionInfoTypeScript = (isMainnet: boolean) =>
+  isMainnet
+    ? MainnetInfo.InscriptionInfoTypeScript
+    : TestnetInfo.InscriptionInfoTypeScript;
+export const getInscriptionInfoDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.InscriptionInfoDep : TestnetInfo.InscriptionInfoDep;
+
+export const getUniqueCellTypeScript = (isMainnet: boolean) =>
+  isMainnet
+    ? MainnetInfo.UniqueCellTypeScript
+    : TestnetInfo.UniqueCellTypeScript;
+export const getUniqueCellTypeDep = (isMainnet: boolean) =>
+  isMainnet ? MainnetInfo.UniqueCellTypeDep : TestnetInfo.UniqueCellTypeDep;
 
 export const getJoyIDLockScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.JoyIDLockScript : TestnetInfo.JoyIDLockScript;

@@ -195,42 +195,50 @@ export interface btc_TxInfo {
   };
 }
 
-export interface ckb_TxInfo {
-  id: string;
-  type: "ckb_transactions";
-  attributes: {
-    is_cellbase: boolean;
-    transaction_hash: string;
-    block_number: string;
-    block_timestamp: string;
-    display_inputs_count: number;
-    display_outputs_count: number;
-    display_inputs: {
-      id: string;
-      from_cellbase: boolean;
-      capacity: string;
-      occupied_capacity: string;
-      address_hash: string;
-      generated_tx_hash: string;
-      cell_index: string;
-      cell_type: string;
-      since: {
-        raw: string;
-        median_timestamp: string;
-      };
-    }[];
-    display_outputs: {
-      id: string;
-      capacity: string;
-      occupied_capacity: string;
-      address_hash: string;
-      status: string;
-      consumed_tx_hash: string;
-      cell_type: string;
-    }[];
-    income: string;
-    created_at: string;
-    create_timestamp: string;
+export interface ckb_TxInfo_new {
+  data: {
+    id: string;
+    type: "ckb_transactions";
+    attributes: {
+      is_cellbase: boolean;
+      transaction_hash: string;
+      block_number: string;
+      block_timestamp: string;
+      display_inputs_count: number;
+      display_outputs_count: number;
+      display_inputs: {
+        id: string;
+        from_cellbase: boolean;
+        capacity: string;
+        occupied_capacity: string;
+        address_hash: string;
+        generated_tx_hash: string;
+        cell_index: string;
+        cell_type: string;
+        since: {
+          raw: string;
+          median_timestamp: string;
+        };
+      }[];
+      display_outputs: {
+        id: string;
+        capacity: string;
+        occupied_capacity: string;
+        address_hash: string;
+        status: string;
+        consumed_tx_hash: string;
+        cell_type: string;
+        extra_info?: {
+          amount: string;
+          decimal: string;
+          name: string;
+          symbol: string;
+        };
+      }[];
+      income: string;
+      created_at: string;
+      create_timestamp: string;
+    };
   };
 }
 
@@ -276,6 +284,12 @@ export interface ckb_LiveCell {
       capacity: string;
     };
   };
+}
+
+export interface xudt_info {
+  decimal: number;
+  name: string;
+  symbol: string;
 }
 
 // type
