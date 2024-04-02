@@ -6,6 +6,13 @@ import {
   assembleTransferSporeAction,
   assembleCobuildWitnessLayout,
 } from "@spore-sdk/core/lib/cobuild";
+import {
+  PERSONAL,
+  blake2b,
+  hexToBytes,
+  serializeInput,
+} from "@nervosnetwork/ckb-sdk-utils";
+import { u64ToLe, u8ToHex, utf8ToHex } from "@rgbpp-sdk/ckb";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -105,4 +112,30 @@ export const generateSporeCoBuild = (
     sporeActions = sporeActions.concat(actions);
   }
   return assembleCobuildWitnessLayout(sporeActions);
+};
+
+export const generateInscriptionId = (
+  firstInput: CKBComponents.CellInput,
+  outputIndex: number
+) => {
+  const input = hexToBytes(serializeInput(firstInput));
+  const s = blake2b(32, null, null, PERSONAL);
+  s.update(input);
+  s.update(hexToBytes(`0x${u64ToLe(BigInt(outputIndex))}`));
+  return `0x${s.digest("hex")}`;
+};
+
+export const serializeInscriptionXudtInfo = (info: {
+  decimal: number;
+  name: string;
+  symbol: string;
+  xudtHash: string;
+}) => {
+  let ret = u8ToHex(info.decimal);
+  const name = remove0x(utf8ToHex(info.name));
+  ret = ret.concat(u8ToHex(name.length / 2) + name);
+  const symbol = remove0x(utf8ToHex(info.symbol));
+  ret = ret.concat(u8ToHex(symbol.length / 2) + symbol);
+  ret = ret.concat(remove0x(info.xudtHash));
+  return ret;
 };

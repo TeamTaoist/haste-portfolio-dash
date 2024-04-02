@@ -89,7 +89,7 @@ export class BtcHepler {
         }/api/address/${address}/utxo`
       )
       .catch((err) => {
-        console.error(err.message);
+        console.error(err);
       });
 
     if (result && result.status == 200) {
@@ -152,7 +152,7 @@ export class BtcHepler {
         }`
       )
       .catch((err) => {
-        console.error(err.message);
+        console.error(err);
       });
 
     if (result && result.status == 200) {
@@ -168,7 +168,7 @@ export class BtcHepler {
         }/api/address/${address}`
       )
       .catch((err) => {
-        console.error(err.message);
+        console.error(err);
       });
 
     if (result && result.status == 200) {

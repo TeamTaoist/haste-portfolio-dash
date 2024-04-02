@@ -12,22 +12,19 @@ import { TabsContent } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { DataManager } from "@/lib/manager/DataManager";
 import { sortStr } from "@/lib/utils";
-import { CkbHepler } from "@/lib/wallet/CkbHelper";
+// import { CkbHepler } from "@/lib/wallet/CkbHelper";
 import { parseUnit } from "@ckb-lumos/bi";
 import { observer } from "mobx-react";
 import { autorun } from "mobx";
 import { useEffect, useState } from "react";
 import { accountStore } from "@/store/AccountStore";
-import { RGBHelper } from "@/lib/wallet/RGBHelper";
 
-export const Send = observer(() => {
-  const [receiveAddress, setReceiverAddress] = useState("");
-  const [amount, setAmount] = useState<number>(0);
+export const Mint = observer(() => {
+  const [amount, setAmount] = useState("");
+  // const [symbol, setSymbol] = useState("");
+  // const [name, setName] = useState("");
 
-  const handlerCancel = () => {
-    setReceiverAddress("");
-    setAmount(0);
-  };
+  const handlerCancel = () => {};
 
   const handleSend = () => {
     const curAccount = accountStore.currentAddress;
@@ -44,54 +41,9 @@ export const Send = observer(() => {
       throw new Error("Please choose a wallet");
     }
 
-    console.log(receiveAddress, amount, wallet.address);
-
     if (wallet.type == "joyid" && wallet.chain == "CKB") {
-      const sendCkb = parseUnit(amount.toString(), "ckb");
-      console.log(sendCkb);
-
-      CkbHepler.instance
-        .transfer_ckb({
-          from: wallet.address,
-          to: receiveAddress.trim(),
-          amount: sendCkb,
-        })
-        .then((rs) => {
-          console.log(rs);
-
-          toast({
-            title: "Success",
-            description: rs,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-
-          toast({
-            title: "Warning",
-            description: err.message,
-            variant: "destructive",
-          });
-        });
-    } else {
-      RGBHelper.instance
-        .transferBTC(receiveAddress.trim(), parseUnit(amount.toString(), "ckb"))
-        .then((rs) => {
-          console.log("Send BTC txHash", rs);
-          toast({
-            title: "Success",
-            description: rs,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-
-          toast({
-            title: "Warning",
-            description: err.message,
-            variant: "destructive",
-          });
-        });
+      const mintAmount = parseUnit(amount.trim(), "ckb");
+      console.log(mintAmount);
     }
   };
 
@@ -101,23 +53,23 @@ export const Send = observer(() => {
   }, []);
 
   return (
-    <TabsContent value="Send" className="space-y-4">
+    <TabsContent value="MintXUDT" className="space-y-4">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Send</CardTitle>
+          <CardTitle>Mint XUDT</CardTitle>
           {/* <CardDescription>Deploy your new project in one-click.</CardDescription> */}
         </CardHeader>
         <CardContent>
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Receive Address</Label>
+                {/* <Label htmlFor="name">Receive Address</Label>
                 <Input
                   id="receiver"
                   placeholder="Receive Address"
                   value={receiveAddress}
                   onChange={(e) => setReceiverAddress(e.target.value)}
-                />
+                /> */}
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Amount</Label>
@@ -125,7 +77,7 @@ export const Send = observer(() => {
                   id="amount"
                   placeholder="Amount"
                   value={amount}
-                  onChange={(e) => setAmount(parseFloat(e.target.value))}
+                  onChange={(e) => setAmount(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">

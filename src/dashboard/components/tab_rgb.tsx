@@ -97,7 +97,7 @@ export function TabRgb() {
           accountStore.setCurrentAddress(curAccount);
         })
         .catch((err) => {
-          console.error(err.message);
+          console.error(err);
 
           toast({
             title: "Warning",
@@ -125,7 +125,7 @@ export function TabRgb() {
           accountStore.setCurrentAddress(curAccount);
         })
         .catch((err) => {
-          console.error(err.message);
+          console.error(err);
 
           toast({
             title: "Warning",
