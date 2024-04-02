@@ -146,3 +146,43 @@ export const getSymbol = (udtTypeScript: Script) => {
 
   return info ? info.symbol : "...";
 };
+
+export const unserializeTokenInfo = (hexData: string) => {
+  const buf = hexToBytes(hexData);
+  const view = new DataView(buf.buffer);
+
+  const decimal = view.getUint8(0);
+
+  const nameLen = view.getUint8(1);
+
+  let header = 2;
+  const nameMax = header + nameLen;
+  const nameBuf = new ArrayBuffer(nameLen);
+  const nameView = new DataView(nameBuf);
+  for (let i = 0; header < nameMax; header++, i++) {
+    const v = view.getUint8(header);
+    nameView.setUint8(i, v);
+  }
+
+  const symbolLen = view.getUint8(header);
+  header++;
+  const symbolMax = header + symbolLen;
+  const symbolBuf = new ArrayBuffer(symbolLen);
+  const symbolView = new DataView(symbolBuf);
+  for (let i = 0; header < symbolMax; header++, i++) {
+    const v = view.getUint8(header);
+    symbolView.setUint8(i, v);
+  }
+
+  console.log(
+    decimal,
+    Buffer.from(nameBuf).toString(),
+    Buffer.from(symbolBuf).toString()
+  );
+
+  return {
+    decimal,
+    name: Buffer.from(nameBuf).toString(),
+    symbol: Buffer.from(symbolBuf).toString(),
+  };
+};

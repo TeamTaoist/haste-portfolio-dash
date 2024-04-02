@@ -292,5 +292,15 @@ export interface xudt_info {
   symbol: string;
 }
 
+export interface CellOutPutData {
+  data: {
+    id: string;
+    type: string;
+    attributes: {
+      data: string;
+    };
+  };
+}
+
 // type
 export type WalletType = "none" | "unisat" | "okx" | "joyid";

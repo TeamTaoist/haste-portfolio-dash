@@ -12,6 +12,7 @@ import {
 } from "@ckb-lumos/lumos";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import {
+  CellOutPutData,
   UdtInfo,
   ckb_AddressInfo,
   ckb_SporeInfo,
@@ -823,7 +824,7 @@ export class CkbHepler {
     return result;
   }
 
-  async getCellOutPutData(id: string) {
+  async getCellOutPutData(id: string): Promise<CellOutPutData | undefined> {
     const result = await this.sendExploreApi(
       `https://${ckb_explorer_api}/api/v1/cell_output_data/${id}`
     );
