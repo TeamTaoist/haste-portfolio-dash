@@ -12,16 +12,20 @@ import { RgbAssert } from "@/lib/interface";
 export const Assets = observer(() => {
   const assetList = DataManager.instance.curAsset;
   const [hide, setHide] = useState(false);
-  const [rgbAssetList, setRgbAssetList] = useState<RgbAssert[]>(); 
+  const [rgbAssetList, setRgbAssetList] = useState<RgbAssert[]>();
 
-  const getRgbAsset = async() => {
-    if(accountStore.currentAddress) {
-      const RgbAssetListRlt = await RGBHelper.instance.getRgbppAssert(accountStore.currentAddress);
-      setRgbAssetList(RgbAssetListRlt);
-      console.log('====>', rgbAssetList)
+  const getRgbAsset = async () => {
+    if (accountStore.currentAddress) {
+      const wallet = accountStore.getWallet(accountStore.currentAddress);
+      if (wallet && wallet.chain == "BTC") {
+        const RgbAssetListRlt = await RGBHelper.instance.getRgbppAssert(
+          accountStore.currentAddress
+        );
+        setRgbAssetList(RgbAssetListRlt);
+        console.log("====>", rgbAssetList);
+      }
     }
-  }
-
+  };
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_assets_show, () => {
@@ -42,8 +46,8 @@ export const Assets = observer(() => {
   }, []);
 
   useEffect(() => {
-    getRgbAsset()
-  }, [])
+    getRgbAsset();
+  }, []);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 ">
@@ -82,4 +86,4 @@ export const Assets = observer(() => {
       ))}
     </div>
   );
-})
+});
