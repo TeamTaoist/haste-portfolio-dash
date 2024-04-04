@@ -1,3 +1,4 @@
+import { isTestNet } from "@/lib/wallet/constants";
 import { makeAutoObservable } from "mobx";
 
 export interface AccountType {
@@ -18,7 +19,11 @@ class AccountStore {
   }
 
   loadAccounts() {
-    const accountsFromStorage = localStorage.getItem("accounts");
+    const isTest = isTestNet();
+
+    const accountsFromStorage = localStorage.getItem(
+      isTest ? "testAccounts" : "mainAccounts"
+    );
     if (accountsFromStorage) {
       this.accounts = JSON.parse(accountsFromStorage);
       this.setCurrentAddress(
@@ -30,7 +35,12 @@ class AccountStore {
   }
 
   saveAccounts() {
-    localStorage.setItem("accounts", JSON.stringify(this.accounts));
+    const isTest = isTestNet();
+
+    localStorage.setItem(
+      isTest ? "testAccounts" : "mainAccounts",
+      JSON.stringify(this.accounts)
+    );
   }
 
   addAccount(account: AccountType) {

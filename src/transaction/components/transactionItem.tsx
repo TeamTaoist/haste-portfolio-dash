@@ -4,13 +4,15 @@ import { HttpManager } from "@/lib/api/HttpManager";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
-import { isMainnet } from "@/lib/wallet/constants";
+import { isTestNet, mainConfig, testConfig } from "@/lib/wallet/constants";
 import { accountStore } from "@/store/AccountStore";
 import { autorun } from "mobx";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 
 export const TransactionItem = observer(() => {
+  const cfg = isTestNet() ? testConfig : mainConfig;
+
   const txList = DataManager.instance.curTxList;
 
   const [hide, setHide] = useState(false);
@@ -87,10 +89,10 @@ export const TransactionItem = observer(() => {
                   href={
                     tx.txHash && tx.txHash.startsWith("0x")
                       ? `https://${
-                          isMainnet ? "" : "pudge."
+                          cfg.isMainnet ? "" : "pudge."
                         }explorer.nervos.org/transaction/${tx.txHash}`
                       : `https://mempool.space/${
-                          isMainnet ? "" : "testnet"
+                          cfg.isMainnet ? "" : "testnet"
                         }/tx/${tx.txHash}`
                   }
                   target="_href"

@@ -1,10 +1,5 @@
 import superagent from "superagent";
-import {
-  BTC_ASSETS_API_URL,
-  BTC_ASSETS_ORGIN,
-  BTC_ASSETS_TOKEN,
-  isMainnet,
-} from "./constants";
+
 import { WalletType, btc_AddressInfo, btc_TxInfo } from "../interface";
 import { initConfig } from "@joyid/bitcoin";
 import {
@@ -13,6 +8,7 @@ import {
   signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
+import { isTestNet, mainConfig, testConfig } from "./constants";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -52,7 +48,8 @@ export class BtcHepler {
       console.log("OKX is installed!");
 
       // {address publicKey}
-      if (isMainnet) {
+      const cfg = isTestNet() ? testConfig : mainConfig;
+      if (cfg.isMainnet) {
         const result = await okxwallet.bitcoin.connect();
         return result;
       } else {
@@ -82,10 +79,12 @@ export class BtcHepler {
   }
 
   async getUtxo(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await superagent
       .get(
         `https://mempool.space${
-          isMainnet ? "" : "/testnet"
+          cfg.isMainnet ? "" : "/testnet"
         }/api/address/${address}/utxo`
       )
       .catch((err) => {
@@ -121,7 +120,8 @@ export class BtcHepler {
         console.log("OKX is installed!");
 
         // {address publicKey}
-        if (isMainnet) {
+        const cfg = isTestNet() ? testConfig : mainConfig;
+        if (cfg.isMainnet) {
           const result = await okxwallet.bitcoin.signPsbt(hex);
           return result;
         } else {
@@ -143,10 +143,12 @@ export class BtcHepler {
     address: string,
     after_txid?: string
   ): Promise<btc_TxInfo[] | undefined> {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await superagent
       .get(
         `https://mempool.space${
-          isMainnet ? "" : "/testnet"
+          cfg.isMainnet ? "" : "/testnet"
         }/api/address/${address}/txs${
           after_txid ? `?after_txid=${after_txid}` : ""
         }`
@@ -161,10 +163,12 @@ export class BtcHepler {
   }
 
   async getBTC(address: string): Promise<btc_AddressInfo | undefined> {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await superagent
       .get(
         `https://mempool.space${
-          isMainnet ? "" : "/testnet"
+          cfg.isMainnet ? "" : "/testnet"
         }/api/address/${address}`
       )
       .catch((err) => {
@@ -201,7 +205,8 @@ export class BtcHepler {
         console.log("OKX is installed!");
 
         // {address publicKey}
-        if (isMainnet) {
+        const cfg = isTestNet() ? testConfig : mainConfig;
+        if (cfg.isMainnet) {
           const result = await okxwallet.bitcoin.pushPsbt(psbtHex);
           return result;
         } else {
@@ -212,10 +217,12 @@ export class BtcHepler {
         throw new Error("OKX Wallet is no installed!");
       }
     } else if (walletType == "joyid") {
+      const cfg = isTestNet() ? testConfig : mainConfig;
+
       const service = BtcAssetsApi.fromToken(
-        BTC_ASSETS_API_URL,
-        BTC_ASSETS_TOKEN,
-        BTC_ASSETS_ORGIN
+        cfg.BTC_ASSETS_API_URL,
+        cfg.BTC_ASSETS_TOKEN,
+        cfg.BTC_ASSETS_ORGIN
       );
       const { txid: btcTxId } = await service.sendBtcTransaction(psbtHex);
       return btcTxId;

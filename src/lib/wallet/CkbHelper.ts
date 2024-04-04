@@ -29,17 +29,15 @@ import {
 } from "@joyid/ckb";
 import { createJoyIDScriptInfo } from "./joyid";
 import {
-  CKB_INDEX_URL,
-  CKB_RPC_URL,
-  CONFIG,
   backend,
-  ckb_explorer_api,
   getSporeDep,
   getSporeTypeScript,
   getSudtTypeScript,
   getXudtDep,
   getXudtTypeScript,
-  isMainnet,
+  isTestNet,
+  mainConfig,
+  testConfig,
 } from "./constants";
 import { number, bytes } from "@ckb-lumos/codec";
 import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
@@ -47,10 +45,12 @@ import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
 import { accountStore } from "@/store/AccountStore";
 
-config.initializeConfig(CONFIG);
+const cfg = isTestNet() ? testConfig : mainConfig;
 
-export const rpc = new RPC(CKB_RPC_URL);
-export const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
+config.initializeConfig(cfg.CONFIG);
+
+export const rpc = new RPC(cfg.CKB_RPC_URL);
+export const indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
 
 export class CkbHepler {
   private static _instance: CkbHepler;
@@ -202,9 +202,11 @@ export class CkbHepler {
 
   // build ckb transfer
   async buildTransfer(options: ckb_TransferOptions) {
-    const sudtScript = getSudtTypeScript(isMainnet);
-    const xudtScript = getXudtTypeScript(isMainnet);
-    const sporeScript = getSporeTypeScript(isMainnet);
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const sudtScript = getSudtTypeScript(cfg.isMainnet);
+    const xudtScript = getXudtTypeScript(cfg.isMainnet);
+    const sporeScript = getSporeTypeScript(cfg.isMainnet);
 
     if (
       options.typeScript &&
@@ -228,13 +230,15 @@ export class CkbHepler {
 
       const fromScript = helpers.parseAddress(options.from);
       const fromAddress = helpers.encodeToAddress(fromScript, {
-        config: CONFIG,
+        config: cfg.CONFIG,
       });
 
       console.log(fromAddress);
 
       const toScript = helpers.parseAddress(options.to);
-      const toAddress = helpers.encodeToAddress(toScript, { config: CONFIG });
+      const toAddress = helpers.encodeToAddress(toScript, {
+        config: cfg.CONFIG,
+      });
 
       console.log(toAddress);
       txSkeleton = await commons.common.transfer(
@@ -244,7 +248,7 @@ export class CkbHepler {
         options.amount,
         undefined,
         undefined,
-        { config: CONFIG }
+        { config: cfg.CONFIG }
       );
 
       txSkeleton = await commons.common.payFee(
@@ -252,7 +256,7 @@ export class CkbHepler {
         [fromAddress],
         1000,
         undefined,
-        { config: CONFIG }
+        { config: cfg.CONFIG }
       );
       return txSkeleton;
     }
@@ -260,6 +264,8 @@ export class CkbHepler {
 
   // build spore transfer
   async spore_buildTransfer(options: ckb_TransferOptions) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
 
     const sporeTS = options.typeScript;
@@ -267,7 +273,7 @@ export class CkbHepler {
       throw new Error("No spore type script");
     }
 
-    const spore_cellDeps = getSporeDep(isMainnet);
+    const spore_cellDeps = getSporeDep(cfg.isMainnet);
     if (spore_cellDeps == null) {
       throw new Error("No spore cell deps");
     }
@@ -275,12 +281,14 @@ export class CkbHepler {
     txSkeleton = addCellDep(txSkeleton, spore_cellDeps);
 
     const fromScript = helpers.parseAddress(options.from);
-    const fromAddress = helpers.encodeToAddress(fromScript, { config: CONFIG });
+    const fromAddress = helpers.encodeToAddress(fromScript, {
+      config: cfg.CONFIG,
+    });
 
     console.log(fromAddress);
 
     const toScript = helpers.parseAddress(options.to);
-    const toAddress = helpers.encodeToAddress(toScript, { config: CONFIG });
+    const toAddress = helpers.encodeToAddress(toScript, { config: cfg.CONFIG });
 
     console.log(toAddress);
 
@@ -320,7 +328,7 @@ export class CkbHepler {
         txSkeleton,
         input,
         undefined,
-        { config: CONFIG }
+        { config: cfg.CONFIG }
       );
       output_sumCapacity = output_sumCapacity.add(input.cellOutput.capacity);
     }
@@ -384,6 +392,8 @@ export class CkbHepler {
 
   // build sudt and xudt transfer
   async sudt_xudt_buildTransfer(options: ckb_TransferOptions) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
 
     const sudtToken = options.typeScript;
@@ -392,19 +402,21 @@ export class CkbHepler {
     }
 
     let isXUDT = false;
-    const xudtScript = getXudtTypeScript(isMainnet);
+    const xudtScript = getXudtTypeScript(cfg.isMainnet);
     if (sudtToken.codeHash == xudtScript.codeHash) {
       isXUDT = true;
     }
     console.log("script is xudt", isXUDT);
 
     const fromScript = helpers.parseAddress(options.from);
-    const fromAddress = helpers.encodeToAddress(fromScript, { config: CONFIG });
+    const fromAddress = helpers.encodeToAddress(fromScript, {
+      config: cfg.CONFIG,
+    });
 
     console.log(fromAddress);
 
     const toScript = helpers.parseAddress(options.to);
-    const toAddress = helpers.encodeToAddress(toScript, { config: CONFIG });
+    const toAddress = helpers.encodeToAddress(toScript, { config: cfg.CONFIG });
 
     console.log(toAddress);
 
@@ -418,7 +430,7 @@ export class CkbHepler {
     let sudt_cellDeps = helpers.locateCellDep(sudtToken);
     if (sudt_cellDeps == null) {
       if (isXUDT) {
-        sudt_cellDeps = getXudtDep(isMainnet);
+        sudt_cellDeps = getXudtDep(cfg.isMainnet);
       } else {
         throw new Error("No sudt cell deps");
       }
@@ -606,11 +618,13 @@ export class CkbHepler {
 
   // issue a new token
   async sudt_buildIssueNewToken(issuer: string, amount: number) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
 
     const issuerScript = helpers.parseAddress(issuer);
     const issuerAddress = helpers.encodeToAddress(issuerScript, {
-      config: CONFIG,
+      config: cfg.CONFIG,
     });
 
     txSkeleton = await commons.sudt.issueToken(
@@ -619,7 +633,7 @@ export class CkbHepler {
       amount,
       undefined,
       undefined,
-      { config: CONFIG }
+      { config: cfg.CONFIG }
     );
 
     txSkeleton = await commons.common.payFee(
@@ -627,7 +641,7 @@ export class CkbHepler {
       [issuerAddress],
       1000,
       undefined,
-      { config: CONFIG }
+      { config: cfg.CONFIG }
     );
 
     return txSkeleton;
@@ -635,11 +649,13 @@ export class CkbHepler {
 
   // udt balance
   async getUdtBalance(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const lock = helpers.parseAddress(address);
 
-    const sudtType = getSudtTypeScript(isMainnet);
+    const sudtType = getSudtTypeScript(cfg.isMainnet);
 
-    const xudtType = getXudtTypeScript(isMainnet);
+    const xudtType = getXudtTypeScript(cfg.isMainnet);
 
     const sudtCellList: Cell[] = [];
 
@@ -741,9 +757,11 @@ export class CkbHepler {
 
   // spore
   async getSpore(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const lock = helpers.parseAddress(address);
 
-    const sporeType = getSporeTypeScript(isMainnet);
+    const sporeType = getSporeTypeScript(cfg.isMainnet);
 
     const sporeCellList: Cell[] = [];
 
@@ -768,12 +786,15 @@ export class CkbHepler {
 
   // transactions
   async getTx(address: string, page: number = 0) {
-    //https://mainnet-api.explorer.nervos.org/api/v1/address_transactions/${address}?page=1&page_size=10&sort=time.desc
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const rs = await superagent
       .post(`${backend}/api/explore`)
       .set("Content-Type", "application/json")
       .send({
-        req: `https://${ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
+        req: `https://${
+          cfg.ckb_explorer_api
+        }/api/v1/address_transactions/${address}?page=${
           page + 1
         }&page_size=10&sort=time.desc`,
       })
@@ -804,43 +825,55 @@ export class CkbHepler {
   }
 
   async getAddressInfo(address: string): Promise<ckb_AddressInfo | undefined> {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/suggest_queries?q=${address}`
+      `https://${cfg.ckb_explorer_api}/api/v1/suggest_queries?q=${address}`
     );
     return result;
   }
 
   async getUDTInfo(type_hash: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/udts/${type_hash}`
+      `https://${cfg.ckb_explorer_api}/api/v1/udts/${type_hash}`
     );
     return result;
   }
 
   async getAddress(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/addresses?q=${address}`
+      `https://${cfg.ckb_explorer_api}/api/v1/addresses?q=${address}`
     );
     return result;
   }
 
   async getCellOutPutData(id: string): Promise<CellOutPutData | undefined> {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/cell_output_data/${id}`
+      `https://${cfg.ckb_explorer_api}/api/v1/cell_output_data/${id}`
     );
     return result;
   }
 
   async getTxInfo(txHash: string): Promise<ckb_TxInfo_new | undefined> {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/transactions/${txHash}`
+      `https://${cfg.ckb_explorer_api}/api/v1/transactions/${txHash}`
     );
     return result;
   }
 
   async getXudtAndSpore(address: string) {
-    const xudtTypeScript = getXudtTypeScript(isMainnet);
-    const sporeTypeScript = getSporeTypeScript(isMainnet);
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const xudtTypeScript = getXudtTypeScript(cfg.isMainnet);
+    const sporeTypeScript = getSporeTypeScript(cfg.isMainnet);
 
     const xudt_collector = indexer.collector({
       lock: helpers.parseAddress(address),
@@ -920,10 +953,12 @@ export class CkbHepler {
   }
 
   async withDrawXUDT(sudtToken: Script) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
 
     let isXUDT = false;
-    const xudtScript = getXudtTypeScript(isMainnet);
+    const xudtScript = getXudtTypeScript(cfg.isMainnet);
     if (sudtToken.codeHash == xudtScript.codeHash) {
       isXUDT = true;
     }
@@ -932,7 +967,7 @@ export class CkbHepler {
     let sudt_cellDeps = helpers.locateCellDep(sudtToken);
     if (sudt_cellDeps == null) {
       if (isXUDT) {
-        sudt_cellDeps = getXudtDep(isMainnet);
+        sudt_cellDeps = getXudtDep(cfg.isMainnet);
       } else {
         throw new Error("No sudt cell deps");
       }
@@ -962,6 +997,8 @@ export class CkbHepler {
     });
 
     for await (const collect of collect_sudt.collect()) {
+      const cfg = isTestNet() ? testConfig : mainConfig;
+
       collect.cellOutput = {
         lock: collect.cellOutput.lock,
         capacity: BI.from(collect.cellOutput.capacity).sub(1000).toHexString(),
@@ -971,7 +1008,7 @@ export class CkbHepler {
         txSkeleton,
         collect,
         undefined,
-        { config: CONFIG }
+        { config: cfg.CONFIG }
       );
     }
 

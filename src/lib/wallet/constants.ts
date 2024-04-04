@@ -1,25 +1,41 @@
 import { CellDep, Script, config } from "@ckb-lumos/lumos";
 import { NetworkType } from "@rgbpp-sdk/btc";
 
-export const isMainnet = false;
-export const CONFIG = config.predefined.AGGRON4;
-export const CKB_RPC_URL = "https://testnet.ckb.dev";
-export const CKB_INDEX_URL = "https://testnet.ckb.dev";
+export const testConfig = {
+  isMainnet: false,
+  CONFIG: config.predefined.AGGRON4,
+  CKB_RPC_URL: "https://testnet.ckb.dev",
+  CKB_INDEX_URL: "https://testnet.ckb.dev",
 
-export const BTC_ASSETS_API_URL = "https://btc-assets-api.testnet.mibao.pro";
-// export const BTC_ASSETS_TOKEN =
-//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU";
-// export const BTC_ASSETS_ORGIN = "http://localhost";
-export const ckb_explorer_api = "testnet-api.explorer.nervos.org";
+  BTC_ASSETS_API_URL: "https://btc-assets-api.testnet.mibao.pro",
+
+  // BTC_ASSETS_TOKEN:
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU",
+  // BTC_ASSETS_ORGIN: "http://localhost",
+
+  BTC_ASSETS_TOKEN:
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4",
+  BTC_ASSETS_ORGIN: "https://caboroca.xyz",
+  ckb_explorer_api: "testnet-api.explorer.nervos.org",
+  rgb_networkType: NetworkType.TESTNET,
+};
 
 // main config
-export const BTC_ASSETS_TOKEN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4";
-export const BTC_ASSETS_ORGIN = "https://caboroca.xyz";
+export const mainConfig = {
+  isMainnet: true,
+  CONFIG: config.predefined.LINA,
+  CKB_RPC_URL: "https://mainnet.ckbapp.dev",
+  CKB_INDEX_URL: "https://mainnet.ckbapp.dev/indexer",
+
+  BTC_ASSETS_API_URL: "https://api.rgbpp.io",
+  BTC_ASSETS_TOKEN:
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4",
+  BTC_ASSETS_ORGIN: "https://caboroca.xyz",
+  ckb_explorer_api: "mainnet-api.explorer.nervos.org",
+  rgb_networkType: NetworkType.MAINNET,
+};
 
 export const backend: string = "https://blockchain-serverless.vercel.app";
-
-export const rgb_networkType = NetworkType.TESTNET;
 
 const TestnetInfo = {
   JoyIDLockScript: {
@@ -361,3 +377,17 @@ export const getMNftTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.MNftTypeScript : TestnetInfo.MNftTypeScript;
 export const getMNftDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.MNftTypeDep : TestnetInfo.MNftTypeDep;
+
+let _isTestNet: boolean =
+  localStorage.getItem("isTestNet") == "1" ? true : false;
+export const isTestNet = () => {
+  return _isTestNet;
+};
+export const chooseTestNet = () => {
+  _isTestNet = true;
+  localStorage.setItem("isTestNet", "1");
+};
+export const chooseMainNet = () => {
+  _isTestNet = false;
+  localStorage.setItem("isTestNet", "0");
+};

@@ -22,20 +22,10 @@ import { CkbHepler } from "./CkbHelper";
 import { DataManager } from "../manager/DataManager";
 import { bytes } from "@ckb-lumos/codec";
 import { blockchain } from "@ckb-lumos/base";
-import {
-  BTC_ASSETS_API_URL,
-  BTC_ASSETS_ORGIN,
-  BTC_ASSETS_TOKEN,
-  CKB_INDEX_URL,
-  CKB_RPC_URL,
-  // getSporeDep,
-  // getSporeTypeScript,
-  isMainnet,
-  rgb_networkType,
-} from "./constants";
 import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { accountStore } from "@/store/AccountStore";
+import { isTestNet, mainConfig, testConfig } from "./constants";
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -71,11 +61,13 @@ export class RGBHelper {
   }
 
   async buildSendBTC(wallet: WalletInfo, toAddress: string, amount: BI) {
-    const networkType = rgb_networkType;
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const networkType = cfg.rgb_networkType;
     const service = BtcAssetsApi.fromToken(
-      BTC_ASSETS_API_URL,
-      BTC_ASSETS_TOKEN,
-      BTC_ASSETS_ORGIN
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
     );
     const source = new DataSource(service, networkType);
 
@@ -204,16 +196,18 @@ export class RGBHelper {
     typeScript: Script,
     transferAmount: bigint = 0n
   ) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const collector = new Collector({
-      ckbNodeUrl: CKB_RPC_URL,
-      ckbIndexerUrl: CKB_INDEX_URL,
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
-    const networkType = rgb_networkType;
+    const networkType = cfg.rgb_networkType;
     const service = BtcAssetsApi.fromToken(
-      BTC_ASSETS_API_URL,
-      BTC_ASSETS_TOKEN,
-      BTC_ASSETS_ORGIN
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
     );
     const source = new DataSource(service, networkType);
 
@@ -222,7 +216,7 @@ export class RGBHelper {
       rgbppLockArgsList,
       xudtTypeBytes: serializeScript(typeScript),
       transferAmount,
-      isMainnet,
+      isMainnet: cfg.isMainnet,
     });
 
     const { commitment, ckbRawTx } = ckbVirtualTxResult;
@@ -261,6 +255,8 @@ export class RGBHelper {
   ) {
     if (ckb_wallet.chain == "BTC") return;
 
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const sudtBalance = await CkbHepler.instance.sudtBalance(
       ckb_wallet.address,
       typeScript
@@ -268,8 +264,8 @@ export class RGBHelper {
     console.log(sudtBalance.toString());
 
     const collector = new Collector({
-      ckbNodeUrl: CKB_RPC_URL,
-      ckbIndexerUrl: CKB_INDEX_URL,
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
     // let assertCellDeps = helpers.locateCellDep(typeScript);
@@ -295,7 +291,7 @@ export class RGBHelper {
     // joy id
     // <<
     const lock = helpers.parseAddress(ckb_wallet.address);
-    const joyidScropt = getJoyIDLockScript(isMainnet);
+    const joyidScropt = getJoyIDLockScript(cfg.isMainnet);
     if (lock.codeHash == joyidScropt.codeHash) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let newWitnessArgs: any = {
@@ -330,7 +326,7 @@ export class RGBHelper {
         ...ckbRawTx,
         cellDeps: [
           ...ckbRawTx.cellDeps,
-          getJoyIDCellDep(isMainnet),
+          getJoyIDCellDep(cfg.isMainnet),
           // assertCellDeps,
         ],
         witnesses: [witness, ...ckbRawTx.witnesses.slice(1)],
@@ -350,18 +346,20 @@ export class RGBHelper {
     typeScript: Script,
     btcWallet: WalletInfo
   ) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     console.log("rgbppLockArgsList", rgbppLockArgsList, toCkbAddress);
 
     const collector = new Collector({
-      ckbNodeUrl: CKB_RPC_URL,
-      ckbIndexerUrl: CKB_INDEX_URL,
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
-    const networkType = rgb_networkType;
+    const networkType = cfg.rgb_networkType;
     const service = BtcAssetsApi.fromToken(
-      BTC_ASSETS_API_URL,
-      BTC_ASSETS_TOKEN,
-      BTC_ASSETS_ORGIN
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
     );
     const source = new DataSource(service, networkType);
 
@@ -382,7 +380,7 @@ export class RGBHelper {
       xudtTypeBytes: serializeScript(typeScript),
       transferAmount,
       toCkbAddress,
-      isMainnet: isMainnet,
+      isMainnet: cfg.isMainnet,
     });
 
     const { commitment, ckbRawTx } = ckbVirtualTxResult;
@@ -457,6 +455,8 @@ export class RGBHelper {
   }
 
   async getRgbppAssert(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const result: btc_utxo[] | undefined = await BtcHepler.instance.getUtxo(
       address
     );
@@ -481,7 +481,7 @@ export class RGBHelper {
         });
       }
       const rgbppLocks = rgbppLockArgsList.map((item) => {
-        const lock = genRgbppLockScript(item.args, isMainnet);
+        const lock = genRgbppLockScript(item.args, cfg.isMainnet);
 
         return {
           lock,
@@ -532,9 +532,11 @@ export class RGBHelper {
   }
 
   async getIsBtcTimeCellSpent(ckbAddress: string, btcTxId: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const collector = new Collector({
-      ckbNodeUrl: CKB_RPC_URL,
-      ckbIndexerUrl: CKB_INDEX_URL,
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
     const stat = await isBtcTimeCellsSpent({
