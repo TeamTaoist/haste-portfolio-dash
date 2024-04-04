@@ -236,6 +236,7 @@ export class RGBHelper {
       psbt.toHex(),
       btc_wallet.type
     );
+
     const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, btc_wallet.type);
 
     const rgbppState = await service.sendRgbppCkbTransaction({

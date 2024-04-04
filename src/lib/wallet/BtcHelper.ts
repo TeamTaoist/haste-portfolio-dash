@@ -1,13 +1,12 @@
 import superagent from "superagent";
 
 import { WalletType, btc_AddressInfo, btc_TxInfo } from "../interface";
-import { initConfig } from "@joyid/bitcoin";
+import { initConfig, sendPsbt } from "@joyid/bitcoin";
 import {
   requestAccounts,
   getPublicKey,
   signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
-import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { isTestNet, mainConfig, testConfig } from "./constants";
 
 export class BtcHepler {
@@ -219,15 +218,8 @@ export class BtcHepler {
         throw new Error("OKX Wallet is no installed!");
       }
     } else if (walletType == "joyid") {
-      const cfg = isTestNet() ? testConfig : mainConfig;
-
-      const service = BtcAssetsApi.fromToken(
-        cfg.BTC_ASSETS_API_URL,
-        cfg.BTC_ASSETS_TOKEN,
-        cfg.BTC_ASSETS_ORGIN
-      );
-      const { txid: btcTxId } = await service.sendBtcTransaction(psbtHex);
-      return btcTxId;
+      const result = await sendPsbt(psbtHex);
+      return result;
     }
 
     throw new Error("Please connect btc wallet");
