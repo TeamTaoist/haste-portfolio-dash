@@ -5,7 +5,7 @@ import { initConfig, sendPsbt } from "@joyid/bitcoin";
 import {
   requestAccounts,
   getPublicKey,
-  signPsbt as joyID_signPsbt,
+  // signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
 import { isTestNet, mainConfig, testConfig } from "./constants";
 
@@ -133,8 +133,8 @@ export class BtcHepler {
         throw new Error("OKX Wallet is no installed!");
       }
     } else if (walletType == "joyid") {
-      const result = await joyID_signPsbt(hex);
-      return result;
+      // const result = await joyID_signPsbt(hex);
+      return hex;
     }
 
     throw new Error("Please connect btc wallet");
