@@ -105,7 +105,9 @@ export class HttpManager {
           const tx = txList[i];
           txInfoList.push({
             txHash: tx.txid,
-            block: tx.status.block_height.toString(),
+            block: tx.status.block_height
+              ? tx.status.block_height.toString()
+              : "Pending",
           });
         }
       }
