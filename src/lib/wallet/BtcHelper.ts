@@ -11,7 +11,7 @@ import { isTestNet, mainConfig, testConfig } from "./constants";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
-  private _network: string = "testnet";
+  private _network: string = isTestNet() ? "testnet" : "mainnet";
   private constructor() {}
 
   public static get instance() {
