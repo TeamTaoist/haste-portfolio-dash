@@ -66,13 +66,15 @@ export class CkbHepler {
   }
 
   async joyid_onConnect() {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     initConfig({
       // your app name
       name: "JoyID demo",
       // your app logo
       logo: "https://fav.farm/🆔",
       // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: "https://testnet.joyid.dev",
+      joyidAppURL: cfg.joyIdUrl,
     });
 
     const connection = await connect();

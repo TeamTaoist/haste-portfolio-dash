@@ -11,13 +11,15 @@ export const testConfig = {
 
   // BTC_ASSETS_TOKEN:
   //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU",
-  // BTC_ASSETS_ORGIN: "http://localhost",
+  // BTC_ASSETS_ORGIN: "localhost",
 
   BTC_ASSETS_TOKEN:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4",
-  BTC_ASSETS_ORGIN: "https://caboroca.xyz",
+  BTC_ASSETS_ORGIN: "caboroca.xyz",
   ckb_explorer_api: "testnet-api.explorer.nervos.org",
   rgb_networkType: NetworkType.TESTNET,
+
+  joyIdUrl: "https://testnet.joyid.dev",
 };
 
 // main config
@@ -30,9 +32,11 @@ export const mainConfig = {
   BTC_ASSETS_API_URL: "https://api.rgbpp.io",
   BTC_ASSETS_TOKEN:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4",
-  BTC_ASSETS_ORGIN: "https://caboroca.xyz",
+  BTC_ASSETS_ORGIN: "caboroca.xyz",
   ckb_explorer_api: "mainnet-api.explorer.nervos.org",
   rgb_networkType: NetworkType.MAINNET,
+
+  joyIdUrl: "https://app.joy.id/",
 };
 
 export const backend: string = "https://blockchain-serverless.vercel.app";
