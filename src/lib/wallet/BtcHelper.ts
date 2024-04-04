@@ -205,14 +205,15 @@ export class BtcHepler {
       if (typeof okxwallet !== "undefined") {
         console.log("OKX is installed!");
 
+        console.log(okxwallet.bitcoinTestnet);
+
         // {address publicKey}
         const cfg = isTestNet() ? testConfig : mainConfig;
         if (cfg.isMainnet) {
           const result = await okxwallet.bitcoin.pushPsbt(psbtHex);
           return result;
         } else {
-          const result = await okxwallet.bitcoinTestnet.pushPsbt(psbtHex);
-          return result;
+          throw new Error("OKX Wallet is no testnet push psbt");
         }
       } else {
         throw new Error("OKX Wallet is no installed!");
