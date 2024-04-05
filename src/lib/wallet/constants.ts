@@ -31,7 +31,7 @@ export const mainConfig = {
 
   BTC_ASSETS_API_URL: "https://api.rgbpp.io",
   BTC_ASSETS_TOKEN:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjI5ODgxOH0.ijvxyViGeGEbftAYQKhH6dEiJ39l8PtqsOgENPTGwOc",
   BTC_ASSETS_ORGIN: "caboroca.xyz",
   ckb_explorer_api: "mainnet-api.explorer.nervos.org",
   rgb_networkType: NetworkType.MAINNET,
