@@ -31,24 +31,8 @@ class AssetInfoManager {
       txInfo.objects[0].txHash
     );
 
-    const idx = BI.from(txInfo.objects[0].txIndex).toNumber();
-
-    if (ckTxInfo && ckTxInfo.data.attributes.display_outputs.length >= 3) {
-      const outputData = await CkbHepler.instance.getCellOutPutData(
-        ckTxInfo.data.attributes.display_outputs[0].id
-      );
-      if (outputData) {
-        const info = unserializeTokenInfo(outputData.data.attributes.data);
-        this.infoData[hash] = info;
-
-        localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
-
-        EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
-      }
-    } else if (
-      ckTxInfo &&
-      ckTxInfo.data.attributes.display_outputs[idx].extra_info
-    ) {
+    const idx = BI.from(txInfo.objects[0].cells[0][1]).toNumber();
+    if (ckTxInfo && ckTxInfo.data.attributes.display_outputs[idx].extra_info) {
       const info = ckTxInfo.data.attributes.display_outputs[idx].extra_info;
       if (info) {
         this.infoData[hash] = {
@@ -56,6 +40,21 @@ class AssetInfoManager {
           name: info.name,
           decimal: parseInt(info.decimal),
         };
+
+        localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
+
+        EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
+      }
+    } else if (
+      ckTxInfo &&
+      ckTxInfo.data.attributes.display_outputs.length >= 3
+    ) {
+      const outputData = await CkbHepler.instance.getCellOutPutData(
+        ckTxInfo.data.attributes.display_outputs[0].id
+      );
+      if (outputData) {
+        const info = unserializeTokenInfo(outputData.data.attributes.data);
+        this.infoData[hash] = info;
 
         localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
 
