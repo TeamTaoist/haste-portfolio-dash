@@ -1,0 +1,99 @@
+import { RootState } from '@/store/store';
+import { addWalletItem } from '@/store/wallet/walletSlice';
+import { JoyIDBTCconnect, JoyIDCKBConnect, OKXConnect, UnisatConnect } from '@/utils/connect';
+import { CheckIcon } from '@radix-ui/react-icons';
+import Image from 'next/image';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+
+const WalletModalContent: React.FC = () => {
+  
+  const wallets = useSelector((state: RootState) => state.wallet.wallets);
+  const dispatch = useDispatch()
+
+  const connectOKXWallet = async () => {
+    let rlt = await OKXConnect();
+    dispatch(addWalletItem({
+      address: rlt.address,
+      chain: 'btc',
+      walletName: 'okx'
+    }))
+  }
+
+  const connectUnisatWallet = async () => {
+    let rlt = await UnisatConnect();
+    dispatch(addWalletItem({
+      address: rlt.accounts[0],
+      chain: 'btc',
+      walletName: 'unisat'
+    }))
+  }
+
+  const connectJoyIDBTCWallet = async () => {
+    let rlt = await JoyIDBTCconnect();
+    dispatch(addWalletItem({
+      address: rlt.address,
+      chain: 'btc',
+      walletName: 'joyidbtc'
+    }))
+  }
+
+  const connectJoyIDCKBWallet = async () => {
+    let rlt = await JoyIDCKBConnect();
+    dispatch(addWalletItem({
+      address: rlt.address,
+      chain: 'ckb',
+      walletName: 'joyidckb'
+    }))
+  }
+  
+  return (
+    <div
+      className="w-96 flex flex-col gap-4" 
+    >
+      <div className="font-Montserrat text-primary001">Connect a Wallet</div>
+      <div className="flex items-center justify-center">
+        <div className="w-10 border-t border-gray-400"></div>
+        <span className="mx-4 text-white001 font-SourceSanPro">BTC</span>
+        <div className="flex-grow border-t border-gray-400"></div>
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 relative' onClick={connectOKXWallet}>
+          <Image className='rounded-full' src={'/img/okx.png'} width={40} height={40} alt={'btc-okx'}/>
+          <p className='text-white001 font-Montserrat'>OKX</p>
+          {/* <div className='w-9 h-9 bg-success-function rounded-full flex items-center justify-center absolute right-4'>
+            <CheckIcon className='w-7 h-7' color='#ffffff'/>
+          </div> */}
+        </div>
+        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008' onClick={connectUnisatWallet}>
+          <Image className='rounded-full' src={'/img/unisat.png'} width={40} height={40} alt={'btc-okx'}/>
+          <p className='text-white001 font-Montserrat'>Unisat</p>
+        </div>
+        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008' onClick={connectJoyIDBTCWallet}>
+          <Image className='rounded-full' src={'/img/joyid.png'} width={40} height={40} alt={'btc-okx'}/>
+          <p className='text-white001 font-Montserrat'>JoyID</p>
+        </div>  
+      </div>
+      <div className="flex items-center justify-center">
+        <div className="w-10 border-t border-gray-400"></div>
+        <span className="mx-4 text-white001 font-SourceSanPro">CKB</span>
+        <div className="flex-grow border-t border-gray-400"></div>
+      </div>
+      <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008' onClick={connectJoyIDCKBWallet}>
+        <Image className='rounded-full' src={'/img/okx.png'} width={40} height={40} alt={'btc-okx'}/>
+        <p className='text-white001 font-Montserrat'>OKX</p>
+      </div> 
+      <div className='flex justify-between'>
+        <div className='w-[48%] text-primary001 border rounded-lg py-2 font-Montserrat text-center cursor-pointer'>
+          cancel
+        </div>
+        <div className='w-[48%] bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer'>
+          Confirm
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default WalletModalContent
