@@ -1,13 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { store } from '../store/store'; // 确保路径正确
+import { store } from '../store/store'; 
+import { styled } from '@mui/material';
+import { MaterialDesignContent, SnackbarProvider } from 'notistack';
 
 interface ReduxProviderProps {
   children: React.ReactNode;
 }
 
+const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
+  '&.notistack-MuiContent-success': {
+    backgroundColor: '#1CB562',
+    
+  },
+  '&.notistack-MuiContent-error': {
+    backgroundColor: '#E11717',
+  },
+}));
+
 const ReduxProvider: React.FC<ReduxProviderProps> = ({ children }) => {
-  return <Provider store={store}>{children}</Provider>;
+
+  return (
+    <Provider store={store}>
+       <SnackbarProvider
+        autoHideDuration={3000} 
+        Components={{
+          success: StyledMaterialDesignContent,
+          error: StyledMaterialDesignContent
+        }}>
+        {children}
+      </SnackbarProvider>
+    </Provider>);
 };
 
 export default ReduxProvider;

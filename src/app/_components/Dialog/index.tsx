@@ -1,3 +1,4 @@
+import ModalContext from '@/context/ModalContext';
 import React from 'react';
 
 interface ModalProps {
@@ -14,18 +15,19 @@ const CustomModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   };
   
   return (
-    <div
-      className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex justify-center items-center"
-      onClick={onClose}
-    >
-      {/* 弹窗内容 */}
+    <ModalContext.Provider value={{ onClose }}>
+      <div
+        className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex justify-center items-center"
+        onClick={onClose}
+      >
       <div
         className="bg-primary009 p-4 rounded-lg shadow-lg"
-        onClick={handleModalClick} // 阻止点击事件穿透
+        onClick={handleModalClick} 
       >
         {children}
       </div>
     </div>
+    </ModalContext.Provider>
   )
 }
 

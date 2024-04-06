@@ -1,52 +1,77 @@
+import ModalContext from '@/context/ModalContext';
 import { RootState } from '@/store/store';
 import { addWalletItem } from '@/store/wallet/walletSlice';
 import { JoyIDBTCconnect, JoyIDCKBConnect, OKXConnect, UnisatConnect } from '@/utils/connect';
-import { CheckIcon } from '@radix-ui/react-icons';
 import Image from 'next/image';
-import React from 'react';
+import { enqueueSnackbar } from 'notistack';
+import React, { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
-const WalletModalContent: React.FC = () => {
-  
+interface walletModalProps {
+  onClose: () => void
+}
+
+const WalletModalContent: React.FC<walletModalProps> = () => {
+  const { onClose } = useContext(ModalContext);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const dispatch = useDispatch()
 
+  const checkWalletByAddress = (props: {
+    address: string,
+    chain: string,
+    walletName: string,
+  }) => {
+
+    if(wallets.some(wallet => wallet.address === props.address)) {
+      enqueueSnackbar("Account Already Connected", {variant: "error"})
+    } else {
+      dispatch(addWalletItem({
+      address: props.address,
+      chain: props.chain,
+      walletName: props.walletName
+    }))
+    }
+    
+  };
   const connectOKXWallet = async () => {
     let rlt = await OKXConnect();
-    dispatch(addWalletItem({
+
+    checkWalletByAddress({
       address: rlt.address,
       chain: 'btc',
       walletName: 'okx'
-    }))
+    })
   }
 
   const connectUnisatWallet = async () => {
     let rlt = await UnisatConnect();
-    dispatch(addWalletItem({
+    checkWalletByAddress({
       address: rlt.accounts[0],
       chain: 'btc',
       walletName: 'unisat'
-    }))
+    })
   }
 
   const connectJoyIDBTCWallet = async () => {
     let rlt = await JoyIDBTCconnect();
-    dispatch(addWalletItem({
+    checkWalletByAddress({
       address: rlt.address,
       chain: 'btc',
       walletName: 'joyidbtc'
-    }))
+    })
   }
 
   const connectJoyIDCKBWallet = async () => {
     let rlt = await JoyIDCKBConnect();
-    dispatch(addWalletItem({
+    checkWalletByAddress({
       address: rlt.address,
       chain: 'ckb',
       walletName: 'joyidckb'
-    }))
+    })
   }
+
+  useEffect(() => {console.log(wallets)}, [wallets])
   
   return (
     <div
@@ -59,18 +84,18 @@ const WalletModalContent: React.FC = () => {
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 relative' onClick={connectOKXWallet}>
+        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 relative cursor-pointer' onClick={connectOKXWallet}>
           <Image className='rounded-full' src={'/img/okx.png'} width={40} height={40} alt={'btc-okx'}/>
           <p className='text-white001 font-Montserrat'>OKX</p>
           {/* <div className='w-9 h-9 bg-success-function rounded-full flex items-center justify-center absolute right-4'>
             <CheckIcon className='w-7 h-7' color='#ffffff'/>
           </div> */}
         </div>
-        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008' onClick={connectUnisatWallet}>
+        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectUnisatWallet}>
           <Image className='rounded-full' src={'/img/unisat.png'} width={40} height={40} alt={'btc-okx'}/>
           <p className='text-white001 font-Montserrat'>Unisat</p>
         </div>
-        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008' onClick={connectJoyIDBTCWallet}>
+        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectJoyIDBTCWallet}>
           <Image className='rounded-full' src={'/img/joyid.png'} width={40} height={40} alt={'btc-okx'}/>
           <p className='text-white001 font-Montserrat'>JoyID</p>
         </div>  
@@ -80,15 +105,21 @@ const WalletModalContent: React.FC = () => {
         <span className="mx-4 text-white001 font-SourceSanPro">CKB</span>
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
-      <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008' onClick={connectJoyIDCKBWallet}>
+      <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectJoyIDCKBWallet}>
         <Image className='rounded-full' src={'/img/okx.png'} width={40} height={40} alt={'btc-okx'}/>
         <p className='text-white001 font-Montserrat'>OKX</p>
       </div> 
       <div className='flex justify-between'>
-        <div className='w-[48%] text-primary001 border rounded-lg py-2 font-Montserrat text-center cursor-pointer'>
+        <div 
+          className='w-[48%] text-primary001 border rounded-lg py-2 font-Montserrat text-center cursor-pointer'
+          onClick={onClose}
+        >
           cancel
         </div>
-        <div className='w-[48%] bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer'>
+        <div 
+          className='w-[48%] bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer'
+          onClick={onClose}
+        >
           Confirm
         </div>
       </div>
