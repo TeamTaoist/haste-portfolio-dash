@@ -4,7 +4,7 @@ import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { useEffect, useState } from "react";
-import { formatUnit } from "@ckb-lumos/bi";
+import { formatUnit, parseUnit } from "@ckb-lumos/bi";
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,7 @@ export function TabRgb() {
   const [toAddress, setToAddress] = useState<string>("");
   const [isRgb, setIsRgb] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  // const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<number>(0);
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
@@ -85,7 +85,7 @@ export function TabRgb() {
           rgb.idx,
           toAddress,
           rgb.ckbCellInfo.type_script,
-          BI.from(rgb.ckbCellInfo?.amount).toBigInt()
+          BI.from(parseUnit(amount.toString(), "ckb")).toBigInt()
         )
         .then((rs) => {
           console.log("btc to btc tx hash:", rs);
@@ -111,7 +111,7 @@ export function TabRgb() {
         .transfer_btc_to_ckb(
           toAddress,
           rgb.ckbCellInfo.type_script,
-          BI.from(rgb.ckbCellInfo?.amount).toBigInt(),
+          BI.from(parseUnit(amount.toString(), "ckb")).toBigInt(),
           rgb.txHash,
           rgb.idx
         )
@@ -146,6 +146,7 @@ export function TabRgb() {
   const handleOpenDialog = () => {
     setIsRgb(true);
     setToAddress("");
+    setAmount(0);
     setIsOpen(true);
   };
 
@@ -235,6 +236,39 @@ export function TabRgb() {
                         </DialogHeader>
                       </TabsContent>
                     </Tabs>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="username" className="text-right">
+                        Amount
+                      </Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        value={amount}
+                        onChange={(e) => {
+                          if (
+                            parseFloat(e.target.value) >
+                            parseFloat(
+                              formatUnit(
+                                rgb.ckbCellInfo?.amount as string,
+                                "ckb"
+                              )
+                            )
+                          ) {
+                            setAmount(
+                              parseFloat(
+                                formatUnit(
+                                  rgb.ckbCellInfo?.amount as string,
+                                  "ckb"
+                                )
+                              )
+                            );
+                          } else {
+                            setAmount(parseFloat(e.target.value));
+                          }
+                        }}
+                        className="col-span-3"
+                      />
+                    </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="username" className="text-right">
                         {isRgb ? "CKB" : "BTC"} Address

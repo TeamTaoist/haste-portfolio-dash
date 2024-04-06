@@ -282,11 +282,18 @@ export function TabUdt() {
                       Amount
                     </Label>
                     <Input
-                      id="toAddress"
+                      id="amount"
                       type="number"
                       value={amount}
                       onChange={(e) => {
-                        setAmount(parseFloat(e.target.value));
+                        if (
+                          parseFloat(e.target.value) >
+                          parseFloat(formatUnit(udt.amount, "ckb"))
+                        ) {
+                          setAmount(parseFloat(formatUnit(udt.amount, "ckb")));
+                        } else {
+                          setAmount(parseFloat(e.target.value));
+                        }
                       }}
                       className="col-span-3"
                     />
