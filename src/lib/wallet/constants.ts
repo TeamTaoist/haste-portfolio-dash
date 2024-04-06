@@ -41,6 +41,11 @@ export const mainConfig = {
 
 export const backend: string = "https://blockchain-serverless.vercel.app";
 
+export const FIXED_SIZE = 66;
+
+export const CKB_TEST_PRIVATE_KEY =
+  "0x0000000000000000000000000000000000000000000000000000000000000001";
+
 const TestnetInfo = {
   JoyIDLockScript: {
     codeHash:
@@ -164,7 +169,7 @@ const TestnetInfo = {
   UniqueCellTypeDep: {
     outPoint: {
       txHash:
-        "0x2415ee81413fa9dd82245db054c19eb1ae2191185e2cb18ed1262947aec323c3",
+        "0xff91b063c78ed06f10a1ed436122bd7d671f9a72ef5f5fa28d05252c17cf4cef",
       index: "0x0",
     },
     depType: "code",

@@ -90,7 +90,17 @@ export class HttpManager {
 
     const txInfoList: txInfo[] = [];
     if (address.startsWith("ckb") || address.startsWith("ckt")) {
+      const pendingTxList = await CkbHepler.instance.getPendingTx(address);
       const txList = await CkbHepler.instance.getTx(address, page - 1);
+
+      for (let i = 0; i < pendingTxList.length; i++) {
+        const tx = pendingTxList[i];
+        txInfoList.push({
+          txHash: tx.attributes.transaction_hash,
+          block: "Pending",
+        });
+      }
+
       for (let i = 0; i < txList.data.length; i++) {
         const tx = txList.data[i] as ckb_TxInfo;
         txInfoList.push({
@@ -100,6 +110,9 @@ export class HttpManager {
       }
     } else {
       const txList = await BtcHepler.instance.getTx(address, after_tx);
+
+      console.log("BTC tx", txList);
+
       if (txList) {
         for (let i = 0; i < txList.length; i++) {
           const tx = txList[i];

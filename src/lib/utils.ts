@@ -1,4 +1,4 @@
-import { BI, Cell, Script } from "@ckb-lumos/lumos";
+import { BI, Cell, Script, helpers } from "@ckb-lumos/lumos";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { parseUnit } from "@ckb-lumos/bi";
@@ -14,6 +14,7 @@ import {
 } from "@nervosnetwork/ckb-sdk-utils";
 import { u64ToLe, u8ToHex, utf8ToHex } from "@rgbpp-sdk/ckb";
 import { assetInfoMgr } from "./manager/AssetInfoManager";
+import { FIXED_SIZE } from "./wallet/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -185,4 +186,70 @@ export const unserializeTokenInfo = (hexData: string) => {
     name: Buffer.from(nameBuf).toString(),
     symbol: Buffer.from(symbolBuf).toString(),
   };
+};
+
+export const calcUniqueCellInfoCapacity = (
+  address: string,
+  info: {
+    decimal: number;
+    name: string;
+    symbol: string;
+  }
+) => {
+  const lock = helpers.parseAddress(address);
+  const argsSize = hexToBytes(lock.args).length;
+  const lockSize = 32 + 1 + argsSize;
+  const inscriptionInfoTypeSize = 32 + 32 + 1;
+  const capacitySize = 8;
+  const infoDataSize = calcInscriptionInfoSize(info);
+  const cellSize =
+    lockSize + inscriptionInfoTypeSize + capacitySize + infoDataSize;
+  return BigInt(cellSize) * BigInt(10000_0000);
+};
+
+export const calcInscriptionInfoSize = (info: {
+  decimal: number;
+  name: string;
+  symbol: string;
+}) => {
+  let size = FIXED_SIZE;
+  const name = remove0x(utf8ToHex(info.name));
+  size += name.length / 2 + 1;
+  const symbol = remove0x(utf8ToHex(info.symbol));
+  size += symbol.length / 2 + 1;
+  return size;
+};
+
+export const calcXudtCapacity = (lock: CKBComponents.Script): bigint => {
+  const argsSize = hexToBytes(lock.args).length;
+  const lockSize = 32 + 1 + argsSize;
+  const xudtTypeSize = 32 + 32 + 1;
+  const capacitySize = 8;
+  const xudtDataSize = 16;
+  const cellSize = lockSize + xudtTypeSize + capacitySize + xudtDataSize;
+  return BigInt(cellSize) * BigInt(10000_0000);
+};
+
+export const serializeUniqueCellXudtInfo = (info: {
+  decimal: number;
+  name: string;
+  symbol: string;
+}) => {
+  let ret = u8ToHex(info.decimal);
+  const name = remove0x(utf8ToHex(info.name));
+  ret = ret.concat(u8ToHex(name.length / 2) + name);
+  const symbol = remove0x(utf8ToHex(info.symbol));
+  ret = ret.concat(u8ToHex(symbol.length / 2) + symbol);
+  return ret;
+};
+
+export const generateUniqueTypeArgs = (
+  firstInput: CKBComponents.CellInput,
+  firstOutputIndex: number
+) => {
+  const input = hexToBytes(serializeInput(firstInput));
+  const s = blake2b(32, null, null, PERSONAL);
+  s.update(input);
+  s.update(hexToBytes(`0x${u64ToLe(BigInt(firstOutputIndex))}`));
+  return `0x${s.digest("hex").slice(0, 40)}`;
 };

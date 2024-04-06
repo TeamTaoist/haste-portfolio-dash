@@ -30,9 +30,12 @@ import {
 import { createJoyIDScriptInfo } from "./joyid";
 import {
   backend,
+  getJoyIDCellDep,
   getSporeDep,
   getSporeTypeScript,
   getSudtTypeScript,
+  getUniqueCellTypeDep,
+  getUniqueCellTypeScript,
   getXudtDep,
   getXudtTypeScript,
   isTestNet,
@@ -40,10 +43,32 @@ import {
   testConfig,
 } from "./constants";
 import { number, bytes } from "@ckb-lumos/codec";
-import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
+import {
+  append0x,
+  calcXudtCapacity,
+  calculateEmptyCellMinCapacity,
+  generateSporeCoBuild,
+  generateUniqueTypeArgs,
+  serializeUniqueCellXudtInfo,
+} from "../utils";
 import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
 import { accountStore } from "@/store/AccountStore";
+import {
+  CKB_UNIT,
+  Collector,
+  MAX_FEE,
+  MIN_CAPACITY,
+  NoLiveCellError,
+  SECP256K1_WITNESS_LOCK_SIZE,
+  calculateTransactionFee,
+  remove0x,
+} from "@rgbpp-sdk/ckb";
+import {
+  addressToScript,
+  getTransactionSize,
+  serializeWitnessArgs,
+} from "@nervosnetwork/ckb-sdk-utils";
 
 const cfg = isTestNet() ? testConfig : mainConfig;
 
@@ -809,6 +834,24 @@ export class CkbHepler {
     }
   }
 
+  async getPendingTx(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const rs = await superagent
+      .post(`${backend}/api/explore`)
+      .set("Content-Type", "application/json")
+      .send({
+        req: `https://${cfg.ckb_explorer_api}/api/v1/address_pending_transactions/${address}?page=1&page_size=10&sort=time.desc`,
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (rs && rs.status == 200) {
+      return JSON.parse(rs.text);
+    }
+  }
+
   // send explore api
   async sendExploreApi(url: string) {
     const rs = await superagent
@@ -1024,6 +1067,140 @@ export class CkbHepler {
     const txHash = await this.sendTransaction(signed);
     console.log("withDraw txHash:", txHash);
 
+    return txHash;
+  }
+
+  async mintXUDT(name: string, symbol: string, amount: BI) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const curAccount = DataManager.instance.getCurAccount();
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const xudtData = bytes.hexify(number.Uint128LE.pack(amount));
+    const xudtInfo = append0x(
+      serializeUniqueCellXudtInfo({
+        decimal: 8,
+        name: name,
+        symbol: symbol,
+      })
+    );
+
+    const collector = new Collector({
+      ckbNodeUrl: "https://testnet.ckb.dev/rpc",
+      ckbIndexerUrl: "https://testnet.ckb.dev/indexer",
+    });
+
+    // const address = collector
+    //   .getCkb()
+    //   .utils.privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
+    //     prefix: AddressPrefix.Testnet,
+    //   });
+    // // ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj
+    // console.log("ckb address: ", address);
+
+    const lock = addressToScript(wallet.address);
+    const emptyCells = await collector.getCells({
+      lock,
+    });
+    if (!emptyCells || emptyCells.length === 0) {
+      throw new NoLiveCellError("The address has no empty cells");
+    }
+
+    const uniqueCellCapacity =
+      MIN_CAPACITY +
+      BigInt(65) * CKB_UNIT +
+      BigInt(remove0x(xudtInfo).length / 2) * CKB_UNIT;
+    const minXudtCapacity = calcXudtCapacity(
+      helpers.addressToScript(wallet.address)
+    );
+
+    const txFee = MAX_FEE + BigInt(2000_0000);
+    const { inputs, sumInputsCapacity } = collector.collectInputs(
+      emptyCells,
+      uniqueCellCapacity + minXudtCapacity,
+      txFee,
+      MIN_CAPACITY
+    );
+
+    const uniqueTypeScript = getUniqueCellTypeScript(cfg.isMainnet);
+    const xudtTypeScript = getXudtTypeScript(cfg.isMainnet);
+    const outputs: CKBComponents.CellOutput[] = [
+      {
+        lock,
+        type: {
+          ...uniqueTypeScript,
+          args: generateUniqueTypeArgs(inputs[0], 0),
+        },
+        capacity: append0x(uniqueCellCapacity.toString(16)),
+      },
+      {
+        lock,
+        type: {
+          ...xudtTypeScript,
+          args: utils.computeScriptHash(lock),
+        },
+        capacity: append0x(minXudtCapacity.toString(16)),
+      },
+    ];
+
+    const changeCapacity =
+      sumInputsCapacity - uniqueCellCapacity - minXudtCapacity - txFee;
+    outputs.push({
+      lock,
+      capacity: append0x(changeCapacity.toString(16)),
+    });
+
+    const outputsData = [xudtInfo, xudtData, "0x"];
+
+    const emptyWitness = { lock: "", inputType: "", outputType: "" };
+    const witnesses = inputs.map((_, index) =>
+      index === 0 ? serializeWitnessArgs(emptyWitness) : "0x"
+    );
+
+    const cellDeps = [
+      getJoyIDCellDep(cfg.isMainnet),
+      getUniqueCellTypeDep(cfg.isMainnet),
+      getXudtDep(cfg.isMainnet),
+    ];
+
+    const unsignedTx = {
+      version: "0x0",
+      cellDeps,
+      headerDeps: [],
+      inputs,
+      outputs,
+      outputsData,
+      witnesses,
+    };
+
+    if (txFee === MAX_FEE) {
+      const txSize =
+        getTransactionSize(unsignedTx) + SECP256K1_WITNESS_LOCK_SIZE;
+      const estimatedTxFee = calculateTransactionFee(txSize);
+      const estimatedChangeCapacity =
+        changeCapacity + (MAX_FEE - estimatedTxFee);
+      unsignedTx.outputs[unsignedTx.outputs.length - 1].capacity = append0x(
+        estimatedChangeCapacity.toString(16)
+      );
+    }
+
+    const signedTx = await signRawTransaction(
+      unsignedTx as CKBTransaction,
+      wallet.address
+    );
+
+    console.log(signedTx);
+
+    const txHash = await collector
+      .getCkb()
+      .rpc.sendTransaction(signedTx, "passthrough");
     return txHash;
   }
 }

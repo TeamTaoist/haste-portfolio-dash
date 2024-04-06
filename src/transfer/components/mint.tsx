@@ -18,15 +18,20 @@ import { observer } from "mobx-react";
 import { autorun } from "mobx";
 import { useEffect, useState } from "react";
 import { accountStore } from "@/store/AccountStore";
+import { CkbHepler } from "@/lib/wallet/CkbHelper";
 
 export const Mint = observer(() => {
-  const [amount, setAmount] = useState("");
-  // const [symbol, setSymbol] = useState("");
-  // const [name, setName] = useState("");
+  const [amount, setAmount] = useState<number>(0);
+  const [symbol, setSymbol] = useState("");
+  const [name, setName] = useState("");
 
-  const handlerCancel = () => {};
+  const handlerCancel = () => {
+    setAmount(0);
+    setSymbol("");
+    setName("");
+  };
 
-  const handleSend = () => {
+  const handleMint = () => {
     const curAccount = accountStore.currentAddress;
     if (!curAccount) {
       toast({
@@ -42,8 +47,37 @@ export const Mint = observer(() => {
     }
 
     if (wallet.type == "joyid" && wallet.chain == "CKB") {
-      const mintAmount = parseUnit(amount.trim(), "ckb");
-      console.log(mintAmount);
+      const mintAmount = parseUnit(amount.toString(), "ckb");
+      console.log(mintAmount.toString(), name, symbol);
+
+      if (name.length <= 0 || symbol.length <= 0 || mintAmount.lte(0)) {
+        toast({
+          title: "Warning",
+          description: "name or symbol or amount value wrong",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      CkbHepler.instance
+        .mintXUDT(name, symbol, mintAmount)
+        .then((txHash) => {
+          console.log("mint success", txHash);
+
+          toast({
+            title: "Success",
+            description: txHash,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+
+          toast({
+            title: "Warning",
+            description: err.messgae,
+            variant: "destructive",
+          });
+        });
     }
   };
 
@@ -63,13 +97,22 @@ export const Mint = observer(() => {
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                {/* <Label htmlFor="name">Receive Address</Label>
+                <Label htmlFor="name">Name</Label>
                 <Input
-                  id="receiver"
-                  placeholder="Receive Address"
-                  value={receiveAddress}
-                  onChange={(e) => setReceiverAddress(e.target.value)}
-                /> */}
+                  id="name"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Symbol</Label>
+                <Input
+                  id="symbol"
+                  placeholder="Symbol"
+                  value={symbol}
+                  onChange={(e) => setSymbol(e.target.value)}
+                />
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Amount</Label>
@@ -77,7 +120,13 @@ export const Mint = observer(() => {
                   id="amount"
                   placeholder="Amount"
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+                  onChange={(e) =>
+                    setAmount(
+                      parseFloat(
+                        e.target.value.length <= 0 ? "0" : e.target.value
+                      )
+                    )
+                  }
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -93,7 +142,7 @@ export const Mint = observer(() => {
           <Button variant="outline" onClick={handlerCancel}>
             Cancel
           </Button>
-          <Button onClick={handleSend}>Send</Button>
+          <Button onClick={handleMint}>Mint</Button>
         </CardFooter>
       </Card>
     </TabsContent>

@@ -6,12 +6,17 @@ import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { useLocation } from "react-router-dom";
+import { Mint } from "./components/mint";
+import { isTestNet } from "@/lib/wallet/constants";
+import { accountStore } from "@/store/AccountStore";
+import { autorun } from "mobx";
+import { observer } from "mobx-react";
 // import { SendSudt } from "./components/send_sudt";
 // import { SendSpore } from "./components/send_spore";
 // import { CkbToBtc } from "./components/ckb_to_btc";
 // import { BtcToCkb } from "./components/btc_to_ckb";
 
-export function Transfer() {
+export const Transfer = observer(() => {
   const [reload, setReload] = useState(false);
 
   const location = useLocation();
@@ -38,6 +43,11 @@ export function Transfer() {
     };
   }, [reload]);
 
+  useEffect(() => {
+    const disposer = autorun(() => {});
+    return () => disposer();
+  }, []);
+
   return (
     <div className="mx-auto mt-7">
       <div hidden={true}>{reload ? 1 : 2}</div>
@@ -45,6 +55,13 @@ export function Transfer() {
         <div className="flex justify-center">
           <TabsList>
             <TabsTrigger value="Send">Send</TabsTrigger>
+            {isTestNet() &&
+            accountStore.currentAddress &&
+            accountStore.currentAddress.startsWith("ckt") ? (
+              <TabsTrigger value="MintXUDT">MintXUDT</TabsTrigger>
+            ) : (
+              ""
+            )}
             {/* <TabsTrigger value="Receive">Receive</TabsTrigger> */}
             {/* <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
             <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
@@ -54,6 +71,7 @@ export function Transfer() {
         </div>
         <div className="flex justify-center">
           <Send></Send>
+          <Mint></Mint>
           {/* <Receive></Receive> */}
           {/* <SendSudt></SendSudt>
           <SendSpore></SendSpore>
@@ -63,4 +81,6 @@ export function Transfer() {
       </Tabs>
     </div>
   );
-}
+});
+
+// export default Transfer;
