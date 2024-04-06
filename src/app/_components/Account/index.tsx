@@ -7,7 +7,8 @@ import { formatString } from '@/utils/common';
 import CustomModal from '../Dialog';
 import WalletModalContent from '../Dialog/WalletDialog';
 import { useDispatch } from 'react-redux';
-import { setCurrentWalletAddress } from '@/store/wallet/walletSlice';
+import { removeWalletItem, setCurrentWalletAddress } from '@/store/wallet/walletSlice';
+import { ChevronsLeft, ChevronsRight, Unplug } from 'lucide-react';
 
 const AccountSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
@@ -22,11 +23,20 @@ const AccountSidebar: React.FC = () => {
     setIsColleapse(!isColleapse);
   };
   
-  useEffect(() => {
-    if(!localStorage.getItem('wallets')) {
+  useEffect(() => { 
+    const walletsStr = localStorage.getItem('wallets');
+    
+    let wallets;
+    try {
+      wallets = JSON.parse(walletsStr!!);
+    } catch {
+      wallets = null;
+    }
+
+    if (!wallets || !wallets.length) {
       setIsOpenWalletModal(true);
     }
-  }, [dispatch, wallets])
+  }, [setIsOpenWalletModal, wallets]);
 
   return (
     <div className='h-full'>
@@ -69,14 +79,14 @@ const AccountSidebar: React.FC = () => {
               onClick={toggleSidebar}
             >
             {
-              isColleapse ? <CaretLeftIcon color='white' /> : <CaretRightIcon color='white' />
+              isColleapse ? <ChevronsLeft/> : <ChevronsRight />
             }
           </div>
           </div>
           <div className='flex flex-col mt-8'>
             {wallets.map(wallet => (
               <div key={wallet.address} className={` 
-                flex items-center py-2 border-b cursor-pointer
+                flex items-center py-2 border-b cursor-pointer group
                 ${wallet.address === currentWallet ? 'bg-primary008': 'bg-primary007'}
               `}
                 onClick={() => {
@@ -88,15 +98,25 @@ const AccountSidebar: React.FC = () => {
               </div>
               {
                 isColleapse && 
-                <div className='w-full px-2'>
-                  <div className='w-full flex justify-between'>
-                    <div className=' font-SourceSanPro font-semibold text-primary003'>{formatString(wallet.address, 5)}</div>
-                    {/* <div className=' font-SourceSanPro font-semibold text-primary003'>$ 888</div> */}
+                <>
+                  <div className='w-full px-2 '>
+                    <div className='w-full flex justify-between'>
+                      <div className=' font-SourceSanPro font-semibold text-primary003'>{formatString(wallet.address, 5)}</div>
+                      {/* <div className=' font-SourceSanPro font-semibold text-primary003'>$ 888</div> */}
+                    </div>
+                    <div className='flex'>
+                      <div className=' font-SourceSanPro text-primary003'>{wallet.chain}</div>
+                    </div>
                   </div>
-                  <div className='flex'>
-                    <div className=' font-SourceSanPro text-primary003'>{wallet.chain}</div>
+                  <div 
+                    className='pr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+                    onClick={() => {
+                      dispatch(removeWalletItem(wallet.address));
+                    }}
+                  >
+                    <Unplug />
                   </div>
-                </div>
+                </>
               }
             </div>
             ) )}

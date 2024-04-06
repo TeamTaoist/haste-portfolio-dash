@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store'; // 确保路径正确
 import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon, Component1Icon, FileTextIcon, GridIcon, PaperPlaneIcon, ThickArrowLeftIcon } from '@radix-ui/react-icons';
 import { initializeWallets } from '@/store/wallet/walletSlice';
+import { ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';
 
 const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
@@ -36,29 +37,29 @@ const ResponsiveSidebar: React.FC = () => {
               onClick={toggleSidebar}
             >
             {
-              isColleapse ? <CaretLeftIcon color='white' /> : <CaretRightIcon color='white' />
+              isColleapse ? <ChevronsLeft/> : <ChevronsRight />
             }
           </div>
           </div>
           <div className='flex flex-col mt-8'>
-            <div className='flex items-center px-4 gap-4 py-4'>
-              <Component1Icon color="#8C92BA" className='w-6 h-6'/>
+            <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
+              <LayoutDashboard />
               {
                 isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === 'dashboard' ? 'font-semibold': ''}`}>Dashboard</p>
               }
             </div>
           </div>
           <div className='flex flex-col'>
-            <div className='flex items-center px-4 gap-4 py-4'>
-              <FileTextIcon color="#8C92BA" className='w-6 h-6'/>
+            <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
+              <NotebookText />
               {
                 isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === 'transaction' ? 'font-semibold': ''}`}>Transaction</p>
               }
             </div>
           </div>
           <div className='flex flex-col'>
-            <div className='flex items-center px-4 gap-4 py-4'>
-              <PaperPlaneIcon color="#8C92BA" className='w-6 h-6'/>
+            <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
+              <SendToBack />
               {
                 isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === 'send' ? 'font-semibold': ''}`}>Send & Receive</p>
               }
