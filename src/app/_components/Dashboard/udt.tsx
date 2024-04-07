@@ -35,7 +35,7 @@ export default function UDTList() {
                   </div>
                   <div>
                     <p className="font-semibold">SUDT</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 truncate sm:max-w-none max-w-[8rem]">
+                    <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
                       sudtsudt
                     </p>
                   </div>
