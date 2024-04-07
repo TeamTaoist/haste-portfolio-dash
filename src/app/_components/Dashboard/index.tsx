@@ -30,7 +30,7 @@ export default function Dashboard() {
     );
   }, [tab]);
   return (
-    <div className="p-4">
+    <div className="p-4 flex-1">
       <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-4 bg-inherit  border-none z-1 static text-white001">
         {TAB_LIST.map((tab) => (
           <Link
