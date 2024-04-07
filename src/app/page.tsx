@@ -1,6 +1,7 @@
 "use client"
 
 import AccountSidebar from "./_components/Account";
+import Dashboard from "./_components/Dashboard";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       </div>
       <div className="flex h-full">
         <AccountSidebar />
+        <Dashboard />
       </div>
     </main>
   );
