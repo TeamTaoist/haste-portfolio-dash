@@ -17,11 +17,17 @@ import {
   getConfig,
   // connect,
 } from "@joyid/ckb";
-import { getCotaTypeScript } from "./constants";
+import {
+  getCotaTypeScript,
+  isTestNet,
+  mainConfig,
+  testConfig,
+} from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import { accountStore } from "@/store/AccountStore";
 
-const isMainnet = false;
+const cfg = isTestNet() ? testConfig : mainConfig;
+const isMainnet = cfg.isMainnet;
 
 export interface CellCollector {
   collect(): AsyncIterable<Cell>;
@@ -205,7 +211,7 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
             txSkeleton = addCellDep(txSkeleton, cotaCellDep);
           }
 
-          txSkeleton = addCellDep(txSkeleton, getJoyIDCellDep(false));
+          txSkeleton = addCellDep(txSkeleton, getJoyIDCellDep(isMainnet));
 
           const witness = bytes.hexify(
             blockchain.WitnessArgs.pack(newWitnessArgs)
