@@ -30,8 +30,8 @@ export default function Dashboard() {
     );
   }, [tab]);
   return (
-    <div className="p-4 flex-1">
-      <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-4 bg-inherit  border-none z-1 static text-white001">
+    <div className="flex-1 h-full min-h-0 overflow-auto p-4">
+      <div className="flex sm:space-x-0 bg-inherit border-none z-1 static text-white001">
         {TAB_LIST.map((tab) => (
           <Link
             key={tab.value}
@@ -46,7 +46,9 @@ export default function Dashboard() {
           </Link>
         ))}
       </div>
-      <div>{TAB_LIST.find((t) => t.value === currentTab)?.component}</div>
+      <div className="mt-4">
+        {TAB_LIST.find((t) => t.value === currentTab)?.component}
+      </div>
     </div>
   );
 }
