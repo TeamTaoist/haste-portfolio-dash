@@ -24,9 +24,30 @@ export default function UDTList() {
               key={index}
               className="hover:bg-primary010 grid grid-cols-12 group py-2 border-t border-gray-500"
             >
-              <td className="col-span-7 lg:col-span-5 px-2">SUDT</td>
+              <td className="col-span-7 lg:col-span-5 px-2">
+                <div className="flex gap-3 items-center">
+                  <div>
+                    <img
+                      src="https://static.cx.metamask.io/api/v1/tokenIcons/1/0xdac17f958d2ee523a2206206994597c13d831ec7.png"
+                      alt="USDT"
+                      className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+                    ></img>
+                  </div>
+                  <div>
+                    <p className="font-semibold">SUDT</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 truncate sm:max-w-none max-w-[8rem]">
+                      sudtsudt
+                    </p>
+                  </div>
+                </div>
+              </td>
               <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
-                0.000001
+                <p className="text-sm sm:text-base text-default font-semibold truncate">
+                  0.000001
+                </p>
+                <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
+                  $1.23
+                </p>
               </td>
             </tr>
           ))}
