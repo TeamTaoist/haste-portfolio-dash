@@ -125,7 +125,13 @@ export const Send = observer(() => {
                   id="amount"
                   placeholder="Amount"
                   value={amount}
-                  onChange={(e) => setAmount(parseFloat(e.target.value))}
+                  onChange={(e) =>
+                    setAmount(
+                      parseFloat(
+                        e.target.value.length <= 0 ? "0" : e.target.value
+                      )
+                    )
+                  }
                 />
               </div>
               <div className="flex flex-col space-y-1.5">

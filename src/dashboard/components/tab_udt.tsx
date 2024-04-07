@@ -292,7 +292,11 @@ export function TabUdt() {
                         ) {
                           setAmount(parseFloat(formatUnit(udt.amount, "ckb")));
                         } else {
-                          setAmount(parseFloat(e.target.value));
+                          setAmount(
+                            parseFloat(
+                              e.target.value.length <= 0 ? "0" : e.target.value
+                            )
+                          );
                         }
                       }}
                       className="col-span-3"
