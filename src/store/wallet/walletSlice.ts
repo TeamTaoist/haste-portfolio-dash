@@ -4,6 +4,8 @@ export interface WalletItem {
   chain: string;
   address: string;
   walletName: string;
+  pubKey: string;
+  keyType?: string;
 }
 
 interface WalletState {

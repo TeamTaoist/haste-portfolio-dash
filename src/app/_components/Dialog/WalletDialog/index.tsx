@@ -21,6 +21,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     address: string,
     chain: string,
     walletName: string,
+    pubKey: string
   }) => {
 
     if(wallets.some(wallet => wallet.address === props.address)) {
@@ -29,7 +30,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       dispatch(addWalletItem({
       address: props.address,
       chain: props.chain,
-      walletName: props.walletName
+      walletName: props.walletName,
+      pubKey: props.pubKey
     }))
     }
     
@@ -40,7 +42,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     checkWalletByAddress({
       address: rlt.address,
       chain: 'btc',
-      walletName: 'okx'
+      walletName: 'okx',
+      pubKey: rlt.publicKey
     })
   }
 
@@ -49,7 +52,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     checkWalletByAddress({
       address: rlt.accounts[0],
       chain: 'btc',
-      walletName: 'unisat'
+      walletName: 'unisat',
+      pubKey: rlt.pubkey
     })
   }
 
@@ -58,7 +62,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     checkWalletByAddress({
       address: rlt.address,
       chain: 'btc',
-      walletName: 'joyidbtc'
+      walletName: 'joyidbtc',
+      pubKey: rlt.publicKey!!
     })
   }
 
@@ -67,7 +72,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     checkWalletByAddress({
       address: rlt.address,
       chain: 'ckb',
-      walletName: 'joyidckb'
+      walletName: 'joyidckb',
+      pubKey: rlt.publickKey
     })
   }
 

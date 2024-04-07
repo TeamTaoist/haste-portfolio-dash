@@ -62,7 +62,8 @@ export const JoyIDCKBConnect = async () => {
   })
   const JoyIDCkbWallet = await connect();
   return {
-    address: JoyIDCkbWallet.address
+    address: JoyIDCkbWallet.address,
+    publickKey: JoyIDCkbWallet.pubkey
   }
 }
 

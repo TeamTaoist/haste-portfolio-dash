@@ -26,25 +26,16 @@ import {
   signRawTransaction,
 } from "@joyid/ckb";
 import { createJoyIDScriptInfo } from "./joyid";
-import {
-  CKB_INDEX_URL,
-  CKB_RPC_URL,
-  CONFIG,
-  backend,
-  ckb_explorer_api,
-  getSporeDep,
-  getSporeTypeScript,
-  getSudtTypeScript,
-  getXudtDep,
-  getXudtTypeScript,
-  isMainnet,
-} from "./constants";
+
 import { number, bytes } from "@ckb-lumos/codec";
 import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
 import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
-import { accountStore } from "@/store/AccountStore";
-import { ckb_AddressInfo, ckb_SporeInfo, ckb_UDTInfo, UdtInfo } from "@/types/BTC";
+import { ckb_AddressInfo, ckb_SporeInfo, ckb_TransferOptions, ckb_UDTInfo, UdtInfo } from "@/types/BTC";
+import store from "@/store/store";
+import { setCurrentWalletAddress } from '@/store/wallet/walletSlice';
+import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeDep, getSporeTypeScript, getSudtTypeScript, getXudtDep, getXudtTypeScript } from "@/settings/variable";
+import { getEnv } from "@/settings/env";
 
 config.initializeConfig(CONFIG);
 
@@ -64,36 +55,13 @@ export class CkbHepler {
     return this._instance;
   }
 
-  async joyid_onConnect() {
-    initConfig({
-      // your app name
-      name: "JoyID demo",
-      // your app logo
-      logo: "https://fav.farm/🆔",
-      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: "https://testnet.joyid.dev",
-    });
-
-    const connection = await connect();
-
-    console.log("JoyId connect", connection);
-
-    DataManager.instance.joyIdConnectionType = connection.keyType;
-    return {
-      account: connection.address,
-      pubkey: connection.pubkey,
-      keyType: connection.keyType,
-    };
-  }
-
   // transfer ckb
-  async transfer_ckb(options: ckb_TransferOptions) {
-    const curAccount = DataManager.instance.getCurAccount();
-    if (!curAccount) {
+  async transfer_ckb(options: ckb_TransferOptions, currentAccount: string) {
+    if (!currentAccount) {
       throw new Error("Please choose a wallet");
     }
-
-    const wallet = accountStore.getWallet(curAccount);
+    const wallets = store.getState().wallet.wallets;
+    const wallet = wallets.find(wallet => wallet.address === currentAccount);
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
@@ -101,7 +69,7 @@ export class CkbHepler {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (wallet.type == "joyid") {
+    if (wallet.walletName == "joyidckb") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
         options.from
@@ -118,9 +86,10 @@ export class CkbHepler {
   }
 
   // transfer udt
-  async transfer_udt(options: ckb_TransferOptions) {
+  async transfer_udt(options: ckb_TransferOptions,currentAccount: string ) {
     // const curAccount = DataManager.instance.getCurAccount();
-    const wallet = accountStore.getWallet(options.from);
+    const wallets = store.getState().wallet.wallets;
+    const wallet = wallets.find(wallet => wallet.address === currentAccount);    
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
@@ -128,7 +97,7 @@ export class CkbHepler {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (wallet.type == "joyid") {
+    if (wallet.walletName == "joyidckb") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
         options.from
@@ -145,13 +114,14 @@ export class CkbHepler {
   }
 
   // deploy new sudt token
-  async deploy_sudt(issuer: string, amount: number) {
-    const curAccount = DataManager.instance.getCurAccount();
-    if (!curAccount) {
+  async deploy_sudt(issuer: string, amount: number, currentAccount: string) {
+    const wallets = store.getState().wallet.wallets;
+    const wallet = wallets.find(wallet => wallet.address === currentAccount);
+    
+    if (!currentAccount) {
       throw new Error("Please choose a wallet");
     }
 
-    const wallet = accountStore.getWallet(curAccount);
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
@@ -159,7 +129,7 @@ export class CkbHepler {
     const unsigned = await this.sudt_buildIssueNewToken(issuer, amount);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (wallet.address == "joyid") {
+    if (wallet.walletName == "joyidckb") {
       const signed = await signRawTransaction(tx as CKBTransaction, issuer);
 
       console.log("[deploy_sudt]sign raw tx", signed);
@@ -173,17 +143,18 @@ export class CkbHepler {
   }
 
   // transfer spore
-  async transfer_spore(options: ckb_TransferOptions) {
+  async transfer_spore(options: ckb_TransferOptions, currentAccount: string) {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
     // const curAccount = DataManager.instance.getCurAccount();
-    const wallet = accountStore.getWallet(options.from);
+    const wallets = store.getState().wallet.wallets;
+    const wallet = wallets.find(wallet => wallet.address === currentAccount);
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
 
-    if (wallet.type == "joyid") {
+    if (wallet.walletName == "joyidckb") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
         options.from
@@ -391,7 +362,7 @@ export class CkbHepler {
     }
 
     let isXUDT = false;
-    const xudtScript = getXudtTypeScript(isMainnet);
+    const xudtScript = getXudtTypeScript(getEnv() === 'Mainnet');
     if (sudtToken.codeHash == xudtScript.codeHash) {
       isXUDT = true;
     }
@@ -417,7 +388,7 @@ export class CkbHepler {
     let sudt_cellDeps = helpers.locateCellDep(sudtToken);
     if (sudt_cellDeps == null) {
       if (isXUDT) {
-        sudt_cellDeps = getXudtDep(isMainnet);
+        sudt_cellDeps = getXudtDep(getEnv());
       } else {
         throw new Error("No sudt cell deps");
       }
@@ -635,9 +606,9 @@ export class CkbHepler {
   async getUdtBalance(address: string) {
     const lock = helpers.parseAddress(address);
 
-    const sudtType = getSudtTypeScript(isMainnet);
+    const sudtType = getSudtTypeScript(getEnv() === 'Mainnet');
 
-    const xudtType = getXudtTypeScript(isMainnet);
+    const xudtType = getXudtTypeScript(getEnv() === 'Mainnet');
 
     const sudtCellList: Cell[] = [];
 
@@ -739,7 +710,7 @@ export class CkbHepler {
   async getSpore(address: string) {
     const lock = helpers.parseAddress(address);
 
-    const sporeType = getSporeTypeScript(isMainnet);
+    const sporeType = getSporeTypeScript(getEnv() === 'Mainnet');
 
     const sporeCellList: Cell[] = [];
 
@@ -821,8 +792,8 @@ export class CkbHepler {
   }
 
   async getXudtAndSpore(address: string) {
-    const xudtTypeScript = getXudtTypeScript(isMainnet);
-    const sporeTypeScript = getSporeTypeScript(isMainnet);
+    const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
+    const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');
 
     const xudt_collector = indexer.collector({
       lock: helpers.parseAddress(address),
@@ -900,11 +871,11 @@ export class CkbHepler {
     return { xudtList, sporeList };
   }
 
-  async withDrawXUDT(sudtToken: Script) {
+  async withDrawXUDT(sudtToken: Script, currentAccount: string) {
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
 
     let isXUDT = false;
-    const xudtScript = getXudtTypeScript(isMainnet);
+    const xudtScript = getXudtTypeScript(getEnv() === 'Mainnet');
     if (sudtToken.codeHash == xudtScript.codeHash) {
       isXUDT = true;
     }
@@ -913,7 +884,7 @@ export class CkbHepler {
     let sudt_cellDeps = helpers.locateCellDep(sudtToken);
     if (sudt_cellDeps == null) {
       if (isXUDT) {
-        sudt_cellDeps = getXudtDep(isMainnet);
+        sudt_cellDeps = getXudtDep(getEnv() === 'Mainnet');
       } else {
         throw new Error("No sudt cell deps");
       }
@@ -921,12 +892,12 @@ export class CkbHepler {
 
     txSkeleton = addCellDep(txSkeleton, sudt_cellDeps!!);
 
-    const curAccount = DataManager.instance.getCurAccount();
-    if (!curAccount) {
+    const wallets = store.getState().wallet.wallets;
+    const wallet = wallets.find(wallet => wallet.address === currentAccount);
+    if (!currentAccount) {
       throw new Error("Please choose a wallet");
     }
 
-    const wallet = accountStore.getWallet(curAccount);
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
