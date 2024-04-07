@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface WalletItem {
+export interface WalletItem {
   chain: string;
   address: string;
   walletName: string;
