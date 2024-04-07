@@ -44,7 +44,7 @@ export default function WalletSelect({
     <div className="relative" ref={selectRef}>
       <button
         type="button"
-        className="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 focus:outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6"
+        className="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6"
         aria-haspopup="listbox"
         aria-expanded="true"
         aria-labelledby="listbox-label"
@@ -68,7 +68,7 @@ export default function WalletSelect({
       </button>
       {showOptions && (
         <ul
-          className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+          className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg outline-none sm:text-sm"
           role="listbox"
           aria-labelledby="listbox-label"
           aria-activedescendant="listbox-option-3"
@@ -86,8 +86,8 @@ export default function WalletSelect({
                 </div>
               </div>
               {w.address === selectWallet?.address && (
-                <span className="text-indigo-600 absolute inset-y-0 right-0 flex items-center pr-2">
-                  <Check className="text-primary-default w-4" />
+                <span className="absolute inset-y-0 right-0 flex items-center pr-2">
+                  <Check className="w-4" />
                 </span>
               )}
             </li>
