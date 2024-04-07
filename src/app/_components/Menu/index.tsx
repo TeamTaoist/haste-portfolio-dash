@@ -4,11 +4,13 @@ import { RootState } from '@/store/store'; // 确保路径正确
 import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon, Component1Icon, FileTextIcon, GridIcon, PaperPlaneIcon, ThickArrowLeftIcon } from '@radix-ui/react-icons';
 import { initializeWallets } from '@/store/wallet/walletSlice';
 import { ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
-  const [activeTab, isActiveTab] = useState<string>('dashboard')
   const deviceType = useSelector((state: RootState) => state.device.type);
+  const activeTab = usePathname();
 
   const toggleSidebar = () => {
     setIsColleapse(!isColleapse);
@@ -41,30 +43,30 @@ const ResponsiveSidebar: React.FC = () => {
             }
           </div>
           </div>
-          <div className='flex flex-col mt-8'>
+          <Link className='flex flex-col mt-8' href="/">
             <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
               <LayoutDashboard />
               {
-                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === 'dashboard' ? 'font-semibold': ''}`}>Dashboard</p>
+                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/' ? 'font-semibold': ''}`}>Dashboard</p>
               }
             </div>
-          </div>
-          <div className='flex flex-col'>
+          </Link>
+          <Link className='flex flex-col' href="transaction">
             <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
               <NotebookText />
               {
-                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === 'transaction' ? 'font-semibold': ''}`}>Transaction</p>
+                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/transaction' ? 'font-semibold': ''}`}>Transaction</p>
               }
             </div>
-          </div>
-          <div className='flex flex-col'>
+          </Link>
+          <Link className='flex flex-col' href="send">
             <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
               <SendToBack />
               {
-                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === 'send' ? 'font-semibold': ''}`}>Send & Receive</p>
+                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/send' ? 'font-semibold': ''}`}>Send & Receive</p>
               }
             </div>
-          </div>  
+          </Link>  
         </div>
       ) : (
         // 移动视图
