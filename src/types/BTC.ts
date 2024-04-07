@@ -1,5 +1,5 @@
-import { BIish } from "@ckb-lumos/bi";
-import { BI, Script } from "@ckb-lumos/lumos";
+import { BI, BIish } from "@ckb-lumos/bi";
+import { Script } from "@ckb-lumos/lumos";
 
 export interface BTCAccountInfo {
   address: string;

@@ -1,6 +1,6 @@
 import {
-  BI,
   Cell,
+  CellDep,
   Indexer,
   RPC,
   Script,
@@ -10,6 +10,7 @@ import {
   helpers,
   utils,
 } from "@ckb-lumos/lumos";
+import { BI } from "@ckb-lumos/bi";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 // import {
 //   UdtInfo,
@@ -31,16 +32,36 @@ import { number, bytes } from "@ckb-lumos/codec";
 import { calculateEmptyCellMinCapacity, generateSporeCoBuild } from "../utils";
 import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
-import { ckb_AddressInfo, ckb_SporeInfo, ckb_TransferOptions, ckb_UDTInfo, UdtInfo } from "@/types/BTC";
+import {
+  ckb_AddressInfo,
+  ckb_SporeInfo,
+  ckb_TransferOptions,
+  ckb_UDTInfo,
+  UdtInfo,
+} from "@/types/BTC";
 import store from "@/store/store";
-import { setCurrentWalletAddress } from '@/store/wallet/walletSlice';
-import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeDep, getSporeTypeScript, getSudtTypeScript, getXudtDep, getXudtTypeScript } from "@/settings/variable";
+import { setCurrentWalletAddress } from "@/store/wallet/walletSlice";
+import {
+  backend,
+  ckb_explorer_api,
+  CKB_INDEX_URL,
+  CKB_RPC_URL,
+  CONFIG,
+  getSporeDep,
+  getSporeTypeScript,
+  getSudtDep,
+  getSudtTypeScript,
+  getXudtDep,
+  getXudtTypeScript,
+} from "@/settings/variable";
 import { getEnv } from "@/settings/env";
 
 config.initializeConfig(CONFIG);
 
 const rpc = new RPC(CKB_RPC_URL);
 const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
+
+const isMainnet = getEnv() == "Testnet" ? false : true;
 
 export class CkbHepler {
   private static _instance: CkbHepler;
@@ -61,7 +82,7 @@ export class CkbHepler {
       throw new Error("Please choose a wallet");
     }
     const wallets = store.getState().wallet.wallets;
-    const wallet = wallets.find(wallet => wallet.address === currentAccount);
+    const wallet = wallets.find((wallet) => wallet.address === currentAccount);
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
@@ -86,10 +107,10 @@ export class CkbHepler {
   }
 
   // transfer udt
-  async transfer_udt(options: ckb_TransferOptions,currentAccount: string ) {
+  async transfer_udt(options: ckb_TransferOptions, currentAccount: string) {
     // const curAccount = DataManager.instance.getCurAccount();
     const wallets = store.getState().wallet.wallets;
-    const wallet = wallets.find(wallet => wallet.address === currentAccount);    
+    const wallet = wallets.find((wallet) => wallet.address === currentAccount);
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
@@ -116,8 +137,8 @@ export class CkbHepler {
   // deploy new sudt token
   async deploy_sudt(issuer: string, amount: number, currentAccount: string) {
     const wallets = store.getState().wallet.wallets;
-    const wallet = wallets.find(wallet => wallet.address === currentAccount);
-    
+    const wallet = wallets.find((wallet) => wallet.address === currentAccount);
+
     if (!currentAccount) {
       throw new Error("Please choose a wallet");
     }
@@ -149,7 +170,7 @@ export class CkbHepler {
 
     // const curAccount = DataManager.instance.getCurAccount();
     const wallets = store.getState().wallet.wallets;
-    const wallet = wallets.find(wallet => wallet.address === currentAccount);
+    const wallet = wallets.find((wallet) => wallet.address === currentAccount);
     if (!wallet) {
       throw new Error("Please choose a wallet");
     }
@@ -211,6 +232,7 @@ export class CkbHepler {
         txSkeleton,
         [fromAddress],
         toAddress,
+        //@ts-ignore
         options.amount,
         undefined,
         undefined,
@@ -362,7 +384,7 @@ export class CkbHepler {
     }
 
     let isXUDT = false;
-    const xudtScript = getXudtTypeScript(getEnv() === 'Mainnet');
+    const xudtScript = getXudtTypeScript(getEnv() === "Mainnet");
     if (sudtToken.codeHash == xudtScript.codeHash) {
       isXUDT = true;
     }
@@ -385,13 +407,15 @@ export class CkbHepler {
 
     // console.log(sudt_from.toString(), sudt_to.toString(), ckb_from.toString());
 
-    let sudt_cellDeps = helpers.locateCellDep(sudtToken);
-    if (sudt_cellDeps == null) {
-      if (isXUDT) {
-        sudt_cellDeps = getXudtDep(getEnv());
-      } else {
-        throw new Error("No sudt cell deps");
-      }
+    // let sudt_cellDeps = helpers.locateCellDep(sudtToken);
+    // if (sudt_cellDeps == null) {
+    // }
+
+    let sudt_cellDeps: CellDep;
+    if (isXUDT) {
+      sudt_cellDeps = getXudtDep(isMainnet);
+    } else {
+      sudt_cellDeps = getSudtDep(isMainnet);
     }
 
     txSkeleton = addCellDep(txSkeleton, sudt_cellDeps!!);
@@ -606,9 +630,9 @@ export class CkbHepler {
   async getUdtBalance(address: string) {
     const lock = helpers.parseAddress(address);
 
-    const sudtType = getSudtTypeScript(getEnv() === 'Mainnet');
+    const sudtType = getSudtTypeScript(getEnv() === "Mainnet");
 
-    const xudtType = getXudtTypeScript(getEnv() === 'Mainnet');
+    const xudtType = getXudtTypeScript(getEnv() === "Mainnet");
 
     const sudtCellList: Cell[] = [];
 
@@ -710,7 +734,7 @@ export class CkbHepler {
   async getSpore(address: string) {
     const lock = helpers.parseAddress(address);
 
-    const sporeType = getSporeTypeScript(getEnv() === 'Mainnet');
+    const sporeType = getSporeTypeScript(getEnv() === "Mainnet");
 
     const sporeCellList: Cell[] = [];
 
@@ -792,8 +816,8 @@ export class CkbHepler {
   }
 
   async getXudtAndSpore(address: string) {
-    const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
-    const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');
+    const xudtTypeScript = getXudtTypeScript(getEnv() === "Mainnet");
+    const sporeTypeScript = getSporeTypeScript(getEnv() === "Mainnet");
 
     const xudt_collector = indexer.collector({
       lock: helpers.parseAddress(address),
@@ -875,25 +899,23 @@ export class CkbHepler {
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
 
     let isXUDT = false;
-    const xudtScript = getXudtTypeScript(getEnv() === 'Mainnet');
+    const xudtScript = getXudtTypeScript(getEnv() === "Mainnet");
     if (sudtToken.codeHash == xudtScript.codeHash) {
       isXUDT = true;
     }
     console.log("script is xudt", isXUDT);
 
-    let sudt_cellDeps = helpers.locateCellDep(sudtToken);
-    if (sudt_cellDeps == null) {
-      if (isXUDT) {
-        sudt_cellDeps = getXudtDep(getEnv() === 'Mainnet');
-      } else {
-        throw new Error("No sudt cell deps");
-      }
+    let sudt_cellDeps: CellDep;
+    if (isXUDT) {
+      sudt_cellDeps = getXudtDep(isMainnet);
+    } else {
+      sudt_cellDeps = getSudtDep(isMainnet);
     }
 
     txSkeleton = addCellDep(txSkeleton, sudt_cellDeps!!);
 
     const wallets = store.getState().wallet.wallets;
-    const wallet = wallets.find(wallet => wallet.address === currentAccount);
+    const wallet = wallets.find((wallet) => wallet.address === currentAccount);
     if (!currentAccount) {
       throw new Error("Please choose a wallet");
     }
