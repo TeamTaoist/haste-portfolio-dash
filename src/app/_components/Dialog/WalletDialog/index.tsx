@@ -9,6 +9,8 @@ import { enqueueSnackbar } from 'notistack';
 import React, { useContext, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import { AccountData } from '../../../../types/BTC';
+import { getCKBCapacity } from '@/query/ckb/tools';
 
 interface walletModalProps {
   onClose: () => void
@@ -21,6 +23,12 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
 
   const _getBTCBalance = async (address: string) => {
     const rlt = await getBTCAsset(address);
+    return rlt
+  }
+
+  const _getCKBCapacity = async (address: string) => {
+    const rlt = await getCKBCapacity(address);
+    return rlt
   }
 
   const checkWalletByAddress = async (props: {
@@ -33,13 +41,20 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     if(wallets.some(wallet => wallet.address === props.address)) {
       enqueueSnackbar("Account Already Connected", {variant: "error"})
     } else {
-      let balance = await _getBTCBalance(props.address);
+      let balance;
+      if(props.chain === 'btc') {
+        let accountData = await _getBTCBalance(props.address);
+        balance = accountData?.chain_stats.funded_txo_sum;
+      } else if (props.chain === 'ckb') {
+        balance = await _getCKBCapacity(props.address);
+        balance = (balance.toNumber() / (10 ** 8)).toFixed(2);
+      }
       dispatch(addWalletItem({
         address: props.address,
         chain: props.chain,
         walletName: props.walletName,
         pubKey: props.pubKey,
-        balance: balance!!,
+        balance: balance ? balance.toString() : '',
       }))
     }
     
@@ -84,6 +99,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       pubKey: rlt.publickKey
     })
   }
+
+
 
   useEffect(() => {console.log(wallets)}, [wallets])
   

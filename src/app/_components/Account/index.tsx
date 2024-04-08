@@ -102,10 +102,10 @@ const AccountSidebar: React.FC = () => {
                   <div className='w-full px-2 '>
                     <div className='w-full flex justify-between'>
                       <div className=' font-SourceSanPro font-semibold text-primary003'>{formatString(wallet.address, 5)}</div>
-                      {/* <div className=' font-SourceSanPro font-semibold text-primary003'>$ 888</div> */}
+                      {/* <div className=' font-SourceSanPro font-semibold text-primary003'> ${wallet}</div> */}
                     </div>
                     <div className='flex'>
-                      <div className=' font-SourceSanPro text-primary003'>{wallet.chain}</div>
+                      <div className='font-SourceSanPro text-primary003'>{wallet.chain} {wallet.balance}</div>
                     </div>
                   </div>
                   <div 

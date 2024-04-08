@@ -48,5 +48,5 @@ export const signPsdt = async (hex: string, walletType: WalletType) => {
 
 export const getBTCAsset = async(address: string) => {
   let result = await getBTC(address)
-  console.log(result);
+  return result;
 }
