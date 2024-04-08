@@ -1,0 +1,12 @@
+name: trigger-netlify-build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl request
+        run: curl -X POST -d {} ${{ secrets.YOUR_BUILD_HOOK }}
