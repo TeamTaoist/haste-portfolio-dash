@@ -103,9 +103,9 @@ export default function TransactionItem({
             <CircleArrowOutDownLeft />
           )}
         </div>
-        <div className="overflow-y-visible overflow-x-auto sm:overflow-x-visible whitespace-nowrap text-ellipsis md:flex flex-wrap flex-1 md:justify-between lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-center pl-4">
-          <div className="flex items-center space-x-4 mb-1 sm:mb-0 col-span-4 2xl:col-span-3">
-            <div className="flex md:block mb-1 sm:mb-0">
+        <div className="overflow-y-visible overflow-x-auto sm:overflow-x-visible whitespace-nowrap text-ellipsis flex flex-wrap flex-1 justify-between lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-center pl-4">
+          <div className="flex items-center space-x-4 col-span-4 2xl:col-span-3">
+            <div className="flex md:block">
               <div className="font-semibold whitespace-nowrap">
                 {type === TRANSACTION_TYPE.SEND ? "Send" : "Receive"}
               </div>
@@ -126,10 +126,10 @@ export default function TransactionItem({
               <ReceiveBlock amount={amount} />
             )}
           </div>
-          <div className="hidden sm:flex items-center justify-end space-x-2 sm:space-x-4 col-span-1 2xl:col-span-2">
+          <div className="flex items-center justify-end space-x-2 col-span-1 2xl:col-span-2">
             <a
               href="http://"
-              className="hover:bg-slate-600 p-2 rounded-full flex"
+              className="text-slate-400 hover:bg-slate-600 p-2 rounded-full flex"
               target="_blank"
               rel="noopener noreferrer"
             >
