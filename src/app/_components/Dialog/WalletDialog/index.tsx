@@ -1,4 +1,6 @@
 import ModalContext from '@/context/ModalContext';
+import { getBTC } from '@/query/btc/memepool';
+import { getBTCAsset } from '@/query/btc/tools';
 import { RootState } from '@/store/store';
 import { addWalletItem } from '@/store/wallet/walletSlice';
 import { JoyIDBTCconnect, JoyIDCKBConnect, OKXConnect, UnisatConnect } from '@/utils/connect';
@@ -17,7 +19,11 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const dispatch = useDispatch()
 
-  const checkWalletByAddress = (props: {
+  const _getBTCBalance = async (address: string) => {
+    const rlt = await getBTCAsset(address);
+  }
+
+  const checkWalletByAddress = async (props: {
     address: string,
     chain: string,
     walletName: string,
@@ -27,12 +33,14 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     if(wallets.some(wallet => wallet.address === props.address)) {
       enqueueSnackbar("Account Already Connected", {variant: "error"})
     } else {
+      let balance = await _getBTCBalance(props.address);
       dispatch(addWalletItem({
-      address: props.address,
-      chain: props.chain,
-      walletName: props.walletName,
-      pubKey: props.pubKey
-    }))
+        address: props.address,
+        chain: props.chain,
+        walletName: props.walletName,
+        pubKey: props.pubKey,
+        balance: balance!!,
+      }))
     }
     
   };

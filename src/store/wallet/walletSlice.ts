@@ -6,6 +6,7 @@ export interface WalletItem {
   walletName: string;
   pubKey: string;
   keyType?: string;
+  balance?: string;
 }
 
 interface WalletState {

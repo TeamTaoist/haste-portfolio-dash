@@ -5,6 +5,7 @@ import {
   getPublicKey,
   signPsbt
 } from "@joyid/bitcoin";
+import { getBTC } from "./memepool";
 
 export const signPsdt = async (hex: string, walletType: WalletType) => {
     if (walletType == "unisat") {
@@ -43,4 +44,9 @@ export const signPsdt = async (hex: string, walletType: WalletType) => {
     }
 
     throw new Error("Please connect btc wallet");
-  }
+}
+
+export const getBTCAsset = async(address: string) => {
+  let result = await getBTC(address)
+  console.log(result);
+}

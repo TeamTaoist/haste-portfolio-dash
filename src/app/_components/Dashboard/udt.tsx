@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from 'next/image';
 
 export default function UDTList() {
   const [tokens] = useState(new Array(100).fill(0));
@@ -27,11 +28,13 @@ export default function UDTList() {
               <td className="col-span-7 lg:col-span-5 px-2">
                 <div className="flex gap-3 items-center">
                   <div>
-                    <img
-                      src="https://static.cx.metamask.io/api/v1/tokenIcons/1/0xdac17f958d2ee523a2206206994597c13d831ec7.png"
+                    <Image
+                      width={32}
+                      height={32}
+                      src="/img/btc.png"
                       alt="USDT"
                       className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
-                    ></img>
+                    />
                   </div>
                   <div>
                     <p className="font-semibold">SUDT</p>

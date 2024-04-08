@@ -21,12 +21,9 @@ export const UnisatConnect = async () => {
   const unisat = (window as any)["unisat"];
     if (typeof unisat !== "undefined") {
       const curNetwork = await unisat.getNetwork();
-      if (this) {
+      if (process.env.NODE_ENV === 'development') {
         //@ts-ignore
-        if (curNetwork != this!!._network!!) {
-          //@ts-ignore
-          await unisat.switchNetwork(this._network);
-        }
+        await unisat.switchNetwork('testnet');
       }
 
       const accounts: string[] = await unisat.requestAccounts();
