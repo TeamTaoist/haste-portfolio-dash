@@ -70,10 +70,10 @@ export class HttpManager {
         });
       }
 
-      await RGBHelper.instance.getRgbAssertByService(
-        "08a7694f94029e01a51cd102a718dadb0b7d1480beb291bb921f4243e65511d5",
-        address
-      );
+      // await RGBHelper.instance.getRgbAssertByService(
+      //   "08a7694f94029e01a51cd102a718dadb0b7d1480beb291bb921f4243e65511d5",
+      //   address
+      // );
 
       const rgbAssertList = await RGBHelper.instance.getRgbppAssert(address);
       DataManager.instance.curRgbAssert = rgbAssertList;
