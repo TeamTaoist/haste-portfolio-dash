@@ -94,7 +94,7 @@ export default function TransactionItem({
   token,
 }: ITransactionItemProps) {
   return (
-    <div className="hover:bg-primary010 cursor-pointer p-4">
+    <div className="hover:bg-primary010 cursor-pointer p-4 sm:border-b last:border-none border-gray-500">
       <div className="flex items-center">
         <div className="relative rounded-full flex w-8 h-8 items-center justify-center">
           {type === TRANSACTION_TYPE.SEND ? (
@@ -103,7 +103,7 @@ export default function TransactionItem({
             <CircleArrowOutDownLeft />
           )}
         </div>
-        <div className="overflow-y-visible overflow-x-auto sm:overflow-x-visible whitespace-nowrap text-ellipsis md:flex flex-wrap flex-1 md:justify-between lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-center sm:pl-4">
+        <div className="overflow-y-visible overflow-x-auto sm:overflow-x-visible whitespace-nowrap text-ellipsis md:flex flex-wrap flex-1 md:justify-between lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-center pl-4">
           <div className="flex items-center space-x-4 mb-1 sm:mb-0 col-span-4 2xl:col-span-3">
             <div className="flex md:block mb-1 sm:mb-0">
               <div className="font-semibold whitespace-nowrap">
@@ -133,7 +133,7 @@ export default function TransactionItem({
               target="_blank"
               rel="noopener noreferrer"
             >
-              <ExternalLink />
+              <ExternalLink size={20} />
             </a>
           </div>
         </div>
