@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleX } from "lucide-react";
+import { CircleX, Search } from "lucide-react";
 import { useState } from "react";
 import EmptyImage from "../common/Empty/image";
 import Image from "next/image";
@@ -62,11 +62,14 @@ export default function AssetModal({
                 Spore
               </button>
             </div>
-            <input
-              type="search"
-              placeholder="Search"
-              className="border outline-none text-gray-900 px-4 pl-4 py-2.5 border-slate-300 focus:border-primary-default !mr-0 w-full mr-3 rounded-md bg-default-deprecated"
-            />
+            <div className="flex items-center gap-3 bg-white border outline-none px-4 pl-4 py-2.5 border-slate-300 !mr-0 w-full mr-3 rounded-md ">
+              <Search className="text-slate-500 w-4" />
+              <input
+                type="search"
+                placeholder="Search"
+                className="bg-transparent focus:border-transparent focus:outline-none text-gray-900 flex-1 h-full"
+              />
+            </div>
           </div>
           <div className="mt-4">
             <div className="sm:overflow-y-auto h-full sm:h-[380px]">
