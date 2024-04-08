@@ -23,10 +23,12 @@ import { BI } from "@ckb-lumos/lumos";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
 import { accountStore } from "@/store/AccountStore";
+import { HttpManager } from "@/lib/api/HttpManager";
 
 export function TabSpore() {
   const [reload, setReload] = useState(false);
   const [toAddress, setToAddress] = useState<string>("");
+  // const [chooseSpore, setChooseSpore] = useState<ckb_SporeInfo>();
 
   const spores = DataManager.instance.tokens.spore;
   useEffect(() => {
@@ -45,6 +47,10 @@ export function TabSpore() {
   }, [reload]);
 
   const handlerConfirm = (spore: ckb_SporeInfo) => {
+    const sporeTypeScript = spore.type_script;
+
+    console.log("spore type script:", sporeTypeScript);
+
     if (toAddress.length <= 0) {
       toast({
         title: "Warning",
@@ -53,10 +59,6 @@ export function TabSpore() {
       });
       return;
     }
-
-    const sporeTypeScript = spore.type_script;
-
-    console.log("spore type script:", sporeTypeScript);
 
     const curAccount = DataManager.instance.getCurAccount();
     if (!curAccount) {
@@ -83,7 +85,9 @@ export function TabSpore() {
           description: txHash,
         });
 
-        accountStore.setCurrentAddress(curAccount);
+        if (accountStore.currentAddress) {
+          HttpManager.instance.getAsset(accountStore.currentAddress);
+        }
       })
       .catch((err) => {
         console.error(err);

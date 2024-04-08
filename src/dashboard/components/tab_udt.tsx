@@ -24,6 +24,8 @@ import { parseUnit } from "@ckb-lumos/bi";
 import { TabsList } from "@radix-ui/react-tabs";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { getSymbol } from "@/lib/utils";
+import { accountStore } from "@/store/AccountStore";
+import { HttpManager } from "@/lib/api/HttpManager";
 
 export function TabUdt() {
   const [reload, setReload] = useState(false);
@@ -31,6 +33,7 @@ export function TabUdt() {
   const [amount, setAmount] = useState<number>(0);
   const [isRgb, setIsRgb] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [chooseUdt, setChooseUdt] = useState<ckb_UDTInfo>();
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
@@ -49,7 +52,18 @@ export function TabUdt() {
 
   const udts = DataManager.instance.tokens.udt;
 
-  const handlerTransfer = (udt: ckb_UDTInfo) => {
+  const handlerTransfer = (udt?: ckb_UDTInfo) => {
+    console.log("send udt", udt);
+
+    if (!udt) {
+      toast({
+        title: "Warning",
+        description: "Cannot find choose one",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (amount <= 0) {
       toast({
         title: "Warning",
@@ -67,8 +81,6 @@ export function TabUdt() {
       });
       return;
     }
-
-    console.log(udt);
 
     if (isRgb) {
       RGBHelper.instance
@@ -171,6 +183,9 @@ export function TabUdt() {
           });
 
           handleCloseDialog();
+          if (accountStore.currentAddress) {
+            HttpManager.instance.getAsset(accountStore.currentAddress);
+          }
         })
         .catch((err) => {
           console.error(err);
@@ -190,11 +205,12 @@ export function TabUdt() {
     }
   };
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (udt: ckb_UDTInfo) => {
     setIsRgb(true);
     setAmount(0);
     setToAddress("");
     setIsOpen(true);
+    setChooseUdt(udt);
   };
 
   const handleCloseDialog = () => {
@@ -238,7 +254,7 @@ export function TabUdt() {
                   ) : (
                     <Button
                       className="relative mt-2 border-none font-SourceSanPro"
-                      onClick={handleOpenDialog}
+                      onClick={() => handleOpenDialog(udt)}
                     >
                       Transfer {getSymbol(udt.type_script)}
                     </Button>
@@ -255,11 +271,11 @@ export function TabUdt() {
                         Transfer to BTC
                       </TabsTrigger>
                       <TabsTrigger
-                        value={getSymbol(udt.type_script)}
+                        value={getSymbol(chooseUdt?.type_script)}
                         className="w-[50%]"
                         onClick={() => setIsRgb(false)}
                       >
-                        Transfer {getSymbol(udt.type_script)} on CKB
+                        Transfer {getSymbol(chooseUdt?.type_script)} on CKB
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="rgb++">
@@ -270,10 +286,10 @@ export function TabUdt() {
                         </DialogDescription>
                       </DialogHeader>
                     </TabsContent>
-                    <TabsContent value={getSymbol(udt.type_script)}>
+                    <TabsContent value={getSymbol(chooseUdt?.type_script)}>
                       <DialogHeader>
                         <DialogTitle>
-                          Transfer {getSymbol(udt.type_script)}
+                          Transfer {getSymbol(chooseUdt?.type_script)}
                         </DialogTitle>
                         <DialogDescription className="!text-white001">
                           * Make sure type correct wallet address
@@ -292,9 +308,21 @@ export function TabUdt() {
                       onChange={(e) => {
                         if (
                           parseFloat(e.target.value) >
-                          parseFloat(formatUnit(udt.amount, "ckb"))
+                          parseFloat(
+                            formatUnit(
+                              chooseUdt?.amount ? chooseUdt.amount : 0,
+                              "ckb"
+                            )
+                          )
                         ) {
-                          setAmount(parseFloat(formatUnit(udt.amount, "ckb")));
+                          setAmount(
+                            parseFloat(
+                              formatUnit(
+                                chooseUdt?.amount ? chooseUdt.amount : 0,
+                                "ckb"
+                              )
+                            )
+                          );
                         } else {
                           setAmount(
                             parseFloat(
@@ -320,7 +348,10 @@ export function TabUdt() {
                     />
                   </div>
                   <DialogFooter>
-                    <Button type="submit" onClick={() => handlerTransfer(udt)}>
+                    <Button
+                      type="submit"
+                      onClick={() => handlerTransfer(chooseUdt)}
+                    >
                       Confirm
                     </Button>
                   </DialogFooter>

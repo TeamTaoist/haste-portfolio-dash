@@ -68,6 +68,8 @@ export const Mint = observer(() => {
             title: "Success",
             description: txHash,
           });
+
+          handlerCancel();
         })
         .catch((err) => {
           console.error(err);

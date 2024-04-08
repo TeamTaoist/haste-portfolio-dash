@@ -63,6 +63,8 @@ export const Send = observer(() => {
             title: "Success",
             description: rs,
           });
+
+          handlerCancel();
         })
         .catch((err) => {
           console.error(err);

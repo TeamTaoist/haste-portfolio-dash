@@ -142,7 +142,9 @@ export const serializeInscriptionXudtInfo = (info: {
   return ret;
 };
 
-export const getSymbol = (udtTypeScript: Script) => {
+export const getSymbol = (udtTypeScript?: Script) => {
+  if (!udtTypeScript) return "...";
+
   const info = assetInfoMgr.getXUDTInfo(udtTypeScript);
 
   return info ? info.symbol : "...";

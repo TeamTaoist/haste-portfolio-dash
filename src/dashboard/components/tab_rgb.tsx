@@ -22,6 +22,8 @@ import { toast } from "@/components/ui/use-toast";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 import { BI } from "@ckb-lumos/lumos";
 import { getSymbol } from "@/lib/utils";
+import { accountStore } from "@/store/AccountStore";
+import { HttpManager } from "@/lib/api/HttpManager";
 
 export function TabRgb() {
   const [reload, setReload] = useState(false);
@@ -29,6 +31,7 @@ export function TabRgb() {
   const [isRgb, setIsRgb] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [amount, setAmount] = useState<number>(0);
+  const [chooseRgb, setChooseRgb] = useState<RgbAssert>();
 
   useEffect(() => {
     EventManager.instance.subscribe(EventType.dashboard_tokens_reload, () => {
@@ -47,7 +50,18 @@ export function TabRgb() {
 
   const rgbs = DataManager.instance.curRgbAssert;
 
-  const handlerTransfer = (rgb: RgbAssert) => {
+  const handlerTransfer = (rgb?: RgbAssert) => {
+    console.log("send rgb", rgb);
+
+    if (!rgb) {
+      toast({
+        title: "Warning",
+        description: "Cannot find choose one",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (toAddress.length <= 0) {
       toast({
         title: "Warning",
@@ -57,7 +71,6 @@ export function TabRgb() {
       return;
     }
 
-    console.log(rgb);
     if (!rgb.ckbCellInfo) {
       toast({
         title: "Warning",
@@ -124,6 +137,9 @@ export function TabRgb() {
           });
 
           handleCloseDialog();
+          if (accountStore.currentAddress) {
+            HttpManager.instance.getAsset(accountStore.currentAddress);
+          }
         })
         .catch((err) => {
           console.error(err);
@@ -143,11 +159,12 @@ export function TabRgb() {
     }
   };
 
-  const handleOpenDialog = () => {
+  const handleOpenDialog = (rgbAssert: RgbAssert) => {
     setIsRgb(true);
     setToAddress("");
     setAmount(0);
     setIsOpen(true);
+    setChooseRgb(rgbAssert);
   };
 
   const handleCloseDialog = () => {
@@ -191,7 +208,9 @@ export function TabRgb() {
                   <DialogTrigger asChild>
                     <Button
                       className="relative mt-2 border-none font-SourceSanPro"
-                      onClick={handleOpenDialog}
+                      onClick={() => {
+                        handleOpenDialog(rgb);
+                      }}
                     >
                       Transfer {getSymbol(rgb.ckbCellInfo.type_script)}
                     </Button>
@@ -207,11 +226,12 @@ export function TabRgb() {
                           Swap to CKB
                         </TabsTrigger>
                         <TabsTrigger
-                          value={getSymbol(rgb.ckbCellInfo.type_script)}
+                          value={getSymbol(chooseRgb?.ckbCellInfo?.type_script)}
                           className="w-[50%]"
                           onClick={() => setIsRgb(false)}
                         >
-                          Transfer {getSymbol(rgb.ckbCellInfo.type_script)} on
+                          Transfer{" "}
+                          {getSymbol(chooseRgb?.ckbCellInfo?.type_script)} on
                           BTC
                         </TabsTrigger>
                       </TabsList>
@@ -224,11 +244,12 @@ export function TabRgb() {
                         </DialogHeader>
                       </TabsContent>
                       <TabsContent
-                        value={getSymbol(rgb.ckbCellInfo.type_script)}
+                        value={getSymbol(chooseRgb?.ckbCellInfo?.type_script)}
                       >
                         <DialogHeader>
                           <DialogTitle>
-                            Transfer {getSymbol(rgb.ckbCellInfo.type_script)}
+                            Transfer{" "}
+                            {getSymbol(chooseRgb?.ckbCellInfo?.type_script)}
                           </DialogTitle>
                           <DialogDescription className="!text-white001">
                             * Make sure type correct wallet address
@@ -249,7 +270,7 @@ export function TabRgb() {
                             parseFloat(e.target.value) >
                             parseFloat(
                               formatUnit(
-                                rgb.ckbCellInfo?.amount as string,
+                                chooseRgb?.ckbCellInfo?.amount as string,
                                 "ckb"
                               )
                             )
@@ -257,7 +278,7 @@ export function TabRgb() {
                             setAmount(
                               parseFloat(
                                 formatUnit(
-                                  rgb.ckbCellInfo?.amount as string,
+                                  chooseRgb?.ckbCellInfo?.amount as string,
                                   "ckb"
                                 )
                               )
@@ -291,7 +312,7 @@ export function TabRgb() {
                     <DialogFooter>
                       <Button
                         type="submit"
-                        onClick={() => handlerTransfer(rgb)}
+                        onClick={() => handlerTransfer(chooseRgb)}
                       >
                         Confirm
                       </Button>
