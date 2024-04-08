@@ -3,6 +3,7 @@
 import { CircleX } from "lucide-react";
 import { useState } from "react";
 import EmptyImage from "../common/Empty/image";
+import Image from "next/image";
 
 enum ASSET_TYPE {
   UDT,
@@ -93,10 +94,21 @@ const UdtAsset = ({ onSelect }: { onSelect: SelectFunction }) => {
       onClick={() => onSelect({ type: ASSET_TYPE.UDT, data: {} })}
     >
       <div className="flex text-left items-center gap-2">
-        <p className="text-xs sm:text-sm leading-5 font-semibold">SUDT</p>
+        <Image
+          width={32}
+          height={32}
+          src="/img/btc.png"
+          alt="USDT"
+          className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+        />
+        <div>
+          <p className="text-xs sm:text-sm leading-5 font-semibold">SUDT</p>
+          <p className="sm:text-xs font-normal text-slate-300">sudtname</p>
+        </div>
       </div>
       <div className="flex flex-col items-end sm:max-w-[200px]">
-        <p className="sm:text-sm font-normal text-sm">1.12341</p>
+        <p className="sm:text-sm font-normal text-sm">1.12341 SUDT</p>
+        <p className="sm:text-xs font-normal text-slate-300">$0.41</p>
       </div>
     </button>
   ));
