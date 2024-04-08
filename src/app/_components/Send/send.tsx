@@ -6,7 +6,8 @@ import { RootState } from "@/store/store";
 import { WalletItem } from "@/store/wallet/walletSlice";
 import { ChevronDown } from "lucide-react";
 import WalletSelect from "./walletSelect";
-import AssetModal, { SelectAssetType } from "./asset";
+import AssetModal, { SelectAssetType, ASSET_TYPE } from "./asset";
+import Image from "next/image";
 
 export default function SendContent() {
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
@@ -49,7 +50,36 @@ export default function SendContent() {
             onClick={() => setAssetModalVisible(true)}
           >
             {selectAsset ? (
-              <>{selectAsset.type}</>
+              <>
+                {selectAsset.type === ASSET_TYPE.UDT ? (
+                  <div className="flex gap-2 items-center">
+                    <Image
+                      width={32}
+                      height={32}
+                      src="/img/btc.png"
+                      alt="USDT"
+                      className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+                    />
+                    <div className="leading-5">
+                      <div className="font-semibold ">SUDT</div>
+                      <div>sudtname</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2 items-center">
+                    <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
+                      <Image
+                        src="/img/btc.png"
+                        alt=""
+                        width={32}
+                        height={0}
+                        className="w-full object-cover block rounded-lg"
+                      />
+                    </div>
+                    <div>lalalal</div>
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <span className="flex items-center h-8">
@@ -63,15 +93,23 @@ export default function SendContent() {
           </button>
         </div>
       </div>
-      <div className="flex flex-col gap-2">
-        <p className="font-semibold">Amount</p>
-        <input
-          type="number"
-          className="w-full h-11 px-3 text-sm rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-primary-default"
-          placeholder="0.00"
-          value={amount}
-        />
-      </div>
+      {selectAsset?.type !== ASSET_TYPE.SPORE && (
+        <div className="flex flex-col gap-2">
+          <p className="font-semibold">Amount</p>
+          <input
+            type="number"
+            className="w-full h-11 px-3 text-sm rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-primary-default"
+            placeholder="0.00"
+            value={amount}
+          />
+          {!!selectAsset && (
+            <p className="sm:text-xs font-normal text-right">
+              Available Balance: 0.0787895165 SUDT
+            </p>
+          )}
+        </div>
+      )}
+
       <div
         className="w-full bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer"
         onClick={onSend}

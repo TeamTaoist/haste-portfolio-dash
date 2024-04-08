@@ -5,7 +5,7 @@ import { useState } from "react";
 import EmptyImage from "../common/Empty/image";
 import Image from "next/image";
 
-enum ASSET_TYPE {
+export enum ASSET_TYPE {
   UDT,
   SPORE,
 }
