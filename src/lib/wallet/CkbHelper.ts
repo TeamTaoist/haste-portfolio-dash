@@ -62,6 +62,8 @@ import {
   NoLiveCellError,
   SECP256K1_WITNESS_LOCK_SIZE,
   calculateTransactionFee,
+  genBtcTimeLockArgs,
+  getBtcTimeLockScript,
   remove0x,
 } from "@rgbpp-sdk/ckb";
 import {
@@ -1202,5 +1204,87 @@ export class CkbHepler {
       .getCkb()
       .rpc.sendTransaction(signedTx, "passthrough");
     return txHash;
+  }
+
+  async getRgbppPendingAssert(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const btcTimeLock = getBtcTimeLockScript(cfg.isMainnet);
+
+    const xudtTS = getXudtTypeScript(cfg.isMainnet);
+
+    const lock = helpers.parseAddress(address);
+
+    const btcLockArgs = genBtcTimeLockArgs(
+      lock,
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      0
+    );
+
+    const addressHexString = bytes.hexify(btcLockArgs);
+    const prefixArgs = addressHexString.split(
+      "000000000000000000000000000000000000000000000000000000000000000000000000"
+    )[0];
+    console.log(prefixArgs);
+
+    const collect = indexer.collector({
+      lock: {
+        script: {
+          codeHash: btcTimeLock.codeHash,
+          hashType: btcTimeLock.hashType,
+          args: prefixArgs,
+        },
+        searchMode: "prefix",
+      },
+      type: {
+        script: {
+          codeHash: xudtTS.codeHash,
+          hashType: xudtTS.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+      scriptSearchMode: "prefix",
+    });
+
+    const xudtList: ckb_UDTInfo[] = [];
+
+    const xudtMap: { [key: string]: ckb_UDTInfo } = {};
+
+    for await (const xudtCell of collect.collect()) {
+      console.log(xudtCell);
+
+      if (xudtCell.cellOutput.type) {
+        const typeHash = utils.computeScriptHash(xudtCell.cellOutput.type);
+        if (!xudtMap[typeHash]) {
+          const ckbUDTInfo: ckb_UDTInfo = {
+            symbol: "UNKNOWN",
+            amount: BI.from(0).toString(),
+            type_hash: typeHash,
+            udt_type: "xudt",
+            type_script: xudtCell.cellOutput.type,
+            isPending: true,
+          };
+
+          xudtMap[typeHash] = ckbUDTInfo;
+          xudtList.push(ckbUDTInfo);
+        }
+
+        let addNum: BI | undefined = undefined;
+        try {
+          addNum = number.Uint128LE.unpack(xudtCell.data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          console.warn(error.message);
+        }
+
+        if (addNum)
+          xudtMap[typeHash].amount = BI.from(xudtMap[typeHash].amount)
+            .add(addNum)
+            .toString();
+      }
+    }
+
+    return xudtList;
   }
 }

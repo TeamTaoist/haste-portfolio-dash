@@ -206,7 +206,7 @@ export function TabUdt() {
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {udts.map((udt) => (
-          <Card key={udt.type_hash}>
+          <Card key={udt.type_hash + (udt.isPending ? "_pending" : "")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 {udt.udt_type}
@@ -233,12 +233,16 @@ export function TabUdt() {
               </p>
               <Dialog open={isOpen} onOpenChange={handlerDialogOpenChange}>
                 <DialogTrigger asChild>
-                  <Button
-                    className="relative mt-2 border-none font-SourceSanPro"
-                    onClick={handleOpenDialog}
-                  >
-                    Transfer {getSymbol(udt.type_script)}
-                  </Button>
+                  {udt.isPending ? (
+                    <p>Pending</p>
+                  ) : (
+                    <Button
+                      className="relative mt-2 border-none font-SourceSanPro"
+                      onClick={handleOpenDialog}
+                    >
+                      Transfer {getSymbol(udt.type_script)}
+                    </Button>
+                  )}
                 </DialogTrigger>
                 <DialogContent className="bg-primary006 !border-none">
                   <Tabs defaultValue="rgb++" className="w-[100%]">

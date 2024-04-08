@@ -39,6 +39,12 @@ export class HttpManager {
         const { xudtList, sporeList } =
           await CkbHepler.instance.getXudtAndSpore(address);
 
+        const xudtPendingList = await CkbHepler.instance.getRgbppPendingAssert(
+          address
+        );
+
+        xudtList.push(...xudtPendingList);
+
         DataManager.instance.tokens = {
           udt: xudtList,
           spore: sporeList,
@@ -63,6 +69,11 @@ export class HttpManager {
           balance: BI.from(0),
         });
       }
+
+      await RGBHelper.instance.getRgbAssertByService(
+        "08a7694f94029e01a51cd102a718dadb0b7d1480beb291bb921f4243e65511d5",
+        address
+      );
 
       const rgbAssertList = await RGBHelper.instance.getRgbppAssert(address);
       DataManager.instance.curRgbAssert = rgbAssertList;

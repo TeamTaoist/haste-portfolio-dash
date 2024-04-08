@@ -195,7 +195,7 @@ const TeamSwitcher = observer(() => {
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandList>
-            <CommandGroup>
+            <CommandGroup key={"netswitch"}>
               <CommandItem
                 key={"mainnet"}
                 onSelect={() => {

@@ -139,6 +139,7 @@ export interface ckb_UDTInfo {
   udt_icon_file?: string;
   udt_type: "xudt";
   type_script: Script;
+  isPending?: boolean;
 }
 
 export interface ckb_AddressInfo {
