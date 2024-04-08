@@ -1,7 +1,13 @@
 "use client";
 
 import { CircleX, Search } from "lucide-react";
-import { useState } from "react";
+import {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+  useRef,
+} from "react";
 import EmptyImage from "../common/Empty/image";
 import Image from "next/image";
 
@@ -26,7 +32,14 @@ export default function AssetModal({
   onSelectAsset,
   closeModal,
 }: IAssetModalProps) {
+  const assetRef = useRef<AssetRef>(null);
   const [selectType, setSelectType] = useState<ASSET_TYPE>(ASSET_TYPE.UDT);
+  const [keyword, setKeyword] = useState("");
+
+  useEffect(() => {
+    assetRef?.current?.search(keyword);
+  }, [keyword, assetRef]);
+
   return (
     <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black/50">
       <div
@@ -68,16 +81,18 @@ export default function AssetModal({
                 type="search"
                 placeholder="Search"
                 className="bg-transparent focus:border-transparent focus:outline-none text-gray-900 flex-1 h-full"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
           </div>
           <div className="mt-4">
             <div className="sm:overflow-y-auto h-full sm:h-[380px]">
               {selectType === ASSET_TYPE.UDT && (
-                <UdtAsset onSelect={onSelectAsset} />
+                <UdtAsset onSelect={onSelectAsset} ref={assetRef} />
               )}
               {selectType === ASSET_TYPE.SPORE && (
-                <SporeAsset onSelect={onSelectAsset} />
+                <SporeAsset onSelect={onSelectAsset} ref={assetRef} />
               )}
             </div>
           </div>
@@ -87,10 +102,35 @@ export default function AssetModal({
   );
 }
 
-const UdtAsset = ({ onSelect }: { onSelect: SelectFunction }) => {
-  const [tokens] = useState(new Array(100).fill(0));
+interface IAssetProps {
+  onSelect: SelectFunction;
+}
+type AssetRef = {
+  search: (keyword?: string) => void;
+};
 
-  return tokens.map((_, index) => (
+const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect }, ref) => {
+  const [tokens] = useState(new Array(100).fill(0));
+  const [filteredTokens, setFilteredTokens] = useState(new Array(100).fill(0));
+
+  useEffect(() => {
+    // TODO
+    // get tokens
+    // setFilteredTokens(tokens);
+  }, []);
+
+  useImperativeHandle(ref, () => ({
+    search: (keyword?: string) => {
+      console.log(">> search in udt", keyword);
+      if (!keyword) {
+        setFilteredTokens(tokens);
+      }
+      // TODO filter name
+      // tokens.filter();
+    },
+  }));
+
+  return filteredTokens.map((_, index) => (
     <button
       key={index}
       className="group group flex rounded-md items-center justify-between w-full space-x-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
@@ -115,10 +155,30 @@ const UdtAsset = ({ onSelect }: { onSelect: SelectFunction }) => {
       </div>
     </button>
   ));
-};
+});
+UdtAsset.displayName = "UdtAsset";
 
-const SporeAsset = ({ onSelect }: { onSelect: SelectFunction }) => {
+const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect }, ref) => {
   const [spores] = useState(new Array(100).fill(0));
+
+  const [filteredSpores, setFilteredSpores] = useState(new Array(100).fill(0));
+
+  useEffect(() => {
+    // TODO
+    // get spores
+    // setFilteredSpores(spores);
+  }, []);
+
+  useImperativeHandle(ref, () => ({
+    search: (keyword?: string) => {
+      console.log(">> search in spore", keyword)
+      if (!keyword) {
+        setFilteredSpores(spores);
+      }
+      // TODO filter name
+      // spores.filter();
+    },
+  }));
 
   return spores.map((_, index) => (
     <button
@@ -144,4 +204,5 @@ const SporeAsset = ({ onSelect }: { onSelect: SelectFunction }) => {
       </div>
     </button>
   ));
-};
+});
+SporeAsset.displayName = "SporeAsset";
