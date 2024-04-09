@@ -1,5 +1,11 @@
 # React + TypeScript + Vite
 
+Main Branch   
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c2fe7e44-f189-4ccc-86ca-aa9309101ba6/deploy-status)](https://app.netlify.com/sites/caboroca-portfolio/deploys)
+
+Dev Branch  
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4109aab3-dc72-4225-a4da-126134dea892/deploy-status)](https://app.netlify.com/sites/clever-sprinkles-2c0505/deploys)
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
