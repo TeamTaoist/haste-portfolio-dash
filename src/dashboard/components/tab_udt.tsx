@@ -91,11 +91,28 @@ export function TabUdt() {
           });
 
           let findUtxo: RgbAssert | undefined = undefined;
+          // find same utxo
           for (let i = 0; i < rs.length; i++) {
             const utxo = rs[i];
-            if (!utxo.ckbCellInfo) {
+            if (
+              utxo.ckbCellInfo &&
+              utxo.ckbCellInfo.type_script.args == udt.type_script.args &&
+              utxo.ckbCellInfo.type_script.codeHash ==
+                udt.type_script.codeHash &&
+              utxo.ckbCellInfo.type_script.hashType == udt.type_script.hashType
+            ) {
               findUtxo = utxo;
               break;
+            }
+          }
+          // find empty utxo
+          if (!findUtxo) {
+            for (let i = 0; i < rs.length; i++) {
+              const utxo = rs[i];
+              if (!utxo.ckbCellInfo) {
+                findUtxo = utxo;
+                break;
+              }
             }
           }
 

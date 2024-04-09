@@ -70,8 +70,13 @@ export class HttpManager {
         });
       }
 
+      // const rs = await RGBHelper.instance.retryBtcTxId(
+      //   "012051cf08ec7701a9ecbdebbceef49af3662d10c898471b42562475a6d85bac"
+      // );
+      // console.log("retry", rs);
+
       // await RGBHelper.instance.getRgbAssertByService(
-      //   "08a7694f94029e01a51cd102a718dadb0b7d1480beb291bb921f4243e65511d5",
+      //   "012051cf08ec7701a9ecbdebbceef49af3662d10c898471b42562475a6d85bac",
       //   address
       // );
 

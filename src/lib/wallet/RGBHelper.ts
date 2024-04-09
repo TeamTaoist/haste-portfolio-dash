@@ -245,11 +245,7 @@ export class RGBHelper {
     });
     console.log("rgbppState", rgbppState);
 
-    const retry = await service.retryRgbppCkbTransaction({
-      btc_txid: btcTxId,
-    });
-
-    console.log("retry", retry);
+    await this.retryBtcTxId(btcTxId);
 
     return btcTxId;
   }
@@ -422,11 +418,7 @@ export class RGBHelper {
 
     console.log("rgbppState", rgbppState);
 
-    const retry = await service.retryRgbppCkbTransaction({
-      btc_txid: btcTxId,
-    });
-
-    console.log("retry", retry);
+    await this.retryBtcTxId(btcTxId);
 
     return btcTxId;
   }
@@ -570,19 +562,21 @@ export class RGBHelper {
   }
 
   async retryBtcTxId(txId: string) {
-    const cfg = isTestNet() ? testConfig : mainConfig;
+    setTimeout(async () => {
+      const cfg = isTestNet() ? testConfig : mainConfig;
 
-    const service = BtcAssetsApi.fromToken(
-      cfg.BTC_ASSETS_API_URL,
-      cfg.BTC_ASSETS_TOKEN,
-      cfg.BTC_ASSETS_ORGIN
-    );
+      const service = BtcAssetsApi.fromToken(
+        cfg.BTC_ASSETS_API_URL,
+        cfg.BTC_ASSETS_TOKEN,
+        cfg.BTC_ASSETS_ORGIN
+      );
 
-    const rs = await service.retryRgbppCkbTransaction({
-      btc_txid: txId,
-    });
+      const rs = await service.retryRgbppCkbTransaction({
+        btc_txid: txId,
+      });
 
-    console.log("retry btc txid", rs);
+      console.log("retry rs", rs);
+    }, 200);
   }
 
   async getRgbAssertByService(txId: string, address: string) {
