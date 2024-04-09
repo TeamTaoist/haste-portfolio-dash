@@ -109,6 +109,10 @@ export function TabRgb() {
           });
 
           handleCloseDialog();
+
+          if (accountStore.currentAddress) {
+            HttpManager.instance.getAsset(accountStore.currentAddress);
+          }
         })
         .catch((err) => {
           console.error(err);
