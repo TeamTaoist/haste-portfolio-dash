@@ -1,0 +1,12 @@
+name: trigger-netlify-build
+
+on:
+  push:
+    branches: [ feature/new-beta-ux ]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl request
+        run: curl -X POST -d {} "https://api.netlify.com/build_hooks/6614b3823fda615229e535f5"
