@@ -1,4 +1,4 @@
-name: trigger-netlify-build
+name: trigger-netlify-build | Dev Branch
 
 on:
   push:
