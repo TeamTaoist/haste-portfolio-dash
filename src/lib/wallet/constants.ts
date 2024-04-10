@@ -390,6 +390,8 @@ export const getMNftDep = (isMainnet: boolean) =>
 let _isTestNet: boolean =
   localStorage.getItem("isTestNet") == "1" ? true : false;
 export const isTestNet = () => {
+  if (import.meta.env.PROD) return false;
+
   return _isTestNet;
 };
 export const chooseTestNet = () => {
