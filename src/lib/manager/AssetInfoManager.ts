@@ -32,7 +32,14 @@ class AssetInfoManager {
     );
 
     const idx = BI.from(txInfo.objects[0].cells[0][1]).toNumber();
-    if (ckTxInfo && ckTxInfo.data.attributes.display_outputs[idx].extra_info) {
+    const info = ckTxInfo?.data.attributes.display_outputs[idx].extra_info;
+    if (
+      info &&
+      info != undefined &&
+      info.symbol &&
+      info.symbol.length > 0 &&
+      info.decimal
+    ) {
       const info = ckTxInfo.data.attributes.display_outputs[idx].extra_info;
       if (info) {
         this.infoData[hash] = {
