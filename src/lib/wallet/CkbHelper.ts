@@ -89,6 +89,17 @@ export class CkbHepler {
 
   public static get instance() {
     if (!CkbHepler._instance) {
+      const cfg = isTestNet() ? testConfig : mainConfig;
+
+      initConfig({
+        // your app name
+        name: "JoyID demo",
+        // your app logo
+        logo: "https://fav.farm/🆔",
+        // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
+        joyidAppURL: cfg.joyIdUrl,
+      });
+
       CkbHepler._instance = new CkbHepler();
 
       commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()]);
@@ -97,17 +108,6 @@ export class CkbHepler {
   }
 
   async joyid_onConnect() {
-    const cfg = isTestNet() ? testConfig : mainConfig;
-
-    initConfig({
-      // your app name
-      name: "JoyID demo",
-      // your app logo
-      logo: "https://fav.farm/🆔",
-      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: cfg.joyIdUrl,
-    });
-
     const connection = await connect();
 
     console.log("JoyId connect", connection);
