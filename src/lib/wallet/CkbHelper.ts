@@ -764,7 +764,7 @@ export class CkbHepler {
         );
         if (!udtMap[typeScriptHex]) {
           udtMap[typeScriptHex] = {
-            type: "xudt",
+            type: "xUDT",
             typeScriptHex: typeScriptHex,
             balance: BI.from(0),
           };
@@ -963,7 +963,7 @@ export class CkbHepler {
             symbol: "UNKNOWN",
             amount: BI.from(0).toString(),
             type_hash: typeHash,
-            udt_type: "xudt",
+            udt_type: "xUDT",
             type_script: xudtCell.cellOutput.type,
           };
 
@@ -1269,7 +1269,7 @@ export class CkbHepler {
             symbol: "UNKNOWN",
             amount: BI.from(0).toString(),
             type_hash: typeHash,
-            udt_type: "xudt",
+            udt_type: "xUDT",
             type_script: xudtCell.cellOutput.type,
             isPending: true,
           };
