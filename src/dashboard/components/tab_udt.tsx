@@ -293,7 +293,7 @@ export function TabUdt() {
                 {getSymbol(udt.type_script)}
               </p>
               <Dialog open={isOpen} onOpenChange={handlerDialogOpenChange}>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+                {import.meta.env.PROD ? (
                   <DialogTrigger asChild>
                     {udt.isPending ? (
                       <p>Pending</p>
@@ -306,13 +306,28 @@ export function TabUdt() {
                       </Button>
                     )}
                   </DialogTrigger>
-                  <Button
-                    className="relative mt-2 border-none font-SourceSanPro"
-                    onClick={() => handleWithDraw(udt)}
-                  >
-                    Melt
-                  </Button>
-                </div>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+                    <DialogTrigger asChild>
+                      {udt.isPending ? (
+                        <p>Pending</p>
+                      ) : (
+                        <Button
+                          className="relative mt-2 border-none font-SourceSanPro"
+                          onClick={() => handleOpenDialog(udt)}
+                        >
+                          Transfer {getSymbol(udt.type_script)}
+                        </Button>
+                      )}
+                    </DialogTrigger>
+                    <Button
+                      className="relative mt-2 border-none font-SourceSanPro"
+                      onClick={() => handleWithDraw(udt)}
+                    >
+                      Melt
+                    </Button>
+                  </div>
+                )}
                 <DialogContent className="bg-primary006 !border-none">
                   <Tabs defaultValue="rgb++" className="w-[100%]">
                     <TabsList className="w-[100%]">

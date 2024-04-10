@@ -7,7 +7,6 @@ import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { useLocation } from "react-router-dom";
 import { Mint } from "./components/mint";
-import { isTestNet } from "@/lib/wallet/constants";
 import { accountStore } from "@/store/AccountStore";
 import { autorun } from "mobx";
 import { observer } from "mobx-react";
@@ -55,25 +54,13 @@ export const Transfer = observer(() => {
         <div className="flex justify-center">
           <TabsList>
             <TabsTrigger value="Send">Send</TabsTrigger>
-            {isTestNet() &&
+            {!import.meta.env.PROD &&
             accountStore.currentAddress &&
             accountStore.currentAddress.startsWith("ckt") ? (
               <TabsTrigger value="MintXUDT">MintXUDT</TabsTrigger>
             ) : (
               ""
             )}
-            {!isTestNet() &&
-            accountStore.currentAddress &&
-            accountStore.currentAddress.startsWith("ckb") ? (
-              <TabsTrigger value="MintXUDT">MintXUDT</TabsTrigger>
-            ) : (
-              ""
-            )}
-            {/* <TabsTrigger value="Receive">Receive</TabsTrigger> */}
-            {/* <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
-            <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
-            <TabsTrigger value="CkbToBtc">CkbToBtc</TabsTrigger>
-            <TabsTrigger value="BtcToCkb">BtcToCkb</TabsTrigger> */}
           </TabsList>
         </div>
         <div className="flex justify-center">
