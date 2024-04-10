@@ -1099,8 +1099,8 @@ export class CkbHepler {
     );
 
     const collector = new Collector({
-      ckbNodeUrl: "https://testnet.ckb.dev/rpc",
-      ckbIndexerUrl: "https://testnet.ckb.dev/indexer",
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
     // const address = collector
@@ -1300,9 +1300,11 @@ export class CkbHepler {
     xudtType: Script,
     receivers: [{ toAddress: string; transferAmount: bigint }]
   ) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const collector = new Collector({
-      ckbNodeUrl: "https://testnet.ckb.dev/rpc",
-      ckbIndexerUrl: "https://testnet.ckb.dev/indexer",
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
     const isMainnet = false;
