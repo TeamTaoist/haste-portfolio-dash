@@ -62,6 +62,13 @@ export const Transfer = observer(() => {
             ) : (
               ""
             )}
+            {!isTestNet() &&
+            accountStore.currentAddress &&
+            accountStore.currentAddress.startsWith("ckb") ? (
+              <TabsTrigger value="MintXUDT">MintXUDT</TabsTrigger>
+            ) : (
+              ""
+            )}
             {/* <TabsTrigger value="Receive">Receive</TabsTrigger> */}
             {/* <TabsTrigger value="SendSUDT">SendSUDT</TabsTrigger>
             <TabsTrigger value="SendSpore">SendSpore</TabsTrigger>
