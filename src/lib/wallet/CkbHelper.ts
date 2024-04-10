@@ -1298,7 +1298,7 @@ export class CkbHepler {
 
   async test_transferXudt(
     xudtType: Script,
-    receiver: { toAddress: string; transferAmount: bigint }
+    receivers: [{ toAddress: string; transferAmount: bigint }]
   ) {
     const collector = new Collector({
       ckbNodeUrl: "https://testnet.ckb.dev/rpc",
@@ -1325,7 +1325,9 @@ export class CkbHepler {
     if (!xudtCells || xudtCells.length === 0) {
       throw new Error("The address has no xudt cells");
     }
-    const sumTransferAmount = receiver.transferAmount;
+    const sumTransferAmount = receivers
+      .map((receiver) => receiver.transferAmount)
+      .reduce((prev, current) => prev + current, BigInt(0));
 
     let {
       // eslint-disable-next-line prefer-const
@@ -1340,17 +1342,31 @@ export class CkbHepler {
     });
 
     const xudtCapacity = calcXudtCapacity(fromLock);
-    const receiverXudtCapacity = calcXudtCapacity(
-      helpers.parseAddress(receiver.toAddress)
-    );
-    const outputs: CKBComponents.CellOutput[] = [
-      {
+
+    let totalReceiverXudtCapacity = BI.from(0).toBigInt();
+    const receiverXudtCapacityList: bigint[] = [];
+    for (let i = 0; i < receivers.length; i++) {
+      const receiver = receivers[i];
+      const v = calcXudtCapacity(helpers.parseAddress(receiver.toAddress));
+      receiverXudtCapacityList.push(v);
+      totalReceiverXudtCapacity += v;
+    }
+
+    const outputs: CKBComponents.CellOutput[] = [];
+    const outputsData: string[] = [];
+
+    for (let i = 0; i < receivers.length; i++) {
+      const receiver = receivers[i];
+      const xudtCapacity = receiverXudtCapacityList[i];
+
+      outputs.push({
         lock: helpers.parseAddress(receiver.toAddress),
         type: xudtType,
-        capacity: append0x(receiverXudtCapacity.toString(16)),
-      },
-    ];
-    const outputsData: string[] = [append0x(u128ToLe(sumTransferAmount))];
+        capacity: append0x(xudtCapacity.toString(16)),
+      });
+      outputsData.push(append0x(u128ToLe(receiver.transferAmount)));
+    }
+
     if (sumAmount > sumTransferAmount) {
       outputs.push({
         lock: fromLock,
@@ -1376,7 +1392,7 @@ export class CkbHepler {
     if (!emptyCells || emptyCells.length === 0) {
       throw new NoLiveCellError("The address has no empty cells");
     }
-    const needCapacity = receiverXudtCapacity;
+    const needCapacity = totalReceiverXudtCapacity;
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } =
       collector.collectInputs(emptyCells, needCapacity, txFee, MIN_CAPACITY);
 
@@ -1397,11 +1413,7 @@ export class CkbHepler {
       | { lock: string; inputType: string; outputType: string }
     )[] = inputs.map((_, index) => (index === 0 ? emptyWitness : "0x"));
 
-    const cellDeps = [
-      getSecp256k1CellDep(isMainnet),
-      // getJoyIDCellDep(isMainnet),
-      getXudtDep(isMainnet),
-    ];
+    const cellDeps = [getSecp256k1CellDep(isMainnet), getXudtDep(isMainnet)];
 
     const unsignedTx = {
       version: "0x0",
