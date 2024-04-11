@@ -12,7 +12,7 @@ import { toast } from "@/components/ui/use-toast";
 export const DispatchPanel = observer(() => {
 
 
-  const [hide, setHide] = useState(false);
+  const [_hide, setHide] = useState(false);
 
   const [loadmore, setLoadMore] = useState(false);
 
@@ -78,7 +78,7 @@ export const DispatchPanel = observer(() => {
     }
 
     let lines = addressList.split('\n');
-    let data: [{ toAddress: string; transferAmount: bigint }] = [];
+    let data: { toAddress: string, transferAmount: bigint }[] = [];
 
     lines.map((line) => {
       let address = line.split(",")[0].trim();
@@ -110,7 +110,7 @@ export const DispatchPanel = observer(() => {
       return;
     }
 
-    let amounts: { string: bigint } = {};
+    let amounts = new Map<string, bigint>();
     data.map((item) => {
       if (amounts[item.toAddress]) {
         amounts[item.toAddress] += item.transferAmount;
@@ -119,7 +119,7 @@ export const DispatchPanel = observer(() => {
       }
     });
 
-    let dispatch_data: [{ toAddress: string; transferAmount: bigint }] = [];
+    let dispatch_data: { toAddress: string, transferAmount: bigint }[] = [];
     for (let [key, value] of Object.entries(amounts)) {
       console.log(`${key}: ${value}`);
       dispatch_data.push({

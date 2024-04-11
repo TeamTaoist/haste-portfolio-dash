@@ -85,7 +85,7 @@ export const indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
 
 export class CkbHepler {
   private static _instance: CkbHepler;
-  private constructor() {}
+  private constructor() { }
 
   public static get instance() {
     if (!CkbHepler._instance) {
@@ -825,11 +825,9 @@ export class CkbHepler {
       .post(`${backend}/api/explore`)
       .set("Content-Type", "application/json")
       .send({
-        req: `https://${
-          cfg.ckb_explorer_api
-        }/api/v1/address_transactions/${address}?page=${
-          page + 1
-        }&page_size=10&sort=time.desc`,
+        req: `https://${cfg.ckb_explorer_api
+          }/api/v1/address_transactions/${address}?page=${page + 1
+          }&page_size=10&sort=time.desc`,
       })
       .catch((err) => {
         console.error(err);
@@ -1298,7 +1296,7 @@ export class CkbHepler {
 
   async batchTransferXudt(
     xudtType: Script,
-    receivers: [{ toAddress: string; transferAmount: bigint }]
+    receivers: { toAddress: string; transferAmount: bigint }[]
   ) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
