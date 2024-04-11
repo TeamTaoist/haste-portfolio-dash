@@ -171,7 +171,7 @@ export interface ckb_UDTInfo {
   amount: string;
   type_hash: string;
   udt_icon_file?: string;
-  udt_type: "xudt";
+  udt_type: "xUDT";
   type_script: Script;
 }
 

@@ -17,7 +17,7 @@ export const backend: string = "https://blockchain-serverless.vercel.app";
 
 export const rgb_networkType = NetworkType.TESTNET;
 
-const TestnetInfo = {
+export const TestnetInfo = {
   JoyIDLockScript: {
     codeHash:
       "0xd23761b364210735c19c60561d213fb3beae2fd6172743719eff6920e020baac",
@@ -131,7 +131,7 @@ const TestnetInfo = {
   } as CellDep,
 };
 
-const MainnetInfo = {
+export const MainnetInfo = {
   JoyIDLockScript: {
     codeHash:
       "0xd00c84f0ec8fd441c38bc3f87a371f547190f2fcff88e642bc5bf54b9e318323",
