@@ -54,9 +54,10 @@ export const Transfer = observer(() => {
         <div className="flex justify-center">
           <TabsList>
             <TabsTrigger value="Send">Send</TabsTrigger>
-            {!import.meta.env.PROD &&
+            {import.meta.env.VITE_OpenXudtMint == "1" &&
             accountStore.currentAddress &&
-            accountStore.currentAddress.startsWith("ckt") ? (
+            (accountStore.currentAddress.startsWith("ckt") ||
+              accountStore.currentAddress.startsWith("ckb")) ? (
               <TabsTrigger value="MintXUDT">MintXUDT</TabsTrigger>
             ) : (
               ""

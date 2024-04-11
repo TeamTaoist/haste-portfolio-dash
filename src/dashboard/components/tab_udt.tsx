@@ -293,7 +293,7 @@ export function TabUdt() {
                 {getSymbol(udt.type_script)}
               </p>
               <Dialog open={isOpen} onOpenChange={handlerDialogOpenChange}>
-                {import.meta.env.PROD ? (
+                {import.meta.env.VITE_OpenXudtMelt != "1" ? (
                   <DialogTrigger asChild>
                     {udt.isPending ? (
                       <p>Pending</p>
