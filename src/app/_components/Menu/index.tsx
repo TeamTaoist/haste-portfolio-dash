@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store/store'; // 确保路径正确
+import { RootState } from '@/store/store'; 
 import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon, Component1Icon, FileTextIcon, GridIcon, PaperPlaneIcon, ThickArrowLeftIcon } from '@radix-ui/react-icons';
 import { initializeWallets } from '@/store/wallet/walletSlice';
 import { ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';

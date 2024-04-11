@@ -1,5 +1,6 @@
-import { CKB_INDEX_URL, CKB_RPC_URL, CONFIG } from "@/settings/variable";
-import { BI, config, helpers, Indexer, RPC } from "@ckb-lumos/lumos";
+import { getEnv } from "@/settings/env";
+import { CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeTypeScript } from "@/settings/variable";
+import { BI, Cell, config, helpers, Indexer, RPC } from "@ckb-lumos/lumos";
 
 config.initializeConfig(CONFIG);
 
@@ -17,3 +18,29 @@ export const getCKBCapacity = async (address: string) => {
     }
     return balance;
 } 
+
+export const getSpore = async(address: string) => {
+    const lock = helpers.parseAddress(address);
+
+    const sporeType = getSporeTypeScript(getEnv() === "Mainnet");
+
+    const sporeCellList: Cell[] = [];
+
+    const sporeCollector = indexer.collector({
+      lock,
+      type: {
+        script: {
+          codeHash: sporeType.codeHash,
+          hashType: sporeType.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    for await (const sporeCell of sporeCollector.collect()) {
+      sporeCellList.push(sporeCell);
+    }
+
+    return sporeCellList;
+  }

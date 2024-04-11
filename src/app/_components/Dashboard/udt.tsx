@@ -1,11 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from 'next/image';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from "@/store/store";
+import { getBTCAsset } from "@/query/btc/tools";
+
 
 export default function UDTList() {
   const [tokens] = useState(new Array(100).fill(0));
+  const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
+  const wallets = useSelector((state: RootState) => state.wallet.wallets);
 
+  const _getBTCAssets = async(address: string) => {
+    const assetsList = await getBTCAsset(address);
+    console.log(assetsList);
+  }
+
+  const getCurrentAssets = async() => {
+    const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
+    console.log(await _getBTCAssets(currentWallet?.address!!));
+  }
+
+  useEffect(() => {
+    getCurrentAssets();
+  }, [])
   return (
     <div className="w-full">
       <table className="w-full">
