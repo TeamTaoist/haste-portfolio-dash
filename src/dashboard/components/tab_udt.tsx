@@ -234,6 +234,30 @@ export function TabUdt() {
     setChooseUdt(udt);
   };
 
+  const handleWithDraw = (udt: ckb_UDTInfo) => {
+    CkbHepler.instance
+      .withDrawXUDT(udt.type_script)
+      .then((txHash) => {
+        toast({
+          title: "Success",
+          description: txHash,
+        });
+
+        if (accountStore.currentAddress) {
+          HttpManager.instance.getAsset(accountStore.currentAddress);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+
+        toast({
+          title: "Warning",
+          description: err.message,
+          variant: "destructive",
+        });
+      });
+  };
+
   const handleCloseDialog = () => {
     setIsOpen(false);
   };
@@ -269,18 +293,41 @@ export function TabUdt() {
                 {getSymbol(udt.type_script)}
               </p>
               <Dialog open={isOpen} onOpenChange={handlerDialogOpenChange}>
-                <DialogTrigger asChild>
-                  {udt.isPending ? (
-                    <p>Pending</p>
-                  ) : (
+                {import.meta.env.VITE_OpenXudtMelt != "1" ? (
+                  <DialogTrigger asChild>
+                    {udt.isPending ? (
+                      <p>Pending</p>
+                    ) : (
+                      <Button
+                        className="relative mt-2 border-none font-SourceSanPro"
+                        onClick={() => handleOpenDialog(udt)}
+                      >
+                        Transfer {getSymbol(udt.type_script)}
+                      </Button>
+                    )}
+                  </DialogTrigger>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+                    <DialogTrigger asChild>
+                      {udt.isPending ? (
+                        <p>Pending</p>
+                      ) : (
+                        <Button
+                          className="relative mt-2 border-none font-SourceSanPro"
+                          onClick={() => handleOpenDialog(udt)}
+                        >
+                          Transfer {getSymbol(udt.type_script)}
+                        </Button>
+                      )}
+                    </DialogTrigger>
                     <Button
                       className="relative mt-2 border-none font-SourceSanPro"
-                      onClick={() => handleOpenDialog(udt)}
+                      onClick={() => handleWithDraw(udt)}
                     >
-                      Transfer {getSymbol(udt.type_script)}
+                      Melt
                     </Button>
-                  )}
-                </DialogTrigger>
+                  </div>
+                )}
                 <DialogContent className="bg-primary006 !border-none">
                   <Tabs defaultValue="rgb++" className="w-[100%]">
                     <TabsList className="w-[100%]">

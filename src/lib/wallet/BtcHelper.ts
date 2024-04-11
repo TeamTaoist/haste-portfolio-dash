@@ -16,6 +16,17 @@ export class BtcHepler {
 
   public static get instance() {
     if (!BtcHepler._instance) {
+      const cfg = isTestNet() ? testConfig : mainConfig;
+
+      initConfig({
+        // your app name
+        name: "JoyID demo",
+        // your app logo
+        logo: "https://fav.farm/🆔",
+        // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
+        joyidAppURL: cfg.joyIdUrl,
+      });
+
       BtcHepler._instance = new BtcHepler();
     }
     return this._instance;
@@ -61,17 +72,6 @@ export class BtcHepler {
   }
 
   async joyId_onConnect() {
-    const cfg = isTestNet() ? testConfig : mainConfig;
-
-    initConfig({
-      // your app name
-      name: "JoyID demo",
-      // your app logo
-      logo: "https://fav.farm/🆔",
-      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: cfg.joyIdUrl,
-    });
-
     const [address] = await requestAccounts();
     const publicKey = getPublicKey();
     console.log(address, publicKey);

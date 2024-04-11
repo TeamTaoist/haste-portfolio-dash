@@ -195,7 +195,7 @@ const TeamSwitcher = observer(() => {
       <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandList>
-            {import.meta.env.PROD ? (
+            {import.meta.env.VITE_OpenTestNet != "1" ? (
               ""
             ) : (
               <CommandGroup key={"netswitch"}>

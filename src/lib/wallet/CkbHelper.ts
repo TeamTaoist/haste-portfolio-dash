@@ -89,6 +89,17 @@ export class CkbHepler {
 
   public static get instance() {
     if (!CkbHepler._instance) {
+      const cfg = isTestNet() ? testConfig : mainConfig;
+
+      initConfig({
+        // your app name
+        name: "JoyID demo",
+        // your app logo
+        logo: "https://fav.farm/🆔",
+        // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
+        joyidAppURL: cfg.joyIdUrl,
+      });
+
       CkbHepler._instance = new CkbHepler();
 
       commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()]);
@@ -97,17 +108,6 @@ export class CkbHepler {
   }
 
   async joyid_onConnect() {
-    const cfg = isTestNet() ? testConfig : mainConfig;
-
-    initConfig({
-      // your app name
-      name: "JoyID demo",
-      // your app logo
-      logo: "https://fav.farm/🆔",
-      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: cfg.joyIdUrl,
-    });
-
     const connection = await connect();
 
     console.log("JoyId connect", connection);
@@ -764,7 +764,7 @@ export class CkbHepler {
         );
         if (!udtMap[typeScriptHex]) {
           udtMap[typeScriptHex] = {
-            type: "xudt",
+            type: "xUDT",
             typeScriptHex: typeScriptHex,
             balance: BI.from(0),
           };
@@ -963,7 +963,7 @@ export class CkbHepler {
             symbol: "UNKNOWN",
             amount: BI.from(0).toString(),
             type_hash: typeHash,
-            udt_type: "xudt",
+            udt_type: "xUDT",
             type_script: xudtCell.cellOutput.type,
           };
 
@@ -1099,8 +1099,8 @@ export class CkbHepler {
     );
 
     const collector = new Collector({
-      ckbNodeUrl: "https://testnet.ckb.dev/rpc",
-      ckbIndexerUrl: "https://testnet.ckb.dev/indexer",
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
     // const address = collector
@@ -1269,7 +1269,7 @@ export class CkbHepler {
             symbol: "UNKNOWN",
             amount: BI.from(0).toString(),
             type_hash: typeHash,
-            udt_type: "xudt",
+            udt_type: "xUDT",
             type_script: xudtCell.cellOutput.type,
             isPending: true,
           };
@@ -1300,9 +1300,11 @@ export class CkbHepler {
     xudtType: Script,
     receivers: [{ toAddress: string; transferAmount: bigint }]
   ) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const collector = new Collector({
-      ckbNodeUrl: "https://testnet.ckb.dev/rpc",
-      ckbIndexerUrl: "https://testnet.ckb.dev/indexer",
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
 
     const isMainnet = false;
