@@ -1296,6 +1296,169 @@ export class CkbHepler {
     return xudtList;
   }
 
+  async batchTransferXudt(
+    xudtType: Script,
+    receivers: [{ toAddress: string; transferAmount: bigint }]
+  ) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const curAccount = DataManager.instance.getCurAccount();
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallet = accountStore.getWallet(curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const collector = new Collector({
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
+    });
+
+    // const isMainnet = false;
+    // const fromAddress = collector
+    //   .getCkb()
+    //   .utils.privateKeyToAddress(CKB_TEST_PRIVATE_KEY, {
+    //     prefix: AddressPrefix.Testnet,
+    //   });
+    // // ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0e4xk4rmg5jdkn8aams492a7jlg73ue0gc0ddfj
+    // console.log("ckb address: ", fromAddress);
+
+    // const fromLock = addressToScript(fromAddress);
+
+    const fromLock = helpers.parseAddress(wallet.address);
+
+    console.log("Lock", fromLock);
+
+    const xudtCells = await collector.getCells({
+      lock: fromLock,
+      type: xudtType,
+    });
+    if (!xudtCells || xudtCells.length === 0) {
+      throw new Error("The address has no xudt cells");
+    }
+    const sumTransferAmount = receivers
+      .map((receiver) => receiver.transferAmount)
+      .reduce((prev, current) => prev + current, BigInt(0));
+
+    let {
+      // eslint-disable-next-line prefer-const
+      inputs,
+      // eslint-disable-next-line prefer-const
+      sumInputsCapacity: sumXudtInputsCapacity,
+      // eslint-disable-next-line prefer-const
+      sumAmount,
+    } = collector.collectUdtInputs({
+      liveCells: xudtCells,
+      needAmount: sumTransferAmount,
+    });
+
+    const xudtCapacity = calcXudtCapacity(fromLock);
+
+    let totalReceiverXudtCapacity = BI.from(0).toBigInt();
+    const receiverXudtCapacityList: bigint[] = [];
+    for (let i = 0; i < receivers.length; i++) {
+      const receiver = receivers[i];
+      const v = calcXudtCapacity(helpers.parseAddress(receiver.toAddress));
+      receiverXudtCapacityList.push(v);
+      totalReceiverXudtCapacity += v;
+    }
+
+    const outputs: CKBComponents.CellOutput[] = [];
+    const outputsData: string[] = [];
+
+    for (let i = 0; i < receivers.length; i++) {
+      const receiver = receivers[i];
+      const xudtCapacity = receiverXudtCapacityList[i];
+
+      outputs.push({
+        lock: helpers.parseAddress(receiver.toAddress),
+        type: xudtType,
+        capacity: append0x(xudtCapacity.toString(16)),
+      });
+      outputsData.push(append0x(u128ToLe(receiver.transferAmount)));
+    }
+
+    if (sumAmount > sumTransferAmount) {
+      outputs.push({
+        lock: fromLock,
+        type: xudtType,
+        capacity: append0x(xudtCapacity.toString(16)),
+      });
+      outputsData.push(append0x(u128ToLe(sumAmount - sumTransferAmount)));
+      sumXudtInputsCapacity -= xudtCapacity;
+    }
+    if (sumXudtInputsCapacity > 0) {
+      outputs.push({
+        lock: fromLock,
+        capacity: append0x(sumXudtInputsCapacity.toString(16)),
+      });
+      outputsData.push("0x");
+    }
+
+    // create recevier input
+    const txFee = MAX_FEE;
+    const emptyCells = await collector.getCells({
+      lock: fromLock,
+    });
+    if (!emptyCells || emptyCells.length === 0) {
+      throw new NoLiveCellError("The address has no empty cells");
+    }
+    const needCapacity = totalReceiverXudtCapacity;
+    const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } =
+      collector.collectInputs(emptyCells, needCapacity, txFee, MIN_CAPACITY);
+
+    inputs.push(...emptyInputs);
+
+    if (sumEmptyCapacity > needCapacity + txFee) {
+      const changeCapacity = sumEmptyCapacity - needCapacity - txFee;
+      outputs.push({
+        lock: fromLock,
+        capacity: append0x(changeCapacity.toString(16)),
+      });
+      outputsData.push("0x");
+    }
+
+    // const emptyWitness = { lock: "", inputType: "", outputType: "" };
+    // const witnesses: (
+    //   | string
+    //   | { lock: string; inputType: string; outputType: string }
+    // )[] = inputs.map((_, index) => (index === 0 ? emptyWitness : "0x"));
+
+    const emptyWitness = { lock: "", inputType: "", outputType: "" };
+    const witnesses: (
+      | string
+      | { lock: string; inputType: string; outputType: string }
+    )[] = inputs.map((_, index) => (index === 0 ? serializeWitnessArgs(emptyWitness) : "0x"));
+
+    // const cellDeps = [getSecp256k1CellDep(isMainnet), getXudtDep(isMainnet)];
+    const cellDeps = [getJoyIDCellDep(cfg.isMainnet), getXudtDep(cfg.isMainnet)];
+
+    const unsignedTx = {
+      version: "0x0",
+      cellDeps,
+      headerDeps: [],
+      inputs,
+      outputs,
+      outputsData,
+      witnesses,
+    };
+
+    // const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(
+    //   unsignedTx
+    // );
+    const signedTx = await signRawTransaction(unsignedTx as CKBTransaction, wallet.address);
+
+    console.log(signedTx);
+
+    const txHash = await collector
+      .getCkb()
+      .rpc.sendTransaction(signedTx, "passthrough");
+    console.log(txHash);
+  }
+
   async test_transferXudt(
     xudtType: Script,
     receivers: [{ toAddress: string; transferAmount: bigint }]

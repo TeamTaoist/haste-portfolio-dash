@@ -91,6 +91,20 @@ export function MainNav({
       >
         Settings
       </Link> */}
+
+      <Link
+        to="/dispatch"
+        className={cn(
+          "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
+          menuType == "send&receive" ? "text-primary004" : ""
+        )}
+        onClick={() => {
+          DataManager.instance.curMenu = "Dispatch";
+          handleClick();
+        }}
+      >
+        Dispatch
+      </Link>
     </nav>
   );
 }
