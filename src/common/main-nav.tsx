@@ -51,7 +51,7 @@ export function MainNav({
           handleClick();
         }}
       >
-        Asset
+        资产清单
       </Link>
       <Link
         to="/tx"
@@ -64,7 +64,7 @@ export function MainNav({
           handleClick();
         }}
       >
-        Transaction
+        交易历史
       </Link>
       <Link
         to="/transfer"
@@ -77,7 +77,7 @@ export function MainNav({
           handleClick();
         }}
       >
-        Send&Receive
+        发送&接收
       </Link>
       {/* <Link
         href="/examples/dashboard"
@@ -96,14 +96,14 @@ export function MainNav({
         to="/dispatch"
         className={cn(
           "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
-          menuType == "send&receive" ? "text-primary004" : ""
+          menuType == "dispatch" ? "text-primary004" : ""
         )}
         onClick={() => {
-          DataManager.instance.curMenu = "Dispatch";
+          DataManager.instance.curMenu = "dispatch";
           handleClick();
         }}
       >
-        Dispatch
+        批量发送
       </Link>
     </nav>
   );

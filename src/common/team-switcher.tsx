@@ -188,7 +188,7 @@ const TeamSwitcher = observer(() => {
           </Avatar>
           {accountStore.currentAddress
             ? sortStr(accountStore.currentAddress, 6)
-            : "add wallet"}
+            : "添加钱包"}
           <CaretSortIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -236,8 +236,8 @@ const TeamSwitcher = observer(() => {
               </CommandGroup>
             )}
 
-            <CommandInput placeholder="Search account..." />
-            <CommandEmpty>No account found.</CommandEmpty>
+            <CommandInput placeholder="搜索钱包地址..." />
+            <CommandEmpty>没有连接钱包</CommandEmpty>
             {walletData &&
               Object.keys(walletData).map((v) => (
                 <CommandGroup heading={v} key={v}>

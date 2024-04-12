@@ -92,7 +92,7 @@ export const Mint = observer(() => {
     <TabsContent value="MintXUDT" className="space-y-4">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Mint XUDT</CardTitle>
+          <CardTitle>铸造 xUDT 资产</CardTitle>
           {/* <CardDescription>Deploy your new project in one-click.</CardDescription> */}
         </CardHeader>
         <CardContent>
@@ -102,7 +102,7 @@ export const Mint = observer(() => {
                 <Label htmlFor="name">Name</Label>
                 <Input
                   id="name"
-                  placeholder="Name"
+                  placeholder="名字，例如 Another USD on CKB"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -111,13 +111,13 @@ export const Mint = observer(() => {
                 <Label htmlFor="name">Symbol</Label>
                 <Input
                   id="symbol"
-                  placeholder="Symbol"
+                  placeholder="标识，例如 AUSDC"
                   value={symbol}
                   onChange={(e) => setSymbol(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Amount</Label>
+                <Label htmlFor="name">供应总量</Label>
                 <Input
                   id="amount"
                   placeholder="Amount"
@@ -132,7 +132,7 @@ export const Mint = observer(() => {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Send Address</Label>
+                <Label htmlFor="name">发行人地址</Label>
                 <Label htmlFor="name">
                   {sortStr(DataManager.instance.getCurAccount(), 6)}
                 </Label>
@@ -142,9 +142,9 @@ export const Mint = observer(() => {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={handlerCancel}>
-            Cancel
+            取消
           </Button>
-          <Button onClick={handleMint}>Mint</Button>
+          <Button onClick={handleMint}>确认铸造</Button>
         </CardFooter>
       </Card>
     </TabsContent>

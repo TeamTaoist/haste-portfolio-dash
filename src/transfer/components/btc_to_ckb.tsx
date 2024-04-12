@@ -64,14 +64,14 @@ export function BtcToCkb() {
     <TabsContent value="BtcToCkb" className="space-y-4">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Btc_to_Ckb</CardTitle>
+          <CardTitle>从 BTC 到 CKB</CardTitle>
           {/* <CardDescription>Deploy your new project in one-click.</CardDescription> */}
         </CardHeader>
         <CardContent>
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Btc Address</Label>
+                <Label htmlFor="name">BTC 地址</Label>
                 <Input
                   id="btc"
                   placeholder="Btc Address"
@@ -80,7 +80,7 @@ export function BtcToCkb() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Amount</Label>
+                <Label htmlFor="name">数量</Label>
                 <Input
                   id="amount"
                   placeholder="Amount"
@@ -89,7 +89,7 @@ export function BtcToCkb() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Receive Address</Label>
+                <Label htmlFor="name">接收地址</Label>
                 <Label htmlFor="name">
                   {/* {sortStr(DataManager.instance.curWalletAddr, 6)} */}
                 </Label>
@@ -98,7 +98,7 @@ export function BtcToCkb() {
           </form>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button onClick={handleSend}>Swap</Button>
+          <Button onClick={handleSend}>确认</Button>
         </CardFooter>
       </Card>
     </TabsContent>

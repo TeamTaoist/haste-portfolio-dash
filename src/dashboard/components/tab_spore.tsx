@@ -148,14 +148,14 @@ export function TabSpore() {
                 <Dialog onOpenChange={handleDialogOpenChange}>
                   <DialogTrigger asChild>
                     <Button className="relative mt-2 border-none font-SourceSanPro">
-                      Transfer Spore
+                      发送 Spore
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                      <DialogTitle>Transfer Spore</DialogTitle>
+                      <DialogTitle>发送 Spore</DialogTitle>
                       <DialogDescription>
-                        * Make sure type correct wallet address
+                        * 注意请使用正确的地址
                       </DialogDescription>
                     </DialogHeader>
                     <Separator />
@@ -171,7 +171,7 @@ export function TabSpore() {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="username" className="text-right">
-                        To Address
+                        接收地址
                       </Label>
                       <Input
                         id="toAddress"
@@ -187,7 +187,7 @@ export function TabSpore() {
                         type="submit"
                         onClick={() => handlerConfirm(spore)}
                       >
-                        Confirm
+                        确认发送
                       </Button>
                     </DialogFooter>
                   </DialogContent>

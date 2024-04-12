@@ -45,7 +45,7 @@ export default function Dispatch() {
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight text-white001 font-Montserrat">
-          Dispatch
+          批量发送
         </h2>
       </div>
       <DispatchPanel />

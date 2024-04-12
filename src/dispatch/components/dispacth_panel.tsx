@@ -148,10 +148,10 @@ export const DispatchPanel = observer(() => {
 
   return (
     <div className="grid w-full gap-1.5">
-      <Input type="text" id="codeHash" placeholder="Please fill in the xUDT code hash. You can find your xUDT code hash in https://explorer.nervos.org/." onChange={(e) => setCodeHash(e.target.value)} />
-      <Input type="text" id="args" placeholder="Please fill in the xUDT args. You can find your xUDT args in https://explorer.nervos.org/." onChange={(e) => setScriptArgs(e.target.value)} />
-      <Textarea id="message" className="flex flex-1 h-[550px] rounded-md border p-4" placeholder="Paste the list you want to dispatch. The format is 'address,amount' (the amount should including decimals)" onChange={(e) => setAddressList(e.target.value)}></Textarea>
-      <Button className="relative rounded-full border-none font-SourceSanPro" onClick={handleDispatch}> Dispatch </Button>
+      <Input type="text" id="codeHash" placeholder="请填入 xUDT 的 code hash，可以从浏览器查询 https://explorer.nervos.org/." onChange={(e) => setCodeHash(e.target.value)} />
+      <Input type="text" id="args" placeholder="请填入 xUDT 的 args. 可以从浏览器查询 https://explorer.nervos.org/." onChange={(e) => setScriptArgs(e.target.value)} />
+      <Textarea id="message" className="flex flex-1 h-[550px] rounded-md border p-4" placeholder="请填入批量地址和数量，地址和数量之间用英文逗号 ',' 隔开，每行一条数据，格式: ckb13asdfs123,9999999" onChange={(e) => setAddressList(e.target.value)}></Textarea>
+      <Button className="relative rounded-full border-none font-SourceSanPro" onClick={handleDispatch}>批量发送</Button>
     </div>
   );
 });

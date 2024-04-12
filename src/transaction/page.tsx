@@ -45,7 +45,7 @@ export default function Transaction() {
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight text-white001 font-Montserrat">
-          Transactions
+          交易历史
         </h2>
       </div>
       <TransactionItem />

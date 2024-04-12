@@ -53,12 +53,12 @@ export const Transfer = observer(() => {
       <Tabs defaultValue="Send" className="space-y-4">
         <div className="flex justify-center">
           <TabsList>
-            <TabsTrigger value="Send">Send</TabsTrigger>
+            <TabsTrigger value="Send">发送</TabsTrigger>
             {import.meta.env.VITE_OpenXudtMint == "1" &&
             accountStore.currentAddress &&
             (accountStore.currentAddress.startsWith("ckt") ||
               accountStore.currentAddress.startsWith("ckb")) ? (
-              <TabsTrigger value="MintXUDT">MintXUDT</TabsTrigger>
+              <TabsTrigger value="MintXUDT">铸造xUDT</TabsTrigger>
             ) : (
               ""
             )}
