@@ -61,7 +61,6 @@ export default function SendContent() {
         // });
       
       const rpc = new RPC(Test_Config.CKB_RPC_URL);
-      
       let sporeCell = await getSporeById(selectAsset?.data.amount, sporeConfig);
       const { txSkeleton } = await transferSpore({
         outPoint: sporeCell.outPoint!!,
@@ -71,7 +70,7 @@ export default function SendContent() {
       });
       const tx = helpers.createTransactionFromSkeleton(txSkeleton);
       //@ts-ignore
-      const signTx = await signRawTransaction(tx, to);
+      const signTx = await signRawTransaction(tx, selectWallet.address);
       try {
         const txHash = rpc.sendTransaction(signTx, "passthrough");
         enqueueSnackbar("Transfer Successful", {variant: "success"})
