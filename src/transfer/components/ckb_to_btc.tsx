@@ -65,23 +65,23 @@ export function CkbToBtc() {
     <TabsContent value="CkbToBtc" className="space-y-4">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Ckb_To_Btc</CardTitle>
+          <CardTitle>从 CKB 到 BTC </CardTitle>
           {/* <CardDescription>Deploy your new project in one-click.</CardDescription> */}
         </CardHeader>
         <CardContent>
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Receive Address</Label>
+                <Label htmlFor="name">接收地址</Label>
                 <Input
                   id="receiver"
-                  placeholder="Receive Address"
+                  placeholder="接收地址"
                   value={receiveAddress}
                   onChange={(e) => setReceiverAddress(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Amount</Label>
+                <Label htmlFor="name">数量</Label>
                 <Input
                   id="amount"
                   placeholder="Amount"
@@ -90,7 +90,7 @@ export function CkbToBtc() {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Send Address</Label>
+                <Label htmlFor="name">发送地址</Label>
                 <Label htmlFor="name">
                   {/* {sortStr(DataManager.instance.curWalletAddr, 6)} */}
                 </Label>
@@ -99,7 +99,7 @@ export function CkbToBtc() {
           </form>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button onClick={handleSend}>Send</Button>
+          <Button onClick={handleSend}>确认发送</Button>
         </CardFooter>
       </Card>
     </TabsContent>

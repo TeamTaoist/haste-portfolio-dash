@@ -16,15 +16,15 @@ export function Receive() {
     <TabsContent value="Receive" className="space-y-4">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Receive</CardTitle>
+          <CardTitle>接收资产</CardTitle>
           {/* <CardDescription>Deploy your new project in one-click.</CardDescription> */}
         </CardHeader>
         <CardContent>
-          <h1>Address</h1>
+          <h1>地址</h1>
           <Label>{sortStr(DataManager.instance.getCurAccount(), 12)}</Label>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button>Copy</Button>
+          <Button>拷贝</Button>
         </CardFooter>
       </Card>
     </TabsContent>

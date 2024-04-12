@@ -106,23 +106,23 @@ export const Send = observer(() => {
     <TabsContent value="Send" className="space-y-4">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Send</CardTitle>
+          <CardTitle>发送</CardTitle>
           {/* <CardDescription>Deploy your new project in one-click.</CardDescription> */}
         </CardHeader>
         <CardContent>
           <form>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Receive Address</Label>
+                <Label htmlFor="name">接收地址</Label>
                 <Input
                   id="receiver"
-                  placeholder="Receive Address"
+                  placeholder="接收地址"
                   value={receiveAddress}
                   onChange={(e) => setReceiverAddress(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Amount</Label>
+                <Label htmlFor="name">数量</Label>
                 <Input
                   id="amount"
                   placeholder="Amount"
@@ -137,7 +137,7 @@ export const Send = observer(() => {
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Send Address</Label>
+                <Label htmlFor="name">我的地址</Label>
                 <Label htmlFor="name">
                   {sortStr(DataManager.instance.getCurAccount(), 6)}
                 </Label>
@@ -147,9 +147,9 @@ export const Send = observer(() => {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={handlerCancel}>
-            Cancel
+            取消
           </Button>
-          <Button onClick={handleSend}>Send</Button>
+          <Button onClick={handleSend}>发送</Button>
         </CardFooter>
       </Card>
     </TabsContent>

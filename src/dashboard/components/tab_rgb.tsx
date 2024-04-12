@@ -216,7 +216,7 @@ export function TabRgb() {
                         handleOpenDialog(rgb);
                       }}
                     >
-                      Transfer {getSymbol(rgb.ckbCellInfo.type_script)}
+                      发送 {getSymbol(rgb.ckbCellInfo.type_script)}
                     </Button>
                   </DialogTrigger>
                   <DialogContent className=" bg-primary007 !border-none">
@@ -227,23 +227,22 @@ export function TabRgb() {
                           className="w-[50%]"
                           onClick={() => setIsRgb(true)}
                         >
-                          Swap to CKB
+                          发送 {getSymbol(chooseRgb?.ckbCellInfo?.type_script)} 到 CKB
                         </TabsTrigger>
                         <TabsTrigger
                           value={getSymbol(chooseRgb?.ckbCellInfo?.type_script)}
                           className="w-[50%]"
                           onClick={() => setIsRgb(false)}
                         >
-                          Transfer{" "}
-                          {getSymbol(chooseRgb?.ckbCellInfo?.type_script)} on
-                          BTC
+                          发送 {" "}
+                          {getSymbol(chooseRgb?.ckbCellInfo?.type_script)} 到 BTC
                         </TabsTrigger>
                       </TabsList>
                       <TabsContent value="rgb++">
                         <DialogHeader>
-                          <DialogTitle>Transfer to CKB use RGB++</DialogTitle>
+                          <DialogTitle>使用 RGB++ 协议发送到 CKB 地址</DialogTitle>
                           <DialogDescription className="!text-white001">
-                            * Make sure type correct wallet address
+                            * 注意请使用正确的 CKB 地址
                           </DialogDescription>
                         </DialogHeader>
                       </TabsContent>
@@ -252,18 +251,18 @@ export function TabRgb() {
                       >
                         <DialogHeader>
                           <DialogTitle>
-                            Transfer{" "}
+                            发送 {" "}
                             {getSymbol(chooseRgb?.ckbCellInfo?.type_script)}
                           </DialogTitle>
                           <DialogDescription className="!text-white001">
-                            * Make sure type correct wallet address
+                            * 注意请使用正确的 BTC 地址，当前支持 Taproot 和 Segwit
                           </DialogDescription>
                         </DialogHeader>
                       </TabsContent>
                     </Tabs>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="username" className="text-right">
-                        Amount
+                        数量
                       </Label>
                       <Input
                         id="amount"
@@ -302,7 +301,7 @@ export function TabRgb() {
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="username" className="text-right">
-                        {isRgb ? "CKB" : "BTC"} Address
+                        {isRgb ? "CKB" : "BTC"} 地址
                       </Label>
                       <Input
                         id="toAddress"
@@ -318,7 +317,7 @@ export function TabRgb() {
                         type="submit"
                         onClick={() => handlerTransfer(chooseRgb)}
                       >
-                        Confirm
+                        确认发送
                       </Button>
                     </DialogFooter>
                   </DialogContent>

@@ -66,7 +66,7 @@ export const TransactionItem = observer(() => {
           <Card key={tx.txHash} hidden={hide} className="m-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <p className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground">
-                block:{tx.block}
+                区块编号 {tx.block}
               </p>
             </CardHeader>
             <CardContent>

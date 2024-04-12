@@ -24,6 +24,7 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
 import { accountStore } from "@/store/AccountStore";
 import { HttpManager } from "@/lib/api/HttpManager";
+import { isTestNet } from "@/lib/wallet/constants";
 
 export function TabSpore() {
   const [reload, setReload] = useState(false);
@@ -132,7 +133,11 @@ export function TabSpore() {
                 <div className="flex flex-col justify-center">
                   <div className="w-32 h-32 overflow-hidden mx-auto">
                     <img
-                      src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
+                      src={
+                        isTestNet()
+                          ? `https://a-simple-demo.spore.pro/api/media/${spore.amount}`
+                          : `https://philosopherstone.xyz/api/media/${spore.amount}`
+                      }
                       className="w-full h-full object-cover object-center"
                     />
                   </div>
@@ -143,26 +148,30 @@ export function TabSpore() {
                 <Dialog onOpenChange={handleDialogOpenChange}>
                   <DialogTrigger asChild>
                     <Button className="relative mt-2 border-none font-SourceSanPro">
-                      Transfer Spore
+                      发送 Spore
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                      <DialogTitle>Transfer Spore</DialogTitle>
+                      <DialogTitle>发送 Spore</DialogTitle>
                       <DialogDescription>
-                        * Make sure type correct wallet address
+                        * 注意请使用正确的地址
                       </DialogDescription>
                     </DialogHeader>
                     <Separator />
                     <div className="flex flex-col gap-4">
                       <img
-                        src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
+                        src={
+                          isTestNet()
+                            ? `https://a-simple-demo.spore.pro/api/media/${spore.amount}`
+                            : `https://philosopherstone.xyz/api/media/${spore.amount}`
+                        }
                         className="w-full h-full object-cover object-center"
                       />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <Label htmlFor="username" className="text-right">
-                        To Address
+                        接收地址
                       </Label>
                       <Input
                         id="toAddress"
@@ -178,7 +187,7 @@ export function TabSpore() {
                         type="submit"
                         onClick={() => handlerConfirm(spore)}
                       >
-                        Confirm
+                        确认发送
                       </Button>
                     </DialogFooter>
                   </DialogContent>

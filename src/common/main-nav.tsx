@@ -1,7 +1,9 @@
+import { toast } from "@/components/ui/use-toast";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { cn } from "@/lib/utils";
+import { accountStore } from "@/store/AccountStore";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -19,6 +21,8 @@ export function MainNav({
 
   const [menuType, setMenuType] = useState(DataManager.instance.curMenu);
 
+  const [chain, setChain] = useState<string>("CKB");
+
   const handleClick = () => {
     setMenuType(DataManager.instance.curMenu);
   };
@@ -30,6 +34,11 @@ export function MainNav({
   };
 
   useEffect(() => {
+
+    const wallet = accountStore.getWallet(accountStore.currentAddress);
+    if (wallet) {
+      setChain(wallet.chain);
+    }
     EventManager.instance.subscribe(EventType.main_nav_reload, reload);
 
     return EventManager.instance.unsubscribe(EventType.main_nav_reload, reload);
@@ -51,7 +60,7 @@ export function MainNav({
           handleClick();
         }}
       >
-        Asset
+        资产清单
       </Link>
       <Link
         to="/tx"
@@ -64,7 +73,7 @@ export function MainNav({
           handleClick();
         }}
       >
-        Transaction
+        交易历史
       </Link>
       <Link
         to="/transfer"
@@ -77,7 +86,7 @@ export function MainNav({
           handleClick();
         }}
       >
-        Send&Receive
+        发送&接收
       </Link>
       {/* <Link
         href="/examples/dashboard"
@@ -91,6 +100,19 @@ export function MainNav({
       >
         Settings
       </Link> */}
+      <Link
+        to="/dispatch"
+        className={cn(
+          "text-sm font-medium text-white001 transition-colors hover:text-primary004 font-SourceSanPro",
+          menuType == "dispatch" ? "text-primary004" : ""
+        )}
+        onClick={() => {
+          DataManager.instance.curMenu = "dispatch";
+          handleClick();
+        }}
+      >
+        批量发送
+      </Link>
     </nav>
   );
 }

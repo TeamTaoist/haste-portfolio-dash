@@ -16,6 +16,7 @@ import { accountStore } from "@/store/AccountStore";
 
 const Dashboard = observer(() => {
   const [hideTab, setHideTab] = useState(true);
+  const [chain, setChain] = useState<string>("CKB");
 
   // const location = useLocation();
 
@@ -83,6 +84,12 @@ const Dashboard = observer(() => {
 
   const getAssetData = async () => {
     if (accountStore.currentAddress) {
+
+      const wallet = accountStore.getWallet(accountStore.currentAddress);
+      if (wallet && wallet.chain == "BTC") {
+        setChain("BTC");
+      }
+
       await HttpManager.instance.getAsset(accountStore.currentAddress);
     }
   };
@@ -102,7 +109,7 @@ const Dashboard = observer(() => {
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight text-white001 font-Montserrat">
-            Chain
+            {chain} 链
           </h2>
         </div>
         <Assets />
@@ -111,14 +118,14 @@ const Dashboard = observer(() => {
             <TabsList>
               {!hideTab ? (
                 <TabsTrigger value="UDT" onClick={() => setTabValue("UDT")}>
-                  UDT
+                  UDT资产
                 </TabsTrigger>
               ) : (
                 ""
               )}
               {!hideTab ? (
                 <TabsTrigger value="SPORE" onClick={() => setTabValue("SPORE")}>
-                  SPORE
+                  DOB资产
                 </TabsTrigger>
               ) : (
                 ""
@@ -127,7 +134,7 @@ const Dashboard = observer(() => {
                 ""
               ) : (
                 <TabsTrigger value="RGB++" onClick={() => setTabValue("RGB++")}>
-                  RGB++
+                  RGB++资产
                 </TabsTrigger>
               )}
             </TabsList>

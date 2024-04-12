@@ -296,13 +296,13 @@ export function TabUdt() {
                 {import.meta.env.VITE_OpenXudtMelt != "1" ? (
                   <DialogTrigger asChild>
                     {udt.isPending ? (
-                      <p>Pending</p>
+                      <p>交易确认中</p>
                     ) : (
                       <Button
                         className="relative mt-2 border-none font-SourceSanPro"
                         onClick={() => handleOpenDialog(udt)}
                       >
-                        Transfer {getSymbol(udt.type_script)}
+                        发送 {getSymbol(udt.type_script)}
                       </Button>
                     )}
                   </DialogTrigger>
@@ -310,13 +310,13 @@ export function TabUdt() {
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
                     <DialogTrigger asChild>
                       {udt.isPending ? (
-                        <p>Pending</p>
+                        <p>交易确认中</p>
                       ) : (
                         <Button
                           className="relative mt-2 border-none font-SourceSanPro"
                           onClick={() => handleOpenDialog(udt)}
                         >
-                          Transfer {getSymbol(udt.type_script)}
+                          发送 {getSymbol(udt.type_script)}
                         </Button>
                       )}
                     </DialogTrigger>
@@ -324,7 +324,7 @@ export function TabUdt() {
                       className="relative mt-2 border-none font-SourceSanPro"
                       onClick={() => handleWithDraw(udt)}
                     >
-                      Melt
+                      Melt销毁
                     </Button>
                   </div>
                 )}
@@ -336,38 +336,38 @@ export function TabUdt() {
                         className="w-[50%]"
                         onClick={() => setIsRgb(true)}
                       >
-                        Transfer to BTC
+                        发送 {getSymbol(chooseUdt?.type_script)} 到 BTC
                       </TabsTrigger>
                       <TabsTrigger
                         value={getSymbol(chooseUdt?.type_script)}
                         className="w-[50%]"
                         onClick={() => setIsRgb(false)}
                       >
-                        Transfer {getSymbol(chooseUdt?.type_script)} on CKB
+                        发送 {getSymbol(chooseUdt?.type_script)} 到 CKB
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="rgb++">
                       <DialogHeader>
-                        <DialogTitle>Transfer to BTC use RGB++</DialogTitle>
+                        <DialogTitle>使用 RGB++ 协议发送到 BTC 链上</DialogTitle>
                         <DialogDescription className="!text-white001">
-                          * Make sure type correct wallet address
+                          * 注意使用正确的 BTC 地址，目前只支持 Taproot 和 Segwit
                         </DialogDescription>
                       </DialogHeader>
                     </TabsContent>
                     <TabsContent value={getSymbol(chooseUdt?.type_script)}>
                       <DialogHeader>
                         <DialogTitle>
-                          Transfer {getSymbol(chooseUdt?.type_script)}
+                          发送 {getSymbol(chooseUdt?.type_script)}
                         </DialogTitle>
                         <DialogDescription className="!text-white001">
-                          * Make sure type correct wallet address
+                          * 注意使用正确的 CKB 地址
                         </DialogDescription>
                       </DialogHeader>
                     </TabsContent>
                   </Tabs>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="username" className="text-right">
-                      Amount
+                      数量
                     </Label>
                     <Input
                       id="amount"
@@ -404,7 +404,7 @@ export function TabUdt() {
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="username" className="text-right">
-                      {isRgb ? "BTC" : "CKB"} Address
+                      {isRgb ? "BTC" : "CKB"} 地址
                     </Label>
                     <Input
                       id="toAddress"
@@ -420,7 +420,7 @@ export function TabUdt() {
                       type="submit"
                       onClick={() => handlerTransfer(chooseUdt)}
                     >
-                      Confirm
+                      确认发送
                     </Button>
                   </DialogFooter>
                 </DialogContent>

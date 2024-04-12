@@ -55,7 +55,9 @@ class JoyIDCellCollector {
       );
     }
 
-    this.fromScript = helpers.parseAddress(fromAddr);
+    this.fromScript = helpers.parseAddress(fromAddr, {
+      config: cfg.CONFIG,
+    });
 
     queryOptions = {
       ...queryOptions,
@@ -154,7 +156,9 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
           console.log("JoyID config: ", getConfig());
           // console.log("JoyID connection: ", connection);
 
-          const lock = helpers.parseAddress(wallet.address);
+          const lock = helpers.parseAddress(wallet.address, {
+            config: cfg.CONFIG,
+          });
 
           // will change if the connection.keyType is a sub_key
           let newWitnessArgs: WitnessArgs = {

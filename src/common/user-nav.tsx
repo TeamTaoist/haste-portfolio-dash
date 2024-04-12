@@ -175,18 +175,18 @@ export const UserNav = observer(() => {
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
             <Button className="relative rounded-full border-none font-SourceSanPro">
-              Add Wallet
+              添加钱包
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Add Wallet</DialogTitle>
+              <DialogTitle>添加钱包</DialogTitle>
               <DialogDescription>
-                At least connect a BTC wallet and a CKB wallet
+                至少需要连接一个钱包，才能使用本应用
               </DialogDescription>
             </DialogHeader>
             <Separator />
-            <h1>BTC</h1>
+            <h1>BTC钱包</h1>
             <div className="flex flex-col gap-4">
               <div
                 onClick={handleOKX}
@@ -218,7 +218,7 @@ export const UserNav = observer(() => {
               </div>
             </div>
             <Separator />
-            <h1>CKB</h1>
+            <h1>CKB钱包</h1>
             <div className="flex flex-col gap-4">
               <div
                 className={`flex px-4 w-[100%] h-12 border rounded-md font-Montserrat justify-center items-center txt-center cursor
@@ -230,7 +230,7 @@ export const UserNav = observer(() => {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleConfirmConnect}>Confirm Connect</Button>
+              <Button onClick={handleConfirmConnect}>确认连接</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
