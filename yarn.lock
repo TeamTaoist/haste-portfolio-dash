@@ -71,6 +71,20 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
+"@ckb-lumos/base@^0.22.0-next.4", "@ckb-lumos/base@0.22.0-next.5":
+  version "0.22.0-next.5"
+  resolved "https://registry.npmjs.org/@ckb-lumos/base/-/base-0.22.0-next.5.tgz"
+  integrity sha512-2I4f/zJm3Bdz/5soXo35vDh98Vffp2clO8n1ZeZRsUtBZUtvAGNbggC4J8/0a/yFw3cStaOJ1Tztla5E0hP+xA==
+  dependencies:
+    "@ckb-lumos/bi" "0.22.0-next.5"
+    "@ckb-lumos/codec" "0.22.0-next.5"
+    "@ckb-lumos/toolkit" "0.22.0-next.5"
+    "@types/blake2b" "^2.1.0"
+    "@types/lodash.isequal" "^4.5.5"
+    blake2b "^2.1.3"
+    js-xxhash "^1.0.4"
+    lodash.isequal "^4.5.0"
+
 "@ckb-lumos/base@0.21.1":
   version "0.21.1"
   resolved "https://registry.npmjs.org/@ckb-lumos/base/-/base-0.21.1.tgz"
@@ -85,24 +99,17 @@
     js-xxhash "^1.0.4"
     lodash.isequal "^4.5.0"
 
-"@ckb-lumos/base@0.22.0-next.5":
-  version "0.22.0-next.5"
-  resolved "https://registry.npmjs.org/@ckb-lumos/base/-/base-0.22.0-next.5.tgz"
-  integrity sha512-2I4f/zJm3Bdz/5soXo35vDh98Vffp2clO8n1ZeZRsUtBZUtvAGNbggC4J8/0a/yFw3cStaOJ1Tztla5E0hP+xA==
-  dependencies:
-    "@ckb-lumos/bi" "0.22.0-next.5"
-    "@ckb-lumos/codec" "0.22.0-next.5"
-    "@ckb-lumos/toolkit" "0.22.0-next.5"
-    "@types/blake2b" "^2.1.0"
-    "@types/lodash.isequal" "^4.5.5"
-    blake2b "^2.1.3"
-    js-xxhash "^1.0.4"
-    lodash.isequal "^4.5.0"
-
 "@ckb-lumos/bi@^0.21.1", "@ckb-lumos/bi@0.21.1":
   version "0.21.1"
   resolved "https://registry.npmjs.org/@ckb-lumos/bi/-/bi-0.21.1.tgz"
   integrity sha512-6q8uesvu3DAM7GReei9H5seino4tnakTeg8uXtZBPDC6rboMohLCPQvEwhl1iHmsybXvBYVQt4Te1BPPZtuaRw==
+  dependencies:
+    jsbi "^4.1.0"
+
+"@ckb-lumos/bi@^0.22.0-next.4", "@ckb-lumos/bi@0.22.2":
+  version "0.22.2"
+  resolved "https://registry.npmjs.org/@ckb-lumos/bi/-/bi-0.22.2.tgz"
+  integrity sha512-F+dLC/tE+xdtNuGgJxlDqbgX/f8azg1tvIFTR5mu7Vhz08nkFgnA+Z+yC0t/I3fDwwH4p/SlGP/yducrsfVTqw==
   dependencies:
     jsbi "^4.1.0"
 
@@ -133,6 +140,13 @@
   dependencies:
     "@ckb-lumos/bi" "0.21.1"
 
+"@ckb-lumos/codec@^0.22.0-next.4":
+  version "0.22.2"
+  resolved "https://registry.npmjs.org/@ckb-lumos/codec/-/codec-0.22.2.tgz"
+  integrity sha512-P5SyhT2qkJwCwcHF3yMLInE0z3wWHDkqJNbSM2Q9oyu0+9kjMQfexNia3T+atBl2M7ELFzN5WvttojYr6DrCwQ==
+  dependencies:
+    "@ckb-lumos/bi" "0.22.2"
+
 "@ckb-lumos/codec@0.21.1":
   version "0.21.1"
   resolved "https://registry.npmjs.org/@ckb-lumos/codec/-/codec-0.21.1.tgz"
@@ -147,7 +161,7 @@
   dependencies:
     "@ckb-lumos/bi" "0.22.0-next.5"
 
-"@ckb-lumos/common-scripts@0.22.0-next.5":
+"@ckb-lumos/common-scripts@^0.22.0-next.4", "@ckb-lumos/common-scripts@0.22.0-next.5":
   version "0.22.0-next.5"
   resolved "https://registry.npmjs.org/@ckb-lumos/common-scripts/-/common-scripts-0.22.0-next.5.tgz"
   integrity sha512-DXGwyc0pmrq0fj+NflDBeBgJSL2bNAVHpULpbUncDUPIBJf9IFyMDSZUgzX6hYjTX0WA07e5CEFo5wwHb24Dmw==
@@ -163,7 +177,7 @@
     bs58 "^5.0.0"
     immutable "^4.3.0"
 
-"@ckb-lumos/config-manager@0.22.0-next.5":
+"@ckb-lumos/config-manager@^0.22.0-next.4", "@ckb-lumos/config-manager@0.22.0-next.5":
   version "0.22.0-next.5"
   resolved "https://registry.npmjs.org/@ckb-lumos/config-manager/-/config-manager-0.22.0-next.5.tgz"
   integrity sha512-kicoRgPP9DPxA90que/+9R0iQgiIJQNreZv1/EJ+4GDOj/pFb0iBbTEQxF3zXtLKjnZoMTqTQH7e4CAV0ZftSA==
@@ -212,7 +226,7 @@
     cross-fetch "^3.1.5"
     events "^3.3.0"
 
-"@ckb-lumos/lumos@0.22.0-next.5":
+"@ckb-lumos/lumos@^0.22.0-next.4", "@ckb-lumos/lumos@0.22.0-next.5":
   version "0.22.0-next.5"
   resolved "https://registry.npmjs.org/@ckb-lumos/lumos/-/lumos-0.22.0-next.5.tgz"
   integrity sha512-Dv+MKa664zsD9Nxrnor04Hb52MNcwgtEutgzdlE+qtAB/skp6P0NVnU9uQF7RiYHNpdmUe8PROlkzB4jaKz9NA==
@@ -230,7 +244,7 @@
     "@ckb-lumos/toolkit" "0.22.0-next.5"
     "@ckb-lumos/transaction-manager" "0.22.0-next.5"
 
-"@ckb-lumos/rpc@0.22.0-next.5":
+"@ckb-lumos/rpc@^0.22.0-next.4", "@ckb-lumos/rpc@0.22.0-next.5":
   version "0.22.0-next.5"
   resolved "https://registry.npmjs.org/@ckb-lumos/rpc/-/rpc-0.22.0-next.5.tgz"
   integrity sha512-ohH5kj/iiyKaTksgWCc4STwnEON9cCC2tPf3eP7XUaJ9ZO01ahOZ9C85NccBoK2lOqcLrZag3Y0LDQWw+eFbBg==
@@ -405,7 +419,7 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.57.0.tgz"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
-"@exact-realty/multipart-parser@^1.0.13":
+"@exact-realty/multipart-parser@^1.0.13", "@exact-realty/multipart-parser@^1.0.9":
   version "1.0.13"
   resolved "https://registry.npmjs.org/@exact-realty/multipart-parser/-/multipart-parser-1.0.13.tgz"
   integrity sha512-BGnB0VVn18dkz85rvBmp/CyxAMvUcVrsNf3qw8Fdx80V6+MsQUTxRdQnC0PzLIxbN8PKGFs8afd+ur8V1JLv8g==
@@ -760,10 +774,20 @@
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.6.tgz"
   integrity sha512-ok9AWwhcgYuGG3Zfhyqg+zwl+Wn5uE+dwC0NV/2qQkx4dABbb/bx96vWu8NSj+BNjjSjno+JRYRjle1jV08k3g==
 
-"@spore-sdk/core@0.2.0-beta.4":
-  version "0.2.0-beta.4"
-  resolved "https://registry.npmjs.org/@spore-sdk/core/-/core-0.2.0-beta.4.tgz"
-  integrity sha512-liVxXk5ZY6+Kh24sJT30Gg7QuqqQk4tlY71lHoO9wj50y3iQWyODyPZEopEP+owmYjOZ5WLPPzKJTIlNRkqxPQ==
+"@spore-sdk/core@0.2.0-beta.2":
+  version "0.2.0-beta.2"
+  resolved "https://registry.npmjs.org/@spore-sdk/core/-/core-0.2.0-beta.2.tgz"
+  integrity sha512-XseuRVOWddVn8UDqHbFqRSV8copflIm3jfaelapv9JlnIZZh74bWcfZsk+CQ9PJta+KiLF1+Yj8ixpMrmdvfqQ==
+  dependencies:
+    "@ckb-lumos/base" "^0.22.0-next.4"
+    "@ckb-lumos/bi" "^0.22.0-next.4"
+    "@ckb-lumos/codec" "^0.22.0-next.4"
+    "@ckb-lumos/common-scripts" "^0.22.0-next.4"
+    "@ckb-lumos/config-manager" "^0.22.0-next.4"
+    "@ckb-lumos/lumos" "^0.22.0-next.4"
+    "@ckb-lumos/rpc" "^0.22.0-next.4"
+    "@exact-realty/multipart-parser" "^1.0.9"
+    lodash "^4.17.21"
 
 "@swc/helpers@0.5.2":
   version "0.5.2"

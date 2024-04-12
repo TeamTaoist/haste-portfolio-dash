@@ -22,7 +22,7 @@
     "@reduxjs/toolkit": "^2.2.3",
     "@rgbpp-sdk/btc": "^0.0.0-snap-20240403090049",
     "@rgbpp-sdk/ckb": "^0.0.0-snap-20240403090049",
-    "@spore-sdk/core": "0.2.0-beta.4",
+    "@spore-sdk/core": "0.2.0-beta.2",
     "@types/react-redux": "^7.1.33",
     "lucide-react": "^0.365.0",
     "net": "^1.0.2",

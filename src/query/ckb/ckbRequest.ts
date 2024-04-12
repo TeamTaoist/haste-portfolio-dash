@@ -56,7 +56,6 @@ import {
 } from "@/settings/variable";
 import { getEnv } from "@/settings/env";
 
-config.initializeConfig(CONFIG);
 
 const rpc = new RPC(CKB_RPC_URL);
 const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);

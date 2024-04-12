@@ -1,8 +1,9 @@
 import { CellDep, Script, config } from "@ckb-lumos/lumos";
 import { NetworkType } from "@rgbpp-sdk/btc";
+import { getEnv } from "./env";
 
 export const isMainnet = false;
-export const CONFIG = config.predefined.AGGRON4;
+export const CONFIG = getEnv() === 'Mainnet' ? config.MAINNET : config.TESTNET;
 export const CKB_RPC_URL = "https://testnet.ckb.dev";
 export const CKB_INDEX_URL = "https://testnet.ckb.dev";
 

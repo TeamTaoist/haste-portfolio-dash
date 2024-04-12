@@ -5,7 +5,7 @@ import { number } from "@ckb-lumos/codec";
 import { BI, Cell, config, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
 import superagent from "superagent";
 
-config.initializeConfig(CONFIG);
+// config.initializeConfig(CONFIG);
 
 export const rpc = new RPC(CKB_RPC_URL);
 export const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
@@ -20,7 +20,7 @@ export const getCKBCapacity = async (address: string) => {
       balance = balance.add(cell.cellOutput.capacity);
     }
     return balance;
-} 
+}
 
 export const getSpore = async(address: string) => {
     const lock = helpers.parseAddress(address);
@@ -46,7 +46,7 @@ export const getSpore = async(address: string) => {
     }
 
     return sporeCellList;
-  }
+}
 
 
 export const getXudtAndSpore = async(address: string) => {
@@ -118,9 +118,12 @@ export const getXudtAndSpore = async(address: string) => {
       if (sporeCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
 
+        console.log("=====sporeCell====",sporeCell)
+
         sporeList.push({
           symbol: "DOBs",
           amount: sporeCell.cellOutput.type.args,
+          outPoint:sporeCell.outPoint,
           type_hash: typeHash,
           udt_type: "spore_cell",
           type_script: sporeCell.cellOutput.type,
@@ -134,19 +137,20 @@ export const getXudtAndSpore = async(address: string) => {
 }
 
 export const getTx = async(address: string, page: number = 0) => {
-    const rs = await superagent
-      .post(`${backend}/api/explore`)
-      .set("Content-Type", "application/json")
-      .send({
-        req: `https://${getEnv() === 'Mainnet' ? 'mainnet-api': 'testnet-api'}.${ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
-          page + 1
-        }&page_size=10&sort=time.desc`,
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  const rs = await superagent
+    .post(`${backend}/api/explore`)
+    .set("Content-Type", "application/json")
+    .send({
+      req: `https://${getEnv() === 'Mainnet' ? 'mainnet-api': 'testnet-api'}.${ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
+        page + 1
+      }&page_size=10&sort=time.desc`,
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 
-    if (rs && rs.status == 200) {
-      return rs.text !== '' ? JSON.parse(rs.text): [];
-    }
+  if (rs && rs.status == 200) {
+    return rs.text !== '' ? JSON.parse(rs.text): [];
   }
+}
+

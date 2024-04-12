@@ -1,5 +1,6 @@
 "use client";
 
+
 import { CircleX, Search } from "lucide-react";
 import {
   useState,
@@ -10,6 +11,11 @@ import {
 } from "react";
 import EmptyImage from "../common/Empty/image";
 import Image from "next/image";
+import {getXudtAndSpore} from "@/query/ckb/tools";
+import {ckb_SporeInfo} from "@/types/BTC";
+import {useSelector} from "react-redux";
+import {RootState} from "@/store/store";
+import {formatString} from "@/utils/common";
 
 export enum ASSET_TYPE {
   UDT,
@@ -159,7 +165,35 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect }, ref) => {
 UdtAsset.displayName = "UdtAsset";
 
 const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect }, ref) => {
-  const [spores] = useState(new Array(100).fill(0));
+  // const [spores] = useState(new Array(100).fill(0));
+  const [spores, setSpores] = useState<ckb_SporeInfo[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const wallets = useSelector((state: RootState) => state.wallet.wallets);
+  const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
+
+  const getCurrentAssets = async() => {
+    const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
+
+    const chain = currentWallet?.chain;
+    if ( chain && chain === 'btc') {
+
+    } else if (chain && chain === 'ckb') {
+      const list = await _getSpore(currentWallet?.address!!);
+    }
+  }
+
+
+  useEffect(() => {
+    getCurrentAssets()
+  }, [currentAddress])
+
+  const _getSpore = async(address: string) => {
+    const assetsList = await getXudtAndSpore(address);
+    console.log("assetsList---",assetsList)
+
+    setSpores(assetsList.sporeList);
+    setIsLoading(false);
+  }
 
   const [filteredSpores, setFilteredSpores] = useState(new Array(100).fill(0));
 
@@ -180,29 +214,55 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect }, ref) => {
     },
   }));
 
-  return spores.map((_, index) => (
-    <button
-      key={index}
-      className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
-      onClick={() => onSelect({ type: ASSET_TYPE.SPORE, data: {} })}
-    >
-      <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-        {Math.round(Math.random()) % 2 === 0 ? (
-          <img
-            src="https://img.reservoir.tools/images/v2/polygon/hc%2BnPcLmWxs%2FDW99DlBQ42k40ZoyYV5jCIms5qHjwvuJ0YcFQ9C1r6S71lSDSuimxWvQT3aWXuWUieWJXqV9xtJ3mLYRXHCS%2FKnL6XlVQXPtnCacxwAonWizJmF9iXI4V3FKXdlFlxHSvbstd697Qtr6Gnv1HtK%2BeOwoXx8ZP5EO99xEAkOYV%2BCdaZx%2FBGYw?width=512"
-            alt=""
-            className="w-full object-cover block rounded-lg"
-          />
-        ) : (
-          <EmptyImage className="h-full w-full max-w-[5rem] max-h-[5rem]" />
-        )}
-      </div>
-      <div className="flex flex-col justify-start items-start truncate">
-        <p className="text-xs sm:text-sm leading-5 text-default font-bold">
-          fdjaslfh hduiagfdsaf djias;hf
+  return <>
+    {
+
+      isLoading ? (
+              Array.from({ length: 3 }, (_, index) => (
+                  <div key={index}
+                       className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
+                  >
+                    <button
+                        key={index}
+                        className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
+                    >
+                      <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
+                        <div
+                            className="w-full h-full bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 bg-200% animate-shimmerSpore"></div>
+                      </div>
+                      <div className="flex flex-col justify-start items-start truncate">
+                        <p className="text-xs sm:text-sm leading-5 text-default font-bold">
+                          <div
+                              className="h-4 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 bg-200% rounded animate-shimmerSpore"></div>
+                        </p>
+                      </div>
+                    </button>
+                  </div>
+              ))
+          ) :
+          (spores.map((spore, index) => (
+              <button
+                  key={index}
+                  className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
+                  onClick={() => onSelect({type: ASSET_TYPE.SPORE, data: spore})}
+              >
+                <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
+                  {Math.round(Math.random()) % 2 === 0 ? (
+                      <img
+                          src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
+                          alt=""
+                          className="w-full object-cover block rounded-lg"
+                      />
+                  ) : (
+                      <EmptyImage className="h-full w-full max-w-[5rem] max-h-[5rem]"/>
+                  )}
+                </div>
+                <div className="flex flex-col justify-start items-start truncate">
+                  <p className="text-xs sm:text-sm leading-5 text-default font-bold">
+                    {formatString(spore.amount, 5)}
         </p>
       </div>
     </button>
-  ));
+  )))}</>
 });
 SporeAsset.displayName = "SporeAsset";
