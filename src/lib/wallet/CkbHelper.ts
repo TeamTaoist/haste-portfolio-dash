@@ -91,28 +91,6 @@ export class CkbHepler {
     return CkbHepler._indexer;
   }
 
-  public static newInstance() {
-    const cfg = isTestNet() ? testConfig : mainConfig;
-
-    initConfig({
-      // your app name
-      name: "JoyID demo",
-      // your app logo
-      logo: "https://fav.farm/🆔",
-      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: cfg.joyIdUrl,
-    });
-
-    CkbHepler._instance = new CkbHepler();
-
-    commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()]);
-
-    config.initializeConfig(cfg.CONFIG);
-
-    CkbHepler._rpc = new RPC(cfg.CKB_RPC_URL);
-    CkbHepler._indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
-  }
-
   public static get instance() {
     if (!CkbHepler._instance) {
       const cfg = isTestNet() ? testConfig : mainConfig;
@@ -294,14 +272,18 @@ export class CkbHepler {
         cellProvider: CkbHepler.instance.indexer,
       });
 
-      const fromScript = helpers.parseAddress(options.from);
+      const fromScript = helpers.parseAddress(options.from, {
+        config: cfg.CONFIG,
+      });
       const fromAddress = helpers.encodeToAddress(fromScript, {
         config: cfg.CONFIG,
       });
 
       console.log(fromAddress);
 
-      const toScript = helpers.parseAddress(options.to);
+      const toScript = helpers.parseAddress(options.to, {
+        config: cfg.CONFIG,
+      });
       const toAddress = helpers.encodeToAddress(toScript, {
         config: cfg.CONFIG,
       });
@@ -348,14 +330,18 @@ export class CkbHepler {
 
     txSkeleton = addCellDep(txSkeleton, spore_cellDeps);
 
-    const fromScript = helpers.parseAddress(options.from);
+    const fromScript = helpers.parseAddress(options.from, {
+      config: cfg.CONFIG,
+    });
     const fromAddress = helpers.encodeToAddress(fromScript, {
       config: cfg.CONFIG,
     });
 
     console.log(fromAddress);
 
-    const toScript = helpers.parseAddress(options.to);
+    const toScript = helpers.parseAddress(options.to, {
+      config: cfg.CONFIG,
+    });
     const toAddress = helpers.encodeToAddress(toScript, { config: cfg.CONFIG });
 
     console.log(toAddress);
@@ -478,14 +464,18 @@ export class CkbHepler {
     }
     console.log("script is xudt", isXUDT);
 
-    const fromScript = helpers.parseAddress(options.from);
+    const fromScript = helpers.parseAddress(options.from, {
+      config: cfg.CONFIG,
+    });
     const fromAddress = helpers.encodeToAddress(fromScript, {
       config: cfg.CONFIG,
     });
 
     console.log(fromAddress);
 
-    const toScript = helpers.parseAddress(options.to);
+    const toScript = helpers.parseAddress(options.to, {
+      config: cfg.CONFIG,
+    });
     const toAddress = helpers.encodeToAddress(toScript, { config: cfg.CONFIG });
 
     console.log(toAddress);
@@ -661,8 +651,12 @@ export class CkbHepler {
 
   // capacityOf
   async capacityOf(address: string) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const collector = CkbHepler.instance.indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address, {
+        config: cfg.CONFIG,
+      }),
       type: "empty",
     });
     let balance = BI.from(0);
@@ -674,8 +668,12 @@ export class CkbHepler {
 
   // sudt balance
   async sudtBalance(address: string, typeScript: Script) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
     const collector = CkbHepler.instance.indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address, {
+        config: cfg.CONFIG,
+      }),
       type: typeScript,
       scriptSearchMode: "exact",
     });
@@ -694,7 +692,9 @@ export class CkbHepler {
       cellProvider: CkbHepler.instance.indexer,
     });
 
-    const issuerScript = helpers.parseAddress(issuer);
+    const issuerScript = helpers.parseAddress(issuer, {
+      config: cfg.CONFIG,
+    });
     const issuerAddress = helpers.encodeToAddress(issuerScript, {
       config: cfg.CONFIG,
     });
@@ -723,7 +723,9 @@ export class CkbHepler {
   async getUdtBalance(address: string) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
-    const lock = helpers.parseAddress(address);
+    const lock = helpers.parseAddress(address, {
+      config: cfg.CONFIG,
+    });
 
     const sudtType = getSudtTypeScript(cfg.isMainnet);
 
@@ -831,7 +833,9 @@ export class CkbHepler {
   async getSpore(address: string) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
-    const lock = helpers.parseAddress(address);
+    const lock = helpers.parseAddress(address, {
+      config: cfg.CONFIG,
+    });
 
     const sporeType = getSporeTypeScript(cfg.isMainnet);
 
@@ -966,7 +970,9 @@ export class CkbHepler {
     const sporeTypeScript = getSporeTypeScript(cfg.isMainnet);
 
     const xudt_collector = CkbHepler.instance.indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address, {
+        config: cfg.CONFIG,
+      }),
       type: {
         script: {
           codeHash: xudtTypeScript.codeHash,
@@ -978,7 +984,9 @@ export class CkbHepler {
     });
 
     const spore_collector = CkbHepler.instance.indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address, {
+        config: cfg.CONFIG,
+      }),
       type: {
         script: {
           codeHash: sporeTypeScript.codeHash,
@@ -1079,7 +1087,9 @@ export class CkbHepler {
 
     const collect_sudt = CkbHepler.instance.indexer.collector({
       lock: {
-        script: helpers.parseAddress(wallet.address),
+        script: helpers.parseAddress(wallet.address, {
+          config: cfg.CONFIG,
+        }),
         searchMode: "exact",
       },
       type: {
@@ -1262,7 +1272,9 @@ export class CkbHepler {
 
     const xudtTS = getXudtTypeScript(cfg.isMainnet);
 
-    const lock = helpers.parseAddress(address);
+    const lock = helpers.parseAddress(address, {
+      config: cfg.CONFIG,
+    });
 
     const btcLockArgs = genBtcTimeLockArgs(
       lock,
@@ -1369,7 +1381,9 @@ export class CkbHepler {
 
     // const fromLock = addressToScript(fromAddress);
 
-    const fromLock = helpers.parseAddress(wallet.address);
+    const fromLock = helpers.parseAddress(wallet.address, {
+      config: cfg.CONFIG,
+    });
 
     console.log("Lock", fromLock);
 
@@ -1402,7 +1416,11 @@ export class CkbHepler {
     const receiverXudtCapacityList: bigint[] = [];
     for (let i = 0; i < receivers.length; i++) {
       const receiver = receivers[i];
-      const v = calcXudtCapacity(helpers.parseAddress(receiver.toAddress));
+      const v = calcXudtCapacity(
+        helpers.parseAddress(receiver.toAddress, {
+          config: cfg.CONFIG,
+        })
+      );
       receiverXudtCapacityList.push(v);
       totalReceiverXudtCapacity += v;
     }
@@ -1415,7 +1433,9 @@ export class CkbHepler {
       const xudtCapacity = receiverXudtCapacityList[i];
 
       outputs.push({
-        lock: helpers.parseAddress(receiver.toAddress),
+        lock: helpers.parseAddress(receiver.toAddress, {
+          config: cfg.CONFIG,
+        }),
         type: xudtType,
         capacity: append0x(xudtCapacity.toString(16)),
       });
@@ -1561,7 +1581,11 @@ export class CkbHepler {
     const receiverXudtCapacityList: bigint[] = [];
     for (let i = 0; i < receivers.length; i++) {
       const receiver = receivers[i];
-      const v = calcXudtCapacity(helpers.parseAddress(receiver.toAddress));
+      const v = calcXudtCapacity(
+        helpers.parseAddress(receiver.toAddress, {
+          config: cfg.CONFIG,
+        })
+      );
       receiverXudtCapacityList.push(v);
       totalReceiverXudtCapacity += v;
     }
@@ -1574,7 +1598,9 @@ export class CkbHepler {
       const xudtCapacity = receiverXudtCapacityList[i];
 
       outputs.push({
-        lock: helpers.parseAddress(receiver.toAddress),
+        lock: helpers.parseAddress(receiver.toAddress, {
+          config: cfg.CONFIG,
+        }),
         type: xudtType,
         capacity: append0x(xudtCapacity.toString(16)),
       });

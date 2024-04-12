@@ -14,7 +14,12 @@ import {
 } from "@nervosnetwork/ckb-sdk-utils";
 import { u64ToLe, u8ToHex, utf8ToHex } from "@rgbpp-sdk/ckb";
 import { assetInfoMgr } from "./manager/AssetInfoManager";
-import { FIXED_SIZE } from "./wallet/constants";
+import {
+  FIXED_SIZE,
+  isTestNet,
+  mainConfig,
+  testConfig,
+} from "./wallet/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -198,7 +203,11 @@ export const calcUniqueCellInfoCapacity = (
     symbol: string;
   }
 ) => {
-  const lock = helpers.parseAddress(address);
+  const cfg = isTestNet() ? testConfig : mainConfig;
+
+  const lock = helpers.parseAddress(address, {
+    config: cfg.CONFIG,
+  });
   const argsSize = hexToBytes(lock.args).length;
   const lockSize = 32 + 1 + argsSize;
   const inscriptionInfoTypeSize = 32 + 32 + 1;

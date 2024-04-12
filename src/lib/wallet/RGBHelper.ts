@@ -293,7 +293,9 @@ export class RGBHelper {
 
     // joy id
     // <<
-    const lock = helpers.parseAddress(ckb_wallet.address);
+    const lock = helpers.parseAddress(ckb_wallet.address, {
+      config: cfg.CONFIG,
+    });
     const joyidScropt = getJoyIDLockScript(cfg.isMainnet);
     if (lock.codeHash == joyidScropt.codeHash) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -497,7 +499,9 @@ export class RGBHelper {
       });
       // const xudtTypeScript = getXudtTypeScript(isMainnet);
       for await (const rgbppLock of rgbppLocks) {
-        const address = helpers.encodeToAddress(rgbppLock.lock);
+        const address = helpers.encodeToAddress(rgbppLock.lock, {
+          config: cfg.CONFIG,
+        });
         const { xudtList, sporeList } =
           await CkbHepler.instance.getXudtAndSpore(address);
 
