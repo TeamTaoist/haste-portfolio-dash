@@ -6,8 +6,13 @@ import Dispatch from "./dispatch/page";
 import Layout from "./layout/layout";
 import { Transfer } from "./transfer/page";
 import { Toaster } from "./components/ui/toaster";
+import { isTestNet, mainConfig, testConfig } from "./lib/wallet/constants";
+import { config } from "@ckb-lumos/lumos";
 
 const App = () => {
+  const cfg = isTestNet() ? testConfig : mainConfig;
+  config.initializeConfig(cfg.CONFIG);
+
   const routes = useRoutes([
     { path: "/", element: <Dashboard /> },
     { path: "/tx", element: <Transaction /> },
