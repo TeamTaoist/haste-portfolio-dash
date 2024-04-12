@@ -31,11 +31,6 @@ export function MainNav({
   };
 
   useEffect(() => {
-
-    const wallet = accountStore.getWallet(accountStore.currentAddress);
-    if (wallet) {
-      setChain(wallet.chain);
-    }
     EventManager.instance.subscribe(EventType.main_nav_reload, reload);
 
     return EventManager.instance.unsubscribe(EventType.main_nav_reload, reload);
