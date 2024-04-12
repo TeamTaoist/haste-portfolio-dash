@@ -2,7 +2,7 @@ import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { cn } from "@/lib/utils";
-import { accountStore } from "@/store/AccountStore";
+// import { accountStore } from "@/store/AccountStore";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
