@@ -1,4 +1,3 @@
-import { toast } from "@/components/ui/use-toast";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
@@ -20,8 +19,6 @@ export function MainNav({
   }
 
   const [menuType, setMenuType] = useState(DataManager.instance.curMenu);
-
-  const [chain, setChain] = useState<string>("CKB");
 
   const handleClick = () => {
     setMenuType(DataManager.instance.curMenu);

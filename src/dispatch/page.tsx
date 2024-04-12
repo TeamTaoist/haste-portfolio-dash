@@ -4,7 +4,6 @@ import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { accountStore } from "@/store/AccountStore";
-import { useNavigate } from "react-router-dom";
 // import { useLocation } from "react-router-dom";
 // import { DataManager } from "@/lib/manager/DataManager";
 // import { HttpManager } from "@/lib/api/HttpManager";
