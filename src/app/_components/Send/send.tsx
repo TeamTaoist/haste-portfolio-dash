@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {ChangeEvent, useState} from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { WalletItem } from "@/store/wallet/walletSlice";
@@ -8,17 +8,47 @@ import { ChevronDown } from "lucide-react";
 import WalletSelect from "./walletSelect";
 import AssetModal, { SelectAssetType, ASSET_TYPE } from "./asset";
 import Image from "next/image";
+import {formatString} from "@/utils/common";
+import { CkbHepler } from "@/query/ckb/ckbRequest";
+import { BI } from "@ckb-lumos/bi";
+import {getSporeTypeScript} from "@/settings/variable";
+import {getEnv} from "@/settings/env";
+import {send_DOB} from "@/lib";
 
 export default function SendContent() {
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const [selectWallet, setSelectWallet] = useState<WalletItem>(wallets[0]);
+  const [to,setTo] = useState('')
 
   const [assetModalVisible, setAssetModalVisible] = useState(false);
   const [selectAsset, setSelectAsset] = useState<SelectAssetType>();
 
   const [amount, setAmount] = useState<number>();
 
-  const onSend = () => {};
+  const onSend = () => {
+      switch (selectAsset?.type) {
+          case ASSET_TYPE.SPORE:
+              send_Spore()
+              break;
+      }
+
+  };
+  const handleInput =(e:ChangeEvent)=>{
+      const {value} = e.target as HTMLInputElement;
+      setTo(value);
+  }
+
+  const send_Spore = async () =>{
+      console.log("===send_Spore====",selectWallet,to,selectAsset)
+      const isMainnet = getEnv() == "Testnet" ? false : true;
+      console.log("===isMainnet====",isMainnet)
+
+      await send_DOB(selectWallet.address,selectAsset?.data?.outPoint,to,isMainnet)
+
+
+
+
+    }
 
   return (
     <>
@@ -36,6 +66,8 @@ export default function SendContent() {
           type="text"
           className="w-full h-11 px-3 text-sm rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-primary-default"
           placeholder="Receive Address"
+          value={to}
+          onChange={(e)=>handleInput(e)}
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -68,15 +100,15 @@ export default function SendContent() {
                 ) : (
                   <div className="flex gap-2 items-center">
                     <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-                      <Image
-                        src="/img/btc.png"
+                      <img
+                        src={`https://a-simple-demo.spore.pro/api/media/${selectAsset.data.amount}`}
                         alt=""
                         width={32}
                         height={0}
                         className="w-full object-cover block rounded-lg"
                       />
                     </div>
-                    <div>lalalal</div>
+                    <div>{formatString(selectAsset.data.amount, 5)}</div>
                   </div>
                 )}
               </>
@@ -120,6 +152,7 @@ export default function SendContent() {
         <AssetModal
           closeModal={() => setAssetModalVisible(false)}
           onSelectAsset={(data) => {
+              console.log(data)
             setSelectAsset(data);
             setAssetModalVisible(false);
           }}

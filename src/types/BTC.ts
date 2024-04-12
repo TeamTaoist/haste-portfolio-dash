@@ -163,6 +163,10 @@ export interface ckb_SporeInfo {
   decimal?: string;
   display_name?: string;
   uan?: string;
+  outPoint?:{
+    txHash:string;
+    index:string;
+  };
   type_script: Script;
 }
 

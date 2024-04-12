@@ -19,7 +19,7 @@ export const getCKBCapacity = async (address: string) => {
       balance = balance.add(cell.cellOutput.capacity);
     }
     return balance;
-} 
+}
 
 export const getSpore = async(address: string) => {
     const lock = helpers.parseAddress(address);
@@ -117,9 +117,12 @@ export const getXudtAndSpore = async(address: string) => {
       if (sporeCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
 
+        console.log("=====sporeCell====",sporeCell)
+
         sporeList.push({
           symbol: "DOBs",
           amount: sporeCell.cellOutput.type.args,
+          outPoint:sporeCell.outPoint,
           type_hash: typeHash,
           udt_type: "spore_cell",
           type_script: sporeCell.cellOutput.type,
