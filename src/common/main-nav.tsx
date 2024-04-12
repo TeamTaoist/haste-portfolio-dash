@@ -1,7 +1,9 @@
+import { toast } from "@/components/ui/use-toast";
 import { EventType } from "@/lib/enum";
 import { DataManager } from "@/lib/manager/DataManager";
 import { EventManager } from "@/lib/manager/EventManager";
 import { cn } from "@/lib/utils";
+import { accountStore } from "@/store/AccountStore";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -19,6 +21,8 @@ export function MainNav({
 
   const [menuType, setMenuType] = useState(DataManager.instance.curMenu);
 
+  const [chain, setChain] = useState<string>("CKB");
+
   const handleClick = () => {
     setMenuType(DataManager.instance.curMenu);
   };
@@ -30,6 +34,11 @@ export function MainNav({
   };
 
   useEffect(() => {
+
+    const wallet = accountStore.getWallet(accountStore.currentAddress);
+    if (wallet) {
+      setChain(wallet.chain);
+    }
     EventManager.instance.subscribe(EventType.main_nav_reload, reload);
 
     return EventManager.instance.unsubscribe(EventType.main_nav_reload, reload);
@@ -91,7 +100,6 @@ export function MainNav({
       >
         Settings
       </Link> */}
-
       <Link
         to="/dispatch"
         className={cn(
