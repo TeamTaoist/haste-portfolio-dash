@@ -53,7 +53,7 @@ export default function Dispatch() {
     };
   }, [reload]);
 
-  return wallet.chain == "BTC"?(<div></div>):(
+  return (import.meta.env.VITE_OpenXudtMint == "1" && wallet.chain == "CKB") ? (
     <div className="flex flex-col flex-1 space-y-4 p-8 pt-6">
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="flex items-center justify-between space-y-2">
@@ -63,5 +63,5 @@ export default function Dispatch() {
       </div>
       <DispatchPanel />
     </div>
-  );
+  ) : (<div></div>);
 }
