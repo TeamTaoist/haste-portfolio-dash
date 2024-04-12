@@ -5,34 +5,49 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import UDTList from "./udt";
 import SporeList from "./spore";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { TabsType } from "@/types/tabs";
 
-const TAB_LIST = [
+const TAB_LIST: TabsType[] = [
   {
     value: "udt",
     label: "UDT",
     component: <UDTList />,
-  },
-  {
-    value: "spore",
-    label: "SPORE",
-    component: <SporeList />,
-  },
+  }
 ];
+
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const [currentTab, setCurrentTab] = useState<string>();
+  const [tabs, setTabs] = useState<TabsType[]>(TAB_LIST)
+  const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
+  const wallets = useSelector((state: RootState) => state.wallet.wallets);
+  
+  useEffect(() => {
+    const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
+    if(currentWallet?.chain === 'ckb') {
+      setTabs([...TAB_LIST,  {
+        value: "spore",
+        label: "SPORE",
+        component: <SporeList />,
+      }]);
+    } else if (currentWallet?.chain === 'btc') {
+      setTabs(TAB_LIST);
+    }
+  }, [currentAddress, wallets])
 
   useEffect(() => {
     setCurrentTab(
-      tab && TAB_LIST.find((t) => t.value === tab) ? tab : TAB_LIST[0].value
+      tabs && (tab && tabs.find((t) => t.value === tab) ? tab : tabs[0].value)
     );
-  }, [tab]);
+  }, [tab, tabs]);
   return (
     <div className="flex-1 h-full min-h-0 overflow-auto p-4">
       <div className="flex sm:space-x-0 bg-inherit border-none z-1 static text-white001">
-        {TAB_LIST.map((tab) => (
+        {tabs && tabs.map((tab) => (
           <Link
             key={tab.value}
             href={`/?tab=${tab.value}`}
@@ -47,7 +62,7 @@ export default function Dashboard() {
         ))}
       </div>
       <div className="mt-4">
-        {TAB_LIST.find((t) => t.value === currentTab)?.component}
+        {tabs && tabs.find((t) => t.value === currentTab)?.component}
       </div>
     </div>
   );

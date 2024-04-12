@@ -8,6 +8,31 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        shimmer: {
+          '0%': {
+            backgroundPosition: '-40rem 0'
+          },
+          '100%': {
+            backgroundPosition: '40rem 0'
+          }
+        },
+        shimmerSpore: {
+          '0%': {
+            backgroundPosition: '-30rem 0'
+          },
+          '100%': {
+            backgroundPosition: '30rem 0'
+          }
+        }
+      },
+      backgroundSize: {
+        '200%': '200%'
+      },
+      animation: {
+        shimmer: 'shimmer 2s infinite linear',
+        shimmerSpore: 'shimmerSpore 2s infinite linear'
+      },
       fontFamily: {
         'Montserrat': ['Montserrat'],
         'SourceSanPro': ['SourceSanPro']
@@ -65,15 +90,6 @@ const config: Config = {
         'labelbdmb': ['14px', {lineHeight: '160%', fontWeight: 700}],
         'buttonmb': ['16px', {lineHeight: '100%', fontWeight: 400}],
         'codemb': ['14px', {lineHeight: '160%', fontWeight: 400}],
-      },
-      animation: {
-        'wiggle': 'wiggle 1s linear infinite',
-      },
-      keyframes: {
-        wiggle: {
-          '0%, 100%': { transform: 'rotate(-15deg)' },
-          '50%': { transform: 'rotate(15deg)' },
-        }
       }
     },
   },

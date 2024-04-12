@@ -1,0 +1,76 @@
+import { getEnv } from "@/settings/env";
+
+export const getRgbppAssert = async(address: string) => {
+    const result: btc_utxo[] | undefined = await BtcHepler.instance.getUtxo(
+      address
+    );
+
+    const rgbAssertList: RgbAssert[] = [];
+
+    if (result) {
+      const rgbppLockArgsList: {
+        args: string;
+        txHash: string;
+        idx: number;
+        value: number;
+      }[] = [];
+      for (let i = 0; i < result.length; i++) {
+        const element = result[i];
+        const rgbArgs = buildRgbppLockArgs(element.vout, element.txid);
+        rgbppLockArgsList.push({
+          args: rgbArgs,
+          txHash: element.txid,
+          idx: element.vout,
+          value: element.value,
+        });
+      }
+      const rgbppLocks = rgbppLockArgsList.map((item) => {
+        const lock = genRgbppLockScript(item.args, getEnv() === 'Mainnet');
+
+        return {
+          lock,
+          txHash: item.txHash,
+          idx: item.idx,
+          value: item.value,
+        };
+      });
+      // const xudtTypeScript = getXudtTypeScript(isMainnet);
+      for await (const rgbppLock of rgbppLocks) {
+        const address = helpers.encodeToAddress(rgbppLock.lock);
+        const { xudtList, sporeList } =
+          await CkbHepler.instance.getXudtAndSpore(address);
+
+        if (xudtList.length > 0) {
+          for (let i = 0; i < xudtList.length; i++) {
+            const xudt = xudtList[i];
+            rgbAssertList.push({
+              txHash: rgbppLock.txHash,
+              idx: rgbppLock.idx,
+              ckbCellInfo: xudt,
+              value: rgbppLock.value,
+            });
+          }
+        } else if (sporeList.length > 0) {
+          for (let i = 0; i < sporeList.length; i++) {
+            const spore = sporeList[i];
+            rgbAssertList.push({
+              txHash: rgbppLock.txHash,
+              idx: rgbppLock.idx,
+              ckbCellInfo: spore,
+              value: rgbppLock.value,
+            });
+          }
+        } else {
+          rgbAssertList.push({
+            txHash: rgbppLock.txHash,
+            idx: rgbppLock.idx,
+            value: rgbppLock.value,
+          });
+        }
+      }
+    }
+
+    console.log(rgbAssertList);
+
+    return rgbAssertList;
+  }
