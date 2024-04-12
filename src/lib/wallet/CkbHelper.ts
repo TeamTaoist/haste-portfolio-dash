@@ -80,19 +80,37 @@ export class CkbHepler {
   private static _instance: CkbHepler;
   private constructor() {}
 
-  // private static _rpc: RPC;
-  // private static _indexer: Indexer;
+  private static _rpc: RPC;
+  private static _indexer: Indexer;
 
   public get rpc() {
-    const cfg = isTestNet() ? testConfig : mainConfig;
-    const rpc = new RPC(cfg.CKB_RPC_URL);
-    return rpc;
+    return CkbHepler._rpc;
   }
 
   public get indexer() {
+    return CkbHepler._indexer;
+  }
+
+  public static newInstance() {
     const cfg = isTestNet() ? testConfig : mainConfig;
-    const indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
-    return indexer;
+
+    initConfig({
+      // your app name
+      name: "JoyID demo",
+      // your app logo
+      logo: "https://fav.farm/🆔",
+      // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
+      joyidAppURL: cfg.joyIdUrl,
+    });
+
+    CkbHepler._instance = new CkbHepler();
+
+    commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()]);
+
+    config.initializeConfig(cfg.CONFIG);
+
+    CkbHepler._rpc = new RPC(cfg.CKB_RPC_URL);
+    CkbHepler._indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
   }
 
   public static get instance() {
@@ -114,8 +132,8 @@ export class CkbHepler {
 
       config.initializeConfig(cfg.CONFIG);
 
-      // CkbHepler._rpc = new RPC(cfg.CKB_RPC_URL);
-      // CkbHepler._indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
+      CkbHepler._rpc = new RPC(cfg.CKB_RPC_URL);
+      CkbHepler._indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
     }
     return this._instance;
   }

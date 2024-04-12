@@ -38,6 +38,7 @@ import {
   chooseTestNet,
   isTestNet,
 } from "@/lib/wallet/constants";
+import { CkbHepler } from "@/lib/wallet/CkbHelper";
 
 let groups: { label: string; teams: { label: string; value: string }[] }[] = [];
 
@@ -203,6 +204,7 @@ const TeamSwitcher = observer(() => {
                   key={"mainnet"}
                   onSelect={() => {
                     chooseMainNet();
+                    CkbHepler.newInstance();
                     setTestNet(false);
 
                     window.location.reload();
@@ -220,6 +222,7 @@ const TeamSwitcher = observer(() => {
                   key={"testnet"}
                   onSelect={() => {
                     chooseTestNet();
+                    CkbHepler.newInstance();
                     setTestNet(true);
 
                     window.location.reload();
