@@ -61,7 +61,9 @@ export class HttpManager {
       if (btcBalance) {
         assetList.push({
           chain: "BTC",
-          balance: BI.from(btcBalance.chain_stats.funded_txo_sum),
+          balance: BI.from(btcBalance.chain_stats.funded_txo_sum).sub(
+            BI.from(btcBalance.chain_stats.spent_txo_sum)
+          ),
         });
       } else {
         assetList.push({

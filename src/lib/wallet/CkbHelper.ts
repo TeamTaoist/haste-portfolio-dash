@@ -80,15 +80,19 @@ export class CkbHepler {
   private static _instance: CkbHepler;
   private constructor() {}
 
-  private static _rpc: RPC;
-  private static _indexer: Indexer;
+  // private static _rpc: RPC;
+  // private static _indexer: Indexer;
 
   public get rpc() {
-    return CkbHepler._rpc;
+    const cfg = isTestNet() ? testConfig : mainConfig;
+    const rpc = new RPC(cfg.CKB_RPC_URL);
+    return rpc;
   }
 
   public get indexer() {
-    return CkbHepler._indexer;
+    const cfg = isTestNet() ? testConfig : mainConfig;
+    const indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
+    return indexer;
   }
 
   public static get instance() {
@@ -110,8 +114,8 @@ export class CkbHepler {
 
       config.initializeConfig(cfg.CONFIG);
 
-      CkbHepler._rpc = new RPC(cfg.CKB_RPC_URL);
-      CkbHepler._indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
+      // CkbHepler._rpc = new RPC(cfg.CKB_RPC_URL);
+      // CkbHepler._indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
     }
     return this._instance;
   }
