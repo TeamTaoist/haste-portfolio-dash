@@ -1,6 +1,6 @@
 import { BI, Script, utils } from "@ckb-lumos/lumos";
 import { xudt_info } from "../interface";
-import { CkbHepler, indexer } from "../wallet/CkbHelper";
+import { CkbHepler } from "../wallet/CkbHelper";
 import { EventManager } from "./EventManager";
 import { EventType } from "../enum";
 import { unserializeTokenInfo } from "../utils";
@@ -15,7 +15,7 @@ class AssetInfoManager {
   private async findXudtInfo(xudtTS: Script) {
     const hash = utils.computeScriptHash(xudtTS);
 
-    const txInfo = await indexer.getTransactions(
+    const txInfo = await CkbHepler.instance.indexer.getTransactions(
       {
         groupByTransaction: true,
         script: xudtTS,

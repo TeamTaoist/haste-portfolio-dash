@@ -76,16 +76,20 @@ import {
   serializeWitnessArgs,
 } from "@nervosnetwork/ckb-sdk-utils";
 
-const cfg = isTestNet() ? testConfig : mainConfig;
-
-config.initializeConfig(cfg.CONFIG);
-
-export const rpc = new RPC(cfg.CKB_RPC_URL);
-export const indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
-
 export class CkbHepler {
   private static _instance: CkbHepler;
-  private constructor() { }
+  private constructor() {}
+
+  private static _rpc: RPC;
+  private static _indexer: Indexer;
+
+  public get rpc() {
+    return CkbHepler._rpc;
+  }
+
+  public get indexer() {
+    return CkbHepler._indexer;
+  }
 
   public static get instance() {
     if (!CkbHepler._instance) {
@@ -103,6 +107,11 @@ export class CkbHepler {
       CkbHepler._instance = new CkbHepler();
 
       commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()]);
+
+      config.initializeConfig(cfg.CONFIG);
+
+      CkbHepler._rpc = new RPC(cfg.CKB_RPC_URL);
+      CkbHepler._indexer = new Indexer(cfg.CKB_INDEX_URL, cfg.CKB_RPC_URL);
     }
     return this._instance;
   }
@@ -259,7 +268,9 @@ export class CkbHepler {
       return txSkeleton;
     } else {
       // ckb
-      let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+      let txSkeleton = helpers.TransactionSkeleton({
+        cellProvider: CkbHepler.instance.indexer,
+      });
 
       const fromScript = helpers.parseAddress(options.from);
       const fromAddress = helpers.encodeToAddress(fromScript, {
@@ -299,7 +310,9 @@ export class CkbHepler {
   async spore_buildTransfer(options: ckb_TransferOptions) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
-    let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+    let txSkeleton = helpers.TransactionSkeleton({
+      cellProvider: CkbHepler.instance.indexer,
+    });
 
     const sporeTS = options.typeScript;
     if (!sporeTS) {
@@ -327,7 +340,7 @@ export class CkbHepler {
 
     // find spore cells
     // <<
-    const spore_collect = indexer.collector({
+    const spore_collect = CkbHepler.instance.indexer.collector({
       lock: fromScript,
       type: sporeTS,
     });
@@ -378,7 +391,7 @@ export class CkbHepler {
 
     // find ckb
     // <<
-    const collect_ckb = indexer.collector({
+    const collect_ckb = CkbHepler.instance.indexer.collector({
       lock: {
         script: fromScript,
         searchMode: "exact",
@@ -427,7 +440,9 @@ export class CkbHepler {
   async sudt_xudt_buildTransfer(options: ckb_TransferOptions) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
-    let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+    let txSkeleton = helpers.TransactionSkeleton({
+      cellProvider: CkbHepler.instance.indexer,
+    });
 
     const sudtToken = options.typeScript;
     if (!sudtToken) {
@@ -473,7 +488,7 @@ export class CkbHepler {
 
     // find sudt
     // <<
-    const collect_sudt = indexer.collector({
+    const collect_sudt = CkbHepler.instance.indexer.collector({
       lock: {
         script: fromScript,
         searchMode: "exact",
@@ -575,7 +590,7 @@ export class CkbHepler {
 
     // find ckb
     // <<
-    const collect_ckb = indexer.collector({
+    const collect_ckb = CkbHepler.instance.indexer.collector({
       lock: {
         script: fromScript,
         searchMode: "exact",
@@ -619,12 +634,12 @@ export class CkbHepler {
 
   // send transaction
   async sendTransaction(tx: Transaction) {
-    return rpc.sendTransaction(tx, "passthrough");
+    return CkbHepler.instance.rpc.sendTransaction(tx, "passthrough");
   }
 
   // capacityOf
   async capacityOf(address: string) {
-    const collector = indexer.collector({
+    const collector = CkbHepler.instance.indexer.collector({
       lock: helpers.parseAddress(address),
       type: "empty",
     });
@@ -637,7 +652,7 @@ export class CkbHepler {
 
   // sudt balance
   async sudtBalance(address: string, typeScript: Script) {
-    const collector = indexer.collector({
+    const collector = CkbHepler.instance.indexer.collector({
       lock: helpers.parseAddress(address),
       type: typeScript,
       scriptSearchMode: "exact",
@@ -653,7 +668,9 @@ export class CkbHepler {
   async sudt_buildIssueNewToken(issuer: string, amount: number) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
-    let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+    let txSkeleton = helpers.TransactionSkeleton({
+      cellProvider: CkbHepler.instance.indexer,
+    });
 
     const issuerScript = helpers.parseAddress(issuer);
     const issuerAddress = helpers.encodeToAddress(issuerScript, {
@@ -694,7 +711,7 @@ export class CkbHepler {
 
     const xudtCellList: Cell[] = [];
 
-    const sudtUtxoCollector = indexer.collector({
+    const sudtUtxoCollector = CkbHepler.instance.indexer.collector({
       lock,
       type: {
         script: {
@@ -706,7 +723,7 @@ export class CkbHepler {
       },
     });
 
-    const xudtUtxoCollector = indexer.collector({
+    const xudtUtxoCollector = CkbHepler.instance.indexer.collector({
       lock,
       type: {
         script: {
@@ -798,7 +815,7 @@ export class CkbHepler {
 
     const sporeCellList: Cell[] = [];
 
-    const sporeCollector = indexer.collector({
+    const sporeCollector = CkbHepler.instance.indexer.collector({
       lock,
       type: {
         script: {
@@ -825,9 +842,11 @@ export class CkbHepler {
       .post(`${backend}/api/explore`)
       .set("Content-Type", "application/json")
       .send({
-        req: `https://${cfg.ckb_explorer_api
-          }/api/v1/address_transactions/${address}?page=${page + 1
-          }&page_size=10&sort=time.desc`,
+        req: `https://${
+          cfg.ckb_explorer_api
+        }/api/v1/address_transactions/${address}?page=${
+          page + 1
+        }&page_size=10&sort=time.desc`,
       })
       .catch((err) => {
         console.error(err);
@@ -924,7 +943,7 @@ export class CkbHepler {
     const xudtTypeScript = getXudtTypeScript(cfg.isMainnet);
     const sporeTypeScript = getSporeTypeScript(cfg.isMainnet);
 
-    const xudt_collector = indexer.collector({
+    const xudt_collector = CkbHepler.instance.indexer.collector({
       lock: helpers.parseAddress(address),
       type: {
         script: {
@@ -936,7 +955,7 @@ export class CkbHepler {
       },
     });
 
-    const spore_collector = indexer.collector({
+    const spore_collector = CkbHepler.instance.indexer.collector({
       lock: helpers.parseAddress(address),
       type: {
         script: {
@@ -1004,7 +1023,9 @@ export class CkbHepler {
   async withDrawXUDT(sudtToken: Script) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
-    let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+    let txSkeleton = helpers.TransactionSkeleton({
+      cellProvider: CkbHepler.instance.indexer,
+    });
 
     let isXUDT = false;
     const xudtScript = getXudtTypeScript(cfg.isMainnet);
@@ -1034,7 +1055,7 @@ export class CkbHepler {
       throw new Error("Please choose a wallet");
     }
 
-    const collect_sudt = indexer.collector({
+    const collect_sudt = CkbHepler.instance.indexer.collector({
       lock: {
         script: helpers.parseAddress(wallet.address),
         searchMode: "exact",
@@ -1233,7 +1254,7 @@ export class CkbHepler {
     )[0];
     console.log(prefixArgs);
 
-    const collect = indexer.collector({
+    const collect = CkbHepler.instance.indexer.collector({
       lock: {
         script: {
           codeHash: btcTimeLock.codeHash,
@@ -1429,10 +1450,15 @@ export class CkbHepler {
     const witnesses: (
       | string
       | { lock: string; inputType: string; outputType: string }
-    )[] = inputs.map((_, index) => (index === 0 ? serializeWitnessArgs(emptyWitness) : "0x"));
+    )[] = inputs.map((_, index) =>
+      index === 0 ? serializeWitnessArgs(emptyWitness) : "0x"
+    );
 
     // const cellDeps = [getSecp256k1CellDep(isMainnet), getXudtDep(isMainnet)];
-    const cellDeps = [getJoyIDCellDep(cfg.isMainnet), getXudtDep(cfg.isMainnet)];
+    const cellDeps = [
+      getJoyIDCellDep(cfg.isMainnet),
+      getXudtDep(cfg.isMainnet),
+    ];
 
     const unsignedTx = {
       version: "0x0",
@@ -1447,7 +1473,10 @@ export class CkbHepler {
     // const signedTx = collector.getCkb().signTransaction(CKB_TEST_PRIVATE_KEY)(
     //   unsignedTx
     // );
-    const signedTx = await signRawTransaction(unsignedTx as CKBTransaction, wallet.address);
+    const signedTx = await signRawTransaction(
+      unsignedTx as CKBTransaction,
+      wallet.address
+    );
 
     console.log(signedTx);
 
