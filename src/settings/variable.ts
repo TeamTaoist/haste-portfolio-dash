@@ -11,7 +11,7 @@ export const BTC_ASSETS_TOKEN =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU";
 export const BTC_ASSETS_ORGIN = "http://localhost";
 
-export const ckb_explorer_api = "testnet-api.explorer.nervos.org";
+export const ckb_explorer_api = "explorer.nervos.org";
 
 export const backend: string = "https://blockchain-serverless.vercel.app";
 

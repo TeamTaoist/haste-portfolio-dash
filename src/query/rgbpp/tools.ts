@@ -1,7 +1,13 @@
 import { getEnv } from "@/settings/env";
+import { btc_utxo, RgbAssert } from "@/types/BTC";
+import { getUtxo } from "../btc/memepool";
+import { helpers } from "@ckb-lumos/lumos";
+import { getXudtAndSpore } from "../ckb/tools";
+import { buildRgbppLockArgs, genRgbppLockScript } from "@rgbpp-sdk/ckb"
+
 
 export const getRgbppAssert = async(address: string) => {
-    const result: btc_utxo[] | undefined = await BtcHepler.instance.getUtxo(
+    const result: btc_utxo[] | undefined = await getUtxo(
       address
     );
 
@@ -37,8 +43,7 @@ export const getRgbppAssert = async(address: string) => {
       // const xudtTypeScript = getXudtTypeScript(isMainnet);
       for await (const rgbppLock of rgbppLocks) {
         const address = helpers.encodeToAddress(rgbppLock.lock);
-        const { xudtList, sporeList } =
-          await CkbHepler.instance.getXudtAndSpore(address);
+        const { xudtList, sporeList } = await getXudtAndSpore(address);
 
         if (xudtList.length > 0) {
           for (let i = 0; i < xudtList.length; i++) {

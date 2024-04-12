@@ -1,8 +1,9 @@
 import { getEnv } from "@/settings/env";
-import { CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeTypeScript, getXudtTypeScript, MainnetInfo, TestnetInfo } from "@/settings/variable";
+import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeTypeScript, getXudtTypeScript, MainnetInfo, TestnetInfo } from "@/settings/variable";
 import { ckb_SporeInfo, ckb_UDTInfo } from "@/types/BTC";
 import { number } from "@ckb-lumos/codec";
 import { BI, Cell, config, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
+import superagent from "superagent";
 
 config.initializeConfig(CONFIG);
 
@@ -131,3 +132,21 @@ export const getXudtAndSpore = async(address: string) => {
 
 
 }
+
+export const getTx = async(address: string, page: number = 0) => {
+    const rs = await superagent
+      .post(`${backend}/api/explore`)
+      .set("Content-Type", "application/json")
+      .send({
+        req: `https://${getEnv() === 'Mainnet' ? 'mainnet-api': 'testnet-api'}.${ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
+          page + 1
+        }&page_size=10&sort=time.desc`,
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (rs && rs.status == 200) {
+      return rs.text !== '' ? JSON.parse(rs.text): [];
+    }
+  }

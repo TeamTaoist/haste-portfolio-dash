@@ -316,3 +316,11 @@ export interface ckb_LiveCell {
 
 // type
 export type WalletType = "none" | "unisat" | "okx" | "joyid";
+
+export interface groupedTransaction {
+  [date: string]: ckb_TxInfo[];
+}
+
+export interface btcGroupedTransaction {
+  [date: string]: ckb_TxInfo[];
+}

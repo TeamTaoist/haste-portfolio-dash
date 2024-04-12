@@ -6,18 +6,26 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from "@/store/store";
 import { getBTCAsset } from "@/query/btc/tools";
 import { getXudtAndSpore } from "@/query/ckb/tools";
-import { ckb_SporeInfo, ckb_UDTInfo } from "@/types/BTC";
+import { ckb_SporeInfo, ckb_UDTInfo, RgbAssert } from "@/types/BTC";
+import { getRgbppAssert } from "@/query/rgbpp/tools";
 
 
 export default function UDTList() {
-  const [xudtList, setXudtList] = useState<ckb_UDTInfo[]>([]);
+  const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
 
-  const _getSpore = async(address: string) => {
+  const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
     setXudtList(assetsList.xudtList);
+    setIsLoading(false);
+  }
+
+  const _getRgbAsset = async(address: string) => {
+    const assetsList = await getRgbppAssert(address);
+    const rgbAssetList = assetsList.map(asset => asset.ckbCellInfo);
+    setXudtList(rgbAssetList)
     setIsLoading(false);
   }
 
@@ -25,9 +33,9 @@ export default function UDTList() {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
     const chain = currentWallet?.chain;
     if ( chain && chain === 'btc') {
-
+      await _getRgbAsset(currentWallet?.address!!)
     } else if (chain && chain === 'ckb') {
-      const list = await _getSpore(currentWallet?.address!!);
+      const list = await _getSporeAndXudt(currentWallet?.address!!);
     }
   }
 
@@ -83,16 +91,16 @@ export default function UDTList() {
                       />
                     </div>
                     <div>
-                      <p className="font-semibold">{xudt.symbol}</p>
+                      <p className="font-semibold">{xudt && xudt.symbol}</p>
                       <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
-                        {xudt.symbol}
+                        {xudt && xudt.symbol}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
                   <p className="text-sm sm:text-base text-default font-semibold truncate">
-                    {xudt.amount}
+                    {xudt && xudt.amount}
                   </p>
                   <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--
