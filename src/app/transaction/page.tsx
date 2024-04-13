@@ -9,6 +9,7 @@ import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
 import { btc_TxInfo, btcGroupedTransaction, BTCTxInfo, ckb_TxInfo, groupedTransaction, GroupedTransactions, BitcoinTransaction, TransactionDetails } from "@/types/BTC";
 import { BI, BIish } from "@ckb-lumos/lumos";
+import { formatUnit } from "@ckb-lumos/bi";
 
 export default function Transaction() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
@@ -36,27 +37,45 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
     const fromAddresses = transaction.vin.map(input => input.prevout.scriptpubkey_address);
     let toAddress = currentAddress;
     let transferredValue = BI.from(0);
+    let inputValue = {
+
+    }
+    let outputValue = {
+
+    }
+    transaction.vin.forEach(input => {
+      //@ts-ignore
+      if(inputValue[input.prevout.scriptpubkey_address]) {
+        //@ts-ignore
+        inputValue[input.prevout.scriptpubkey_address] = inputValue[input.prevout.scriptpubkey_address].add(BI.from(input.prevout.value))
+      } else {
+        //@ts-ignore
+        inputValue[input.prevout.scriptpubkey_address] = BI.from(input.prevout.value)
+      }    
+    });
 
     // Calculate the value being transferred to different addresses
     transaction.vout.forEach(output => {
-        if (output.scriptpubkey_address && output.scriptpubkey_address !== currentAddress) {
-            if (fromAddresses.includes(currentAddress)) {
-                if (output.scriptpubkey_address !== currentAddress) {
-                    toAddress = output.scriptpubkey_address;
-                    transferredValue = BI.from(transferredValue).add(output.value);
-                }
-            } else {
-                transferredValue = BI.from(transferredValue).add(output.value);
-            }
-        }
+      if(!output.scriptpubkey_address) return
+      //@ts-ignore
+      if(outputValue[output.scriptpubkey_address]) {
+        //@ts-ignore
+        outputValue[output.scriptpubkey_address] = outputValue[output.scriptpubkey_address].add(BI.from(output.value))
+      } else {
+        //@ts-ignore
+        outputValue[output.scriptpubkey_address] = BI.from(output.value)
+      }    
     });
+
+
 
     const transactionTime = new Date(transaction.status.block_time * 1000).toLocaleTimeString('en-US');
 
     return {
         fromAddress: fromAddresses.join(', '),
         toAddress,
-        value: transferredValue.toString(),
+        //@ts-ignore
+        value: outputValue[currentAddress!!].sub(inputValue[currentAddress] || 0).toString() ,
         txid: transaction.txid,
         transactionTime
     };
@@ -68,6 +87,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
     const grouped: GroupedTransactions = {};
 
     transactions.forEach(transaction => {
+      console.log(transaction)
       const transactionDetails = processTransaction(transaction);
       
       // Convert the block_time to a date string
@@ -96,6 +116,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
   const _getBTCTx = async() => {
     const list = await getBTCTx(currentAddress!!);
     if(!list) return
+    console.log(list);
     setBtcGroupData(groupTransactionsByDate(list!!));
   }
 
@@ -168,7 +189,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                                     hours={transaction.transactionTime}
                                     type={BI.from(transaction.value).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND} 
                                     amount={
-                                      BI.from(transaction.value).abs().div((BI.from(10).pow(9))).toString()
+                                      formatUnit(transaction.value, 'ckb')
                                     } 
                                     token={'btc'}
                                 />

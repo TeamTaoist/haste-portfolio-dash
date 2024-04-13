@@ -379,7 +379,6 @@ export interface GroupedTransactions {
 }
 
 export interface TransactionDetails {
-    type: TransactionDetails;
     fromAddress: string;
     toAddress: string | undefined;
     value: string;
