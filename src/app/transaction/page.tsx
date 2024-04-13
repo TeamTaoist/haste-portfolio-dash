@@ -7,8 +7,8 @@ import { getTx as getBTCTx } from "@/query/btc/memepool";
 import { getTx as getCKBTx } from "@/query/ckb/tools";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
-import { btcGroupedTransaction, ckb_TxInfo, groupedTransaction } from "@/types/BTC";
-import { BI } from "@ckb-lumos/lumos";
+import { btc_TxInfo, btcGroupedTransaction, BTCTxInfo, ckb_TxInfo, groupedTransaction, GroupedTransactions, BitcoinTransaction, TransactionDetails } from "@/types/BTC";
+import { BI, BIish } from "@ckb-lumos/lumos";
 
 export default function Transaction() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
@@ -16,13 +16,13 @@ export default function Transaction() {
   const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
   const [chain, setChain] = useState<string>("");
   const [groupedData, setGroupedData] = useState<groupedTransaction>()
-  const [btcGroupData, setBtcGroupData] = useState<btcGroupedTransaction> ()
+  const [btcGroupData, setBtcGroupData] = useState<GroupedTransactions> ()
 
   const groupTransaction = (transactions: ckb_TxInfo[]) => {
     const grouped: groupedTransaction = {};
     if(!transactions) return
     transactions.forEach(transaction => {
-        const date = transaction.attributes.created_at.split(' ')[0]; // 提取日期部分
+        const date = transaction.attributes.created_at.split(' ')[0]; 
         if (!grouped[date]) {
             grouped[date] = [];
         }
@@ -31,16 +31,72 @@ export default function Transaction() {
     return grouped;
   }
 
+function processTransaction(transaction: BTCTxInfo): TransactionDetails {
+    //@ts-ignore
+    const fromAddresses = transaction.vin.map(input => input.prevout.scriptpubkey_address);
+    let toAddress = currentAddress;
+    let transferredValue = BI.from(0);
+
+    // Calculate the value being transferred to different addresses
+    transaction.vout.forEach(output => {
+        if (output.scriptpubkey_address && output.scriptpubkey_address !== currentAddress) {
+            if (fromAddresses.includes(currentAddress)) {
+                if (output.scriptpubkey_address !== currentAddress) {
+                    toAddress = output.scriptpubkey_address;
+                    transferredValue = BI.from(transferredValue).add(output.value);
+                }
+            } else {
+                transferredValue = BI.from(transferredValue).add(output.value);
+            }
+        }
+    });
+
+    const transactionTime = new Date(transaction.status.block_time * 1000).toLocaleTimeString('en-US');
+
+    return {
+        fromAddress: fromAddresses.join(', '),
+        toAddress,
+        value: transferredValue.toString(),
+        txid: transaction.txid,
+        transactionTime
+    };
+  }
+
+
+
+  function groupTransactionsByDate(transactions: BTCTxInfo[]): GroupedTransactions {
+    const grouped: GroupedTransactions = {};
+
+    transactions.forEach(transaction => {
+      const transactionDetails = processTransaction(transaction);
+      
+      // Convert the block_time to a date string
+      const date = new Date(transaction.status.block_time * 1000).toISOString().split('T')[0];
+
+      // Initialize the date key if it does not exist
+      if (!grouped[date]) {
+          grouped[date] = [];
+      }
+
+      // Add the processed transaction to the appropriate date
+      //@ts-ignore
+      grouped[date].push(transactionDetails);
+    });
+    return grouped;
+  }
+
+
+
   const _getCKBTx = async() => {
     const list = await getCKBTx(currentAddress!!);
     const groupedTx = groupTransaction(list.data);
-    console.log(groupedTx);
     setGroupedData(groupedTx);
   }
 
   const _getBTCTx = async() => {
     const list = await getBTCTx(currentAddress!!);
-    console.log(list);
+    if(!list) return
+    setBtcGroupData(groupTransactionsByDate(list!!));
   }
 
   useEffect(() => {
@@ -68,7 +124,9 @@ export default function Transaction() {
           </div>
           <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
             {
-                (chain && chain === 'btc') && <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
+                (chain && chain === 'ckb') && 
+                
+                <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
                     {groupedData && Object.keys(groupedData).map(date => (
                         <div key={date} className="top-0 font-medium text-sm py-4">
                             <div className="px-4 text-sm text-subdued mb-2">
@@ -86,6 +144,33 @@ export default function Transaction() {
                                       BI.from(transaction.attributes.income.split('.')[0]).abs().div((BI.from(10).pow(8))).toString()
                                     } 
                                     token={transaction.type === 'ckb_transactions' ? 'ckb': 'btc'}
+                                />
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            }
+            {
+                (chain && chain === 'btc') && 
+                
+                <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
+                    {btcGroupData && Object.keys(btcGroupData).map(date => (
+                        <div key={date} className="top-0 font-medium text-sm py-4">
+                            <div className="px-4 text-sm text-subdued mb-2">
+                                {date} 
+                            </div>
+                            {btcGroupData[date].map((transaction, index) => (
+                                <TransactionItem
+                                    key={index}
+                                    transaction={transaction.txid}
+                                    from={transaction.fromAddress}
+                                    to={transaction.toAddress!!}
+                                    hours={transaction.transactionTime}
+                                    type={BI.from(transaction.value).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND} 
+                                    amount={
+                                      BI.from(transaction.value).abs().div((BI.from(10).pow(9))).toString()
+                                    } 
+                                    token={'btc'}
                                 />
                             ))}
                         </div>

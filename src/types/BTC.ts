@@ -326,5 +326,63 @@ export interface groupedTransaction {
 }
 
 export interface btcGroupedTransaction {
-  [date: string]: ckb_TxInfo[];
+  [date: string]: BTCTxInfo[];
 }
+
+export interface TransactionInput {
+    txid: string;
+    vout: number;
+    scriptsig: string;
+    scriptsig_asm: string;
+    is_coinbase: boolean;
+    sequence: number;
+    witness: string[];
+    prevout: {
+        scriptpubkey: string;
+        scriptpubkey_asm: string;
+        scriptpubkey_type: string;
+        scriptpubkey_address: string;
+        value: number;
+    };
+}
+
+export interface TransactionOutput {
+    value: number;
+    scriptpubkey: string;
+    scriptpubkey_asm: string;
+    scriptpubkey_type: string;
+    scriptpubkey_address?: string;
+}
+
+export interface TransactionStatus {
+    confirmed: boolean;
+    block_height: number;
+    block_hash: string;
+    block_time: number; // Unix timestamp
+}
+
+export interface BitcoinTransaction {
+    txid: string;
+    version: number;
+    locktime: number;
+    vin: TransactionInput[];
+    vout: TransactionOutput[];
+    size: number;
+    weight: number;
+    sigops?: number;
+    fee: number;
+    status: TransactionStatus;
+}
+
+export interface GroupedTransactions {
+    [date: string]: TransactionDetails[];
+}
+
+export interface TransactionDetails {
+    type: TransactionDetails;
+    fromAddress: string;
+    toAddress: string | undefined;
+    value: string;
+    txid: string;
+    transactionTime: string;
+} 
