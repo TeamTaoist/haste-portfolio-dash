@@ -1530,7 +1530,7 @@ export class CkbHepler {
 
   async test_transferXudt(
     xudtType: Script,
-    receivers: [{ toAddress: string; transferAmount: bigint }]
+    receivers: { toAddress: string; transferAmount: bigint }[]
   ) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
