@@ -139,7 +139,7 @@ export const DispatchPanel = observer(() => {
     const xUDTScript: CKBComponents.Script = {
       "codeHash": codeHash,
       "args": scriptArgs,
-      "hashType": "type"
+      "hashType": "data1"
     };
 
 
