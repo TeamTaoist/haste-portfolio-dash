@@ -113,9 +113,9 @@ export const DispatchPanel = observer(() => {
     let amounts = new Map<string, bigint>();
     data.map((item) => {
       if (amounts[item.toAddress]) {
-        amounts[item.toAddress] += item.transferAmount;
+        amounts[item.toAddress] += item.transferAmount * BigInt(100000000);
       } else {
-        amounts[item.toAddress] = item.transferAmount;
+        amounts[item.toAddress] = item.transferAmount * BigInt(100000000);
       }
     });
 
