@@ -114,7 +114,12 @@ export class CkbHepler {
       throw new Error("Please choose a wallet");
     }
 
+    console.log("==========wallet",wallet)
+
     const unsigned = await this.buildTransfer(options);
+
+
+    console.log("==========unsigned",unsigned)
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
     if (wallet.walletName == "joyidckb") {
@@ -387,17 +392,17 @@ export class CkbHepler {
     if (sudtToken.codeHash == xudtScript.codeHash) {
       isXUDT = true;
     }
-    console.log("script is xudt", isXUDT);
+    console.log("script is xudt", isXUDT,CONFIG);
 
-    const fromScript = helpers.parseAddress(options.from);
+    const fromScript = helpers.parseAddress(options.from, { config: CONFIG });
     const fromAddress = helpers.encodeToAddress(fromScript, { config: CONFIG });
 
-    console.log(fromAddress);
+    console.log("fromAddress----",fromAddress);
 
-    const toScript = helpers.parseAddress(options.to);
+    const toScript = helpers.parseAddress(options.to, { config: CONFIG });
     const toAddress = helpers.encodeToAddress(toScript, { config: CONFIG });
 
-    console.log(toAddress);
+    console.log("toAddress----",toAddress);
 
     // const sudt_from = await this.sudtBalance(fromAddress, sudtToken);
     // const sudt_to = await this.sudtBalance(toAddress, sudtToken);
@@ -435,6 +440,7 @@ export class CkbHepler {
     let sudt_sumCapacity = BI.from(0);
     let sudt_sumAmount = BI.from(0);
 
+
     for await (const collect of collect_sudt.collect()) {
       inputs_sudt.push(collect);
 
@@ -454,21 +460,35 @@ export class CkbHepler {
         }
       }
     }
+
+
     // >>
     if (sudt_sumAmount.lt(options.amount)) {
       throw new Error("Not enough sudt amount");
     }
 
+    console.log("inputs_sudt",inputs_sudt)
     for (let i = 0; i < inputs_sudt.length; i++) {
       const input = inputs_sudt[i];
       input.cellOutput.capacity = "0x0";
-      txSkeleton = await commons.common.setupInputCell(txSkeleton, input);
+
+      console.log("inputs_sudt[i]=",inputs_sudt[i],i,fromAddress,CONFIG)
+
+
+      txSkeleton = await commons.common.setupInputCell(txSkeleton, input,fromAddress,{ config: CONFIG });
+
+      console.log("txSkeleton",txSkeleton)
+
     }
+
+
 
     let outputCapacity = BI.from(0);
 
     const outputData = number.Uint128LE.pack(options.amount);
     const newOutputData = outputData;
+
+
 
     const outputs_sudt: Cell = {
       cellOutput: {

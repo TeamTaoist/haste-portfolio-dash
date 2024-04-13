@@ -1,0 +1,160 @@
+import { AssetInfo, ckb_TxInfo, txInfo } from "../interface";
+import { EventManager } from "../manager/EventManager";
+import { EventType } from "../enum";
+import { DataManager } from "../manager/DataManager";
+import { BI } from "@ckb-lumos/lumos";
+import { BtcHepler } from "../wallet/BtcHelper";
+import { CkbHepler } from "../wallet/CkbHelper";
+import { RGBHelper } from "../wallet/RGBHelper";
+export class HttpManager {
+  private static _instance: HttpManager;
+  private constructor() {}
+
+  public static get instance() {
+    if (!HttpManager._instance) {
+      HttpManager._instance = new HttpManager();
+    }
+    return this._instance;
+  }
+
+  public async getAsset(address: string) {
+    EventManager.instance.publish(EventType.dashboard_page_hide_tabs, {});
+    EventManager.instance.publish(EventType.dashboard_assets_hide, {});
+
+    let hasTabs = false;
+
+    const assetList: AssetInfo[] = [];
+
+    if (address.startsWith("ckb") || address.startsWith("ckt")) {
+      // ckb chain
+      hasTabs = true;
+
+      const ckbBalance = await CkbHepler.instance.capacityOf(address);
+      if (ckbBalance) {
+        assetList.push({
+          chain: "CKB",
+          balance: BI.from(ckbBalance),
+        });
+
+        const { xudtList, sporeList } =
+          await CkbHepler.instance.getXudtAndSpore(address);
+
+        const xudtPendingList = await CkbHepler.instance.getRgbppPendingAssert(
+          address
+        );
+
+        xudtList.push(...xudtPendingList);
+
+        DataManager.instance.tokens = {
+          udt: xudtList,
+          spore: sporeList,
+        };
+      } else {
+        assetList.push({
+          chain: "CKB",
+          balance: BI.from(0),
+        });
+      }
+    } else {
+      // btc chain
+      const btcBalance = await BtcHepler.instance.getBTC(address);
+      if (btcBalance) {
+        assetList.push({
+          chain: "BTC",
+          balance: BI.from(btcBalance.chain_stats.funded_txo_sum).sub(
+            BI.from(btcBalance.chain_stats.spent_txo_sum)
+          ),
+        });
+      } else {
+        assetList.push({
+          chain: "BTC",
+          balance: BI.from(0),
+        });
+      }
+
+      // const rs = await RGBHelper.instance.retryBtcTxId(
+      //   "012051cf08ec7701a9ecbdebbceef49af3662d10c898471b42562475a6d85bac"
+      // );
+      // console.log("retry", rs);
+
+      // await RGBHelper.instance.getRgbAssertByService(
+      //   "012051cf08ec7701a9ecbdebbceef49af3662d10c898471b42562475a6d85bac",
+      //   address
+      // );
+
+      const rgbAssertList = await RGBHelper.instance.getRgbppAssert(address);
+      DataManager.instance.curRgbAssert = rgbAssertList;
+    }
+
+    if (hasTabs) {
+      EventManager.instance.publish(EventType.dashboard_page_show_tabs, {});
+    } else {
+      EventManager.instance.publish(EventType.dashboard_page_hide_tabs, {});
+    }
+
+    DataManager.instance.curAsset = assetList;
+    EventManager.instance.publish(EventType.dashboard_assets_show, {});
+    return assetList;
+  }
+
+  public async getTransactions(
+    address: string,
+    after_tx?: string,
+    page: number = 1
+  ) {
+    if (page == 1) {
+      EventManager.instance.publish(EventType.transaction_item_hide, {});
+    }
+
+    const txInfoList: txInfo[] = [];
+    if (address.startsWith("ckb") || address.startsWith("ckt")) {
+      const pendingTxList = await CkbHepler.instance.getPendingTx(address);
+      const txList = await CkbHepler.instance.getTx(address, page - 1);
+
+      for (let i = 0; i < pendingTxList.length; i++) {
+        const tx = pendingTxList[i];
+        txInfoList.push({
+          txHash: tx.attributes.transaction_hash,
+          block: "Pending",
+        });
+      }
+
+      for (let i = 0; i < txList.data.length; i++) {
+        const tx = txList.data[i] as ckb_TxInfo;
+        txInfoList.push({
+          txHash: tx.attributes.transaction_hash,
+          block: tx.attributes.block_number,
+        });
+      }
+    } else {
+      const txList = await BtcHepler.instance.getTx(address, after_tx);
+
+      console.log("BTC tx", txList);
+
+      if (txList) {
+        for (let i = 0; i < txList.length; i++) {
+          const tx = txList[i];
+          txInfoList.push({
+            txHash: tx.txid,
+            block: tx.status.block_height
+              ? tx.status.block_height.toString()
+              : "Pending",
+          });
+        }
+      }
+    }
+
+    if (page == 1) {
+      DataManager.instance.curTxList = [];
+    }
+
+    DataManager.instance.curTxList.push(...txInfoList);
+
+    if (page == 1) {
+      EventManager.instance.publish(EventType.transaction_reload_page, {});
+      EventManager.instance.publish(EventType.transaction_item_show, {});
+    } else {
+      EventManager.instance.publish(EventType.transaction_item_load_more, {});
+    }
+  }
+}

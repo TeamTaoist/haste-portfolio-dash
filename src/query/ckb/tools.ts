@@ -118,7 +118,6 @@ export const getXudtAndSpore = async(address: string) => {
       if (sporeCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
 
-        console.log("=====sporeCell====",sporeCell)
 
         sporeList.push({
           symbol: "DOBs",

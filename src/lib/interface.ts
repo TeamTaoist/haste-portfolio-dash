@@ -1,41 +1,5 @@
-import { BI, BIish } from "@ckb-lumos/bi";
-import { Script } from "@ckb-lumos/lumos";
-
-export interface BTCAccountInfo {
-  address: string;
-  chain_stats: {
-    funded_txo_count: number;
-    funded_txo_sum: number;
-    spent_txo_count: number;
-    spent_txo_sum: number;
-    tx_count: number;
-  };
-  mempool_stats: {
-    funded_txo_count: number;
-    funded_txo_sum: number;
-    spent_txo_count: number;
-    spent_txo_sum: number;
-    tx_count: number;
-  };
-}
-
-export interface BTCTxInfo {
-  txid: string;
-  version: number;
-  locktime: number;
-  vin: { [key: string]: string }[];
-  vout: { [key: string]: string }[];
-  size: number;
-  weight: number;
-  fee: number;
-  status: {
-    confirmed: boolean;
-    block_height: number;
-    block_hash: string;
-    block_time: number;
-  };
-}
-
+import { BIish } from "@ckb-lumos/bi";
+import { BI, Script } from "@ckb-lumos/lumos";
 export interface AccountData {
   chain: string;
   addr: string;
@@ -97,6 +61,8 @@ export interface ckb_TxInfo {
     cells: string[][];
   }[];
   lastCursor: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  attributes?: any;
 }
 
 export interface txInfo {
@@ -163,12 +129,7 @@ export interface ckb_SporeInfo {
   decimal?: string;
   display_name?: string;
   uan?: string;
-  outPoint?:{
-    txHash:string;
-    index:string;
-  };
   type_script: Script;
-  ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
 }
 
 export interface ckb_UDTInfo {
@@ -178,7 +139,7 @@ export interface ckb_UDTInfo {
   udt_icon_file?: string;
   udt_type: "xUDT";
   type_script: Script;
-  ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
+  isPending?: boolean;
 }
 
 export interface ckb_AddressInfo {
@@ -237,50 +198,61 @@ export interface btc_TxInfo {
   };
 }
 
-export interface ckb_TxInfo {
-  id: string;
-  type: "ckb_transactions";
-  attributes: {
-    is_cellbase: boolean;
-    transaction_hash: string;
-    block_number: string;
-    block_timestamp: string;
-    display_inputs_count: number;
-    display_outputs_count: number;
-    display_inputs: {
-      id: string;
-      from_cellbase: boolean;
-      capacity: string;
-      occupied_capacity: string;
-      address_hash: string;
-      generated_tx_hash: string;
-      cell_index: string;
-      cell_type: string;
-      since: {
-        raw: string;
-        median_timestamp: string;
-      };
-    }[];
-    display_outputs: {
-      id: string;
-      capacity: string;
-      occupied_capacity: string;
-      address_hash: string;
-      status: string;
-      consumed_tx_hash: string;
-      cell_type: string;
-    }[];
-    income: string;
-    created_at: string;
-    create_timestamp: string;
+export interface ckb_TxInfo_new {
+  data: {
+    id: string;
+    type: "ckb_transactions";
+    attributes: {
+      is_cellbase: boolean;
+      transaction_hash: string;
+      block_number: string;
+      block_timestamp: string;
+      display_inputs_count: number;
+      display_outputs_count: number;
+      display_inputs: {
+        id: string;
+        from_cellbase: boolean;
+        capacity: string;
+        occupied_capacity: string;
+        address_hash: string;
+        generated_tx_hash: string;
+        cell_index: string;
+        cell_type: string;
+        since: {
+          raw: string;
+          median_timestamp: string;
+        };
+      }[];
+      display_outputs: {
+        id: string;
+        capacity: string;
+        occupied_capacity: string;
+        address_hash: string;
+        status: string;
+        consumed_tx_hash: string;
+        cell_type: string;
+        extra_info?: {
+          amount: string;
+          decimal: string;
+          name: string;
+          symbol: string;
+        };
+      }[];
+      income: string;
+      created_at: string;
+      create_timestamp: string;
+    };
   };
 }
 
 export interface WalletInfo {
   address: string;
-  pubkey: string;
-  type: WalletType;
-  chain: "BTC" | "CKB";
+  pubkey?: string;
+  pubKey?: string;
+  balance?:string;
+  type?: WalletType;
+  walletName?: WalletType;
+  chain: "BTC" | "CKB"|"btc" | "ckb";
 }
 
 export interface RgbAssert {
@@ -320,71 +292,21 @@ export interface ckb_LiveCell {
   };
 }
 
+export interface xudt_info {
+  decimal: number;
+  name: string;
+  symbol: string;
+}
+
+export interface CellOutPutData {
+  data: {
+    id: string;
+    type: string;
+    attributes: {
+      data: string;
+    };
+  };
+}
+
 // type
 export type WalletType = "none" | "unisat" | "okx" | "joyid";
-
-export interface groupedTransaction {
-  [date: string]: ckb_TxInfo[];
-}
-
-export interface btcGroupedTransaction {
-  [date: string]: BTCTxInfo[];
-}
-
-export interface TransactionInput {
-    txid: string;
-    vout: number;
-    scriptsig: string;
-    scriptsig_asm: string;
-    is_coinbase: boolean;
-    sequence: number;
-    witness: string[];
-    prevout: {
-        scriptpubkey: string;
-        scriptpubkey_asm: string;
-        scriptpubkey_type: string;
-        scriptpubkey_address: string;
-        value: number;
-    };
-}
-
-export interface TransactionOutput {
-    value: number;
-    scriptpubkey: string;
-    scriptpubkey_asm: string;
-    scriptpubkey_type: string;
-    scriptpubkey_address?: string;
-}
-
-export interface TransactionStatus {
-    confirmed: boolean;
-    block_height: number;
-    block_hash: string;
-    block_time: number; // Unix timestamp
-}
-
-export interface BitcoinTransaction {
-    txid: string;
-    version: number;
-    locktime: number;
-    vin: TransactionInput[];
-    vout: TransactionOutput[];
-    size: number;
-    weight: number;
-    sigops?: number;
-    fee: number;
-    status: TransactionStatus;
-}
-
-export interface GroupedTransactions {
-    [date: string]: TransactionDetails[];
-}
-
-export interface TransactionDetails {
-    fromAddress: string;
-    toAddress: string | undefined;
-    value: string;
-    txid: string;
-    transactionTime: string;
-}
-
