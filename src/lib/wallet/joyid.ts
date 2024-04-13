@@ -1,14 +1,28 @@
 import { bytes } from "@ckb-lumos/codec";
 import * as blockchain from "@ckb-lumos/base/lib/blockchain";
-import { WitnessArgs, commons, helpers, Script, Cell } from "@ckb-lumos/lumos";
+import {
+  WitnessArgs,
+  commons,
+  helpers,
+  Script,
+  Cell,
+  // CellDep,
+  utils,
+} from "@ckb-lumos/lumos";
 import type * as api from "@ckb-lumos/base";
 import {
   getJoyIDLockScript,
   getJoyIDCellDep,
   getConfig,
+  Aggregator,
   // connect,
 } from "@joyid/ckb";
-import { isTestNet, mainConfig, testConfig } from "./constants";
+import {
+  // getCotaTypeScript,
+  isTestNet,
+  mainConfig,
+  testConfig,
+} from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import { accountStore } from "@/store/AccountStore";
 
@@ -142,64 +156,62 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
           console.log("JoyID config: ", getConfig());
           // console.log("JoyID connection: ", connection);
 
-          // const lock = helpers.parseAddress(wallet.address, {
-          //   config: cfg.CONFIG,
-          // });
+          const lock = helpers.parseAddress(wallet.address, {
+            config: cfg.CONFIG,
+          });
 
           // will change if the connection.keyType is a sub_key
-          const newWitnessArgs: WitnessArgs = {
+          let newWitnessArgs: WitnessArgs = {
             lock: "0x",
           };
 
-          // if (wallet.keyType === "sub_key") {
-          //   const aggregator = new Aggregator(
-          //     "https://cota.nervina.dev/aggregator"
-          //   );
+          if (wallet.keyType === "sub_key") {
+            const aggregator = new Aggregator(cfg.aggregatorUrl);
 
-          //   const pubkeyHash = bytes
-          //     .bytify(utils.ckbHash("0x" + wallet.pubkey))
-          //     .slice(0, 20);
+            const pubkeyHash = bytes
+              .bytify(utils.ckbHash("0x" + wallet.pubkey))
+              .slice(0, 20);
 
-          //   const { unlock_entry: unlockEntry } =
-          //     await aggregator.generateSubkeyUnlockSmt({
-          //       // TODO TBD
-          //       alg_index: 1,
-          //       pubkey_hash: bytes.hexify(pubkeyHash),
-          //       lock_script: bytes.hexify(blockchain.Script.pack(lock)),
-          //     });
-          //   newWitnessArgs = {
-          //     lock: "0x",
-          //     inputType: "0x",
-          //     outputType: "0x" + unlockEntry,
-          //   };
+            const { unlock_entry: unlockEntry } =
+              await aggregator.generateSubkeyUnlockSmt({
+                // TODO TBD
+                alg_index: 1,
+                pubkey_hash: bytes.hexify(pubkeyHash),
+                lock_script: bytes.hexify(blockchain.Script.pack(lock)),
+              });
+            newWitnessArgs = {
+              lock: "0x",
+              inputType: "0x",
+              outputType: "0x" + unlockEntry,
+            };
 
-          //   const cotaType = getCotaTypeScript(
-          //     getConfig().network === "mainnet"
-          //   );
-          //   const cotaCollector = txSkeleton
-          //     .get("cellProvider")
-          //     ?.collector({ lock: lock, type: cotaType });
+            // const cotaType = getCotaTypeScript(
+            //   getConfig().network === "mainnet"
+            // );
+            // const cotaCollector = txSkeleton
+            //   .get("cellProvider")
+            //   ?.collector({ lock: lock, type: cotaType });
 
-          //   const cotaCells: Cell[] = [];
-          //   if (cotaCollector) {
-          //     for await (const cotaCell of cotaCollector.collect()) {
-          //       cotaCells.push(cotaCell);
-          //     }
-          //   }
+            // const cotaCells: Cell[] = [];
+            // if (cotaCollector) {
+            //   for await (const cotaCell of cotaCollector.collect()) {
+            //     cotaCells.push(cotaCell);
+            //   }
+            // }
 
-          //   if (!cotaCells || cotaCells.length === 0) {
-          //     throw new Error("Cota cell doesn't exist");
-          //   }
-          //   const cotaCell = cotaCells[0];
-          //   const cotaCellDep: CellDep = {
-          //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          //     outPoint: cotaCell.outPoint as any,
-          //     depType: "code",
-          //   };
+            // if (!cotaCells || cotaCells.length === 0) {
+            //   throw new Error("Cota cell doesn't exist");
+            // }
+            // const cotaCell = cotaCells[0];
+            // const cotaCellDep: CellDep = {
+            //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            //   outPoint: cotaCell.outPoint as any,
+            //   depType: "code",
+            // };
 
-          //   // note: COTA cell MUST put first
-          //   txSkeleton = addCellDep(txSkeleton, cotaCellDep);
-          // }
+            // // note: COTA cell MUST put first
+            // txSkeleton = addCellDep(txSkeleton, cotaCellDep);
+          }
 
           txSkeleton = addCellDep(txSkeleton, getJoyIDCellDep(isMainnet));
 

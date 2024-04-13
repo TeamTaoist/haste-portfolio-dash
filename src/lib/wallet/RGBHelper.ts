@@ -1,4 +1,4 @@
-import { BI, Script, helpers } from "@ckb-lumos/lumos";
+import { BI, Script, helpers, utils } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@rgbpp-sdk/ckb";
 import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
 import {
+  Aggregator,
   CKBTransaction,
   getJoyIDCellDep,
   getJoyIDLockScript,
@@ -23,7 +24,7 @@ import { bytes } from "@ckb-lumos/codec";
 import { blockchain } from "@ckb-lumos/base";
 import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
-import { accountStore } from "@/store/AccountStore";
+import { AccountType, accountStore } from "@/store/AccountStore";
 import { isTestNet, mainConfig, testConfig } from "./constants";
 
 export class RGBHelper {
@@ -141,7 +142,7 @@ export class RGBHelper {
 
     const unsignedRawTx = await this.ckb_to_btc_buildTx(
       buildRgbppLockArgs(btcTxIdx, btcTxHash),
-      wallet as WalletInfo,
+      wallet as AccountType,
       typeScript,
       amount
     );
@@ -251,7 +252,7 @@ export class RGBHelper {
 
   async ckb_to_btc_buildTx(
     toRgbppLockArgs: string,
-    ckb_wallet: WalletInfo,
+    ckb_wallet: AccountType,
     typeScript: Script,
     amount: bigint = 0n
   ) {
@@ -298,32 +299,30 @@ export class RGBHelper {
     const joyidScropt = getJoyIDLockScript(cfg.isMainnet);
     if (lock.codeHash == joyidScropt.codeHash) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const newWitnessArgs: any = {
+      let newWitnessArgs: any = {
         lock: "0x",
       };
-      // if (DataManager.instance.joyIdConnectionType == "sub_key") {
-      //   const aggregator = new Aggregator(
-      //     "https://cota.nervina.dev/aggregator"
-      //   );
-      //   const pubkeyHash = bytes
-      //     .bytify(utils.ckbHash("0x" + ckb_wallet.pubkey))
-      //     .slice(0, 20);
+      if (ckb_wallet.keyType == "sub_key") {
+        const aggregator = new Aggregator(cfg.aggregatorUrl);
+        const pubkeyHash = bytes
+          .bytify(utils.ckbHash("0x" + ckb_wallet.pubkey))
+          .slice(0, 20);
 
-      //   console.log(ckb_wallet.pubkey);
+        console.log(ckb_wallet.pubkey);
 
-      //   const { unlock_entry: unlockEntry } =
-      //     await aggregator.generateSubkeyUnlockSmt({
-      //       // TODO TBD
-      //       alg_index: 1,
-      //       pubkey_hash: bytes.hexify(pubkeyHash),
-      //       lock_script: bytes.hexify(blockchain.Script.pack(lock)),
-      //     });
-      //   newWitnessArgs = {
-      //     lock: "0x",
-      //     inputType: "0x",
-      //     outputType: "0x" + unlockEntry,
-      //   };
-      // }
+        const { unlock_entry: unlockEntry } =
+          await aggregator.generateSubkeyUnlockSmt({
+            // TODO TBD
+            alg_index: 1,
+            pubkey_hash: bytes.hexify(pubkeyHash),
+            lock_script: bytes.hexify(blockchain.Script.pack(lock)),
+          });
+        newWitnessArgs = {
+          lock: "0x",
+          inputType: "0x",
+          outputType: "0x" + unlockEntry,
+        };
+      }
 
       const witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
       const unsignedTx = {
