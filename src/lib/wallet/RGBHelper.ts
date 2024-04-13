@@ -270,7 +270,7 @@ export class RGBHelper {
       ckbVirtualTx: ckbRawTx,
       commitment,
       tos: [toAddress],
-      feeRate:10,
+      feeRate:3,
       ckbCollector: collector,
       from: btc_wallet.address!,
       fromPubkey: btc_wallet.pubkey || btc_wallet.pubKey,
