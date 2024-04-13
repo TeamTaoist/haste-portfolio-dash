@@ -180,9 +180,10 @@ const TeamSwitcher = observer(() => {
         >
           <Avatar className="mr-2 h-5 w-5">
             <AvatarImage
-              src={`https://avatar.vercel.sh/${selectedTeam.value}.png`}
+              // src={`https://avatar.vercel.sh/${selectedTeam.value}.png`}
+              src = "clown.png"
               alt={selectedTeam.label}
-              className="grayscale"
+              // className="grayscale"
             />
             <AvatarFallback>SC</AvatarFallback>
           </Avatar>

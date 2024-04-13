@@ -30,9 +30,14 @@ export const mainConfig = {
   CKB_INDEX_URL: "https://mainnet.ckbapp.dev/indexer",
 
   BTC_ASSETS_API_URL: "https://api.rgbpp.io",
+  // BTC_ASSETS_TOKEN:
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjI5ODgxOH0.ijvxyViGeGEbftAYQKhH6dEiJ39l8PtqsOgENPTGwOc",
+  // BTC_ASSETS_ORGIN: "caboroca.xyz",
+
   BTC_ASSETS_TOKEN:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjI5ODgxOH0.ijvxyViGeGEbftAYQKhH6dEiJ39l8PtqsOgENPTGwOc",
-  BTC_ASSETS_ORGIN: "caboroca.xyz",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYXN0ZSIsImF1ZCI6Imhhc3RlLnBybyIsImp0aSI6ImJiZGU4YjM4LTViMzUtNGY1OS1hZTY2LWZlMzlhNWJiNDcxNiIsImlhdCI6MTcxMjk5NDIzNH0.ZVame3uVHg1ybCWjcg5532Zhfagt410x5X4mEkxEpgQ",
+  BTC_ASSETS_ORGIN: "haste.pro",
+
   ckb_explorer_api: "mainnet-api.explorer.nervos.org",
   rgb_networkType: NetworkType.MAINNET,
 
