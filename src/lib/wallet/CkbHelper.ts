@@ -1279,13 +1279,14 @@ export class CkbHepler {
     const btcLockArgs = genBtcTimeLockArgs(
       lock,
       "0000000000000000000000000000000000000000000000000000000000000000",
-      0
+      6
     );
 
     const addressHexString = bytes.hexify(btcLockArgs);
     const prefixArgs = addressHexString.split(
-      "000000000000000000000000000000000000000000000000000000000000000000000000"
+      "0000000000000000000000000000000000000000000000000000000000000000"
     )[0];
+
     console.log(prefixArgs);
 
     const collect = CkbHepler.instance.indexer.collector({
@@ -1354,8 +1355,7 @@ export class CkbHepler {
     receivers: { toAddress: string; transferAmount: bigint }[]
   ) {
     // const cfg = isTestNet() ? testConfig : mainConfig;
-    const cfg =  mainConfig;
-
+    const cfg = mainConfig;
 
     const curAccount = DataManager.instance.getCurAccount();
     if (!curAccount) {
