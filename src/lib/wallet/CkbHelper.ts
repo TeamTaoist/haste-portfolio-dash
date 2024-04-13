@@ -1354,8 +1354,7 @@ export class CkbHepler {
     xudtType: Script,
     receivers: { toAddress: string; transferAmount: bigint }[]
   ) {
-    // const cfg = isTestNet() ? testConfig : mainConfig;
-    const cfg = mainConfig;
+    const cfg = isTestNet() ? testConfig : mainConfig;
 
     const curAccount = DataManager.instance.getCurAccount();
     if (!curAccount) {
