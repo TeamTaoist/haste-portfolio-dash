@@ -1,4 +1,4 @@
-import { BI, Script, helpers, utils } from "@ckb-lumos/lumos";
+import { BI, Script, helpers } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -12,7 +12,6 @@ import {
 } from "@rgbpp-sdk/ckb";
 import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
 import {
-  Aggregator,
   CKBTransaction,
   getJoyIDCellDep,
   getJoyIDLockScript,
@@ -299,32 +298,32 @@ export class RGBHelper {
     const joyidScropt = getJoyIDLockScript(cfg.isMainnet);
     if (lock.codeHash == joyidScropt.codeHash) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let newWitnessArgs: any = {
+      const newWitnessArgs: any = {
         lock: "0x",
       };
-      if (DataManager.instance.joyIdConnectionType == "sub_key") {
-        const aggregator = new Aggregator(
-          "https://cota.nervina.dev/aggregator"
-        );
-        const pubkeyHash = bytes
-          .bytify(utils.ckbHash("0x" + ckb_wallet.pubkey))
-          .slice(0, 20);
+      // if (DataManager.instance.joyIdConnectionType == "sub_key") {
+      //   const aggregator = new Aggregator(
+      //     "https://cota.nervina.dev/aggregator"
+      //   );
+      //   const pubkeyHash = bytes
+      //     .bytify(utils.ckbHash("0x" + ckb_wallet.pubkey))
+      //     .slice(0, 20);
 
-        console.log(ckb_wallet.pubkey);
+      //   console.log(ckb_wallet.pubkey);
 
-        const { unlock_entry: unlockEntry } =
-          await aggregator.generateSubkeyUnlockSmt({
-            // TODO TBD
-            alg_index: 1,
-            pubkey_hash: bytes.hexify(pubkeyHash),
-            lock_script: bytes.hexify(blockchain.Script.pack(lock)),
-          });
-        newWitnessArgs = {
-          lock: "0x",
-          inputType: "0x",
-          outputType: "0x" + unlockEntry,
-        };
-      }
+      //   const { unlock_entry: unlockEntry } =
+      //     await aggregator.generateSubkeyUnlockSmt({
+      //       // TODO TBD
+      //       alg_index: 1,
+      //       pubkey_hash: bytes.hexify(pubkeyHash),
+      //       lock_script: bytes.hexify(blockchain.Script.pack(lock)),
+      //     });
+      //   newWitnessArgs = {
+      //     lock: "0x",
+      //     inputType: "0x",
+      //     outputType: "0x" + unlockEntry,
+      //   };
+      // }
 
       const witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
       const unsignedTx = {
