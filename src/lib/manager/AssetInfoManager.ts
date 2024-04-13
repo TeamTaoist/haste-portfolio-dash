@@ -60,12 +60,36 @@ class AssetInfoManager {
         ckTxInfo.data.attributes.display_outputs[0].id
       );
       if (outputData) {
-        const info = unserializeTokenInfo(outputData.data.attributes.data);
-        this.infoData[hash] = info;
+        try {
+          const info = unserializeTokenInfo(outputData.data.attributes.data);
+          this.infoData[hash] = info;
 
-        localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
+          localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
 
-        EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
+          EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
+        } catch (error) {
+          console.warn("Not is unique cell", error);
+        }
+      }
+    } else if (
+      ckTxInfo &&
+      ckTxInfo.data.attributes.display_outputs.length == 2
+    ) {
+      // Seal fxxk
+      const outputData = await CkbHepler.instance.getCellOutPutData(
+        ckTxInfo.data.attributes.display_outputs[1].id
+      );
+      if (outputData) {
+        try {
+          const info = unserializeTokenInfo(outputData.data.attributes.data);
+          this.infoData[hash] = info;
+
+          localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
+
+          EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
+        } catch (error) {
+          console.warn("Not is unique cell", error);
+        }
       }
     }
   }

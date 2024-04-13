@@ -1,28 +1,14 @@
 import { bytes } from "@ckb-lumos/codec";
 import * as blockchain from "@ckb-lumos/base/lib/blockchain";
-import {
-  WitnessArgs,
-  commons,
-  helpers,
-  Script,
-  Cell,
-  utils,
-  CellDep,
-} from "@ckb-lumos/lumos";
+import { WitnessArgs, commons, helpers, Script, Cell } from "@ckb-lumos/lumos";
 import type * as api from "@ckb-lumos/base";
 import {
   getJoyIDLockScript,
   getJoyIDCellDep,
-  Aggregator,
   getConfig,
   // connect,
 } from "@joyid/ckb";
-import {
-  getCotaTypeScript,
-  isTestNet,
-  mainConfig,
-  testConfig,
-} from "./constants";
+import { isTestNet, mainConfig, testConfig } from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import { accountStore } from "@/store/AccountStore";
 
@@ -156,12 +142,12 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
           console.log("JoyID config: ", getConfig());
           // console.log("JoyID connection: ", connection);
 
-          const lock = helpers.parseAddress(wallet.address, {
-            config: cfg.CONFIG,
-          });
+          // const lock = helpers.parseAddress(wallet.address, {
+          //   config: cfg.CONFIG,
+          // });
 
           // will change if the connection.keyType is a sub_key
-          let newWitnessArgs: WitnessArgs = {
+          const newWitnessArgs: WitnessArgs = {
             lock: "0x",
           };
 
