@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -24,7 +26,7 @@ const ResponsiveSidebar: React.FC = () => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    const storedWallets = localStorage.getItem('wallets');
+    const storedWallets = localStorage ? localStorage.getItem('wallets') : '';
     if (storedWallets) {
       dispatch(initializeWallets(JSON.parse(storedWallets)));
     }

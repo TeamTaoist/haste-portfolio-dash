@@ -1,7 +1,7 @@
 "use client";
 
-import AccountSidebar from "./_components/Account";
-import Dashboard from "./_components/Dashboard";
+import AccountSidebar from "@/app/_components/Account";
+import Dashboard from "@/app/_components/Dashboard";
 
 export default function Home() {
   return (

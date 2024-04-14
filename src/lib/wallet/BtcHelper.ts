@@ -7,7 +7,7 @@ import {
   getPublicKey,
   // signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
-import { isTestNet, mainConfig, testConfig } from "./constants";
+import {  mainConfig, testConfig } from "./constants";
 import {getEnv} from "@/settings/env";
 
 export class BtcHepler {
@@ -17,7 +17,7 @@ export class BtcHepler {
 
   public static get instance() {
     if (!BtcHepler._instance) {
-      const cfg = isTestNet() ? testConfig : mainConfig;
+      const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
 
       initConfig({
         // your app name
@@ -34,7 +34,6 @@ export class BtcHepler {
   }
 
   async unisat_onConnect() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const unisat = (window as any)["unisat"];
     if (typeof unisat !== "undefined") {
       console.log("UniSat Wallet is installed!");
@@ -53,13 +52,12 @@ export class BtcHepler {
   }
 
   async okx_onConnect() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const okxwallet = (window as any)["okxwallet"];
     if (typeof okxwallet !== "undefined") {
       console.log("OKX is installed!");
 
       // {address publicKey}
-      const cfg = isTestNet() ? testConfig : mainConfig;
+      const cfg =  getEnv() === 'Testnet' ? testConfig : mainConfig;
       if (cfg.isMainnet) {
         const result = await okxwallet.bitcoin.connect();
         return result;
@@ -81,7 +79,7 @@ export class BtcHepler {
   }
 
   async getUtxo(address: string) {
-    const cfg = isTestNet() ? testConfig : mainConfig;
+    const cfg =  getEnv() === 'Testnet' ? testConfig : mainConfig;
 
     const result = await superagent
       .get(
@@ -100,7 +98,6 @@ export class BtcHepler {
 
   async signPsdt(hex: string, walletType: WalletType) {
     if (walletType == "unisat") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const unisat = (window as any)["unisat"];
       if (typeof unisat !== "undefined") {
         console.log("UniSat Wallet is installed!");
@@ -116,13 +113,12 @@ export class BtcHepler {
         throw new Error("UniSat Wallet is no installed!");
       }
     } else if (walletType == "okx") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const okxwallet = (window as any)["okxwallet"];
       if (typeof okxwallet !== "undefined") {
         console.log("OKX is installed!");
 
         // {address publicKey}
-        const cfg = isTestNet() ? testConfig : mainConfig;
+        const cfg =  getEnv() === 'Testnet' ? testConfig : mainConfig;
         if (cfg.isMainnet) {
           const result = await okxwallet.bitcoin.signPsbt(hex);
           return result;
@@ -145,7 +141,7 @@ export class BtcHepler {
     address: string,
     after_txid?: string
   ): Promise<btc_TxInfo[] | undefined> {
-    const cfg = isTestNet() ? testConfig : mainConfig;
+    const cfg =  getEnv() === 'Testnet' ? testConfig : mainConfig;
 
     const result = await superagent
       .get(
@@ -186,7 +182,6 @@ export class BtcHepler {
 
   async pushPsbt(psbtHex: string, walletType: WalletType) {
     if (walletType == "unisat") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const unisat = (window as any)["unisat"];
       if (typeof unisat !== "undefined") {
         console.log("UniSat Wallet is installed!");
@@ -201,7 +196,6 @@ export class BtcHepler {
         throw new Error("UniSat Wallet is no installed!");
       }
     } else if (walletType == "okx") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const okxwallet = (window as any)["okxwallet"];
       if (typeof okxwallet !== "undefined") {
         console.log("OKX is installed!");

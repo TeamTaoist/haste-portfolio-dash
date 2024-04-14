@@ -1,4 +1,5 @@
-import { WalletInfo } from '@/lib/interface';
+"use client"
+
 import { RootState } from '@/store/store';
 import { setCurrentWalletAddress, WalletItem } from '@/store/wallet/walletSlice';
 import React, { useEffect, useState } from 'react';

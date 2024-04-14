@@ -2,10 +2,6 @@ import { BI, Cell, Script } from "@ckb-lumos/lumos";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { parseUnit } from "@ckb-lumos/bi";
-import {
-  assembleTransferSporeAction,
-  assembleCobuildWitnessLayout,
-} from "@spore-sdk/core/lib/cobuild";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -74,33 +70,3 @@ export const calculateTransactionFee = (txSize: number): BI => {
   return fee;
 };
 
-export const generateSporeCoBuild = (
-  sporeCells: Cell[],
-  inputCellOutPut: {
-    capacity: string;
-    lock: Script;
-    type?: Script;
-  }[]
-): string => {
-  if (sporeCells.length !== inputCellOutPut.length) {
-    throw new Error(
-      "The length of spore input cells length and spore output cells are not same"
-    );
-  }
-  let sporeActions: any[] = [];
-  for (let index = 0; index < sporeCells.length; index++) {
-    const sporeCell = sporeCells[index];
-    const outputData = sporeCell.data;
-    const sporeInput = {
-      cellOutput: inputCellOutPut[index],
-      data: outputData,
-    };
-    const sporeOutput = {
-      cellOutput: sporeCells[index].cellOutput,
-      data: outputData,
-    };
-    const { actions } = assembleTransferSporeAction(sporeInput, sporeOutput);
-    sporeActions = sporeActions.concat(actions);
-  }
-  return assembleCobuildWitnessLayout(sporeActions);
-};

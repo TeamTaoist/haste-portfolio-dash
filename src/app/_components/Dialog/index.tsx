@@ -1,3 +1,5 @@
+"use client"
+
 import ModalContext from '@/context/ModalContext';
 import React from 'react';
 

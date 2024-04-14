@@ -389,18 +389,3 @@ export const getMNftTypeScript = (isMainnet: boolean) =>
 export const getMNftDep = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.MNftTypeDep : TestnetInfo.MNftTypeDep;
 
-let _isTestNet: boolean =
-  localStorage.getItem("isTestNet") == "1" ? true : false;
-export const isTestNet = () => {
-  if (process.env.VITE_OpenTestNet != "1") return false;
-
-  return _isTestNet;
-};
-export const chooseTestNet = () => {
-  _isTestNet = true;
-  localStorage.setItem("isTestNet", "1");
-};
-export const chooseMainNet = () => {
-  _isTestNet = false;
-  localStorage.setItem("isTestNet", "0");
-};

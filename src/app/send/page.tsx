@@ -3,15 +3,15 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import SendContent from "../_components/Send/send";
-import ReceiveContent from "../_components/Send/receive";
+import SendContent from "@/app/_components/SendComponent/send";
+import ReceiveContent from "@/app/_components/SendComponent/receive";
 
 enum TABVALUE {
   SEND = "send",
   RECEIVE = "receive",
 }
 
-export default function Send() {
+const Send = () => {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") as TABVALUE;
   const [currentTab, setCurrentTab] = useState<TABVALUE>();
@@ -61,3 +61,5 @@ export default function Send() {
     </main>
   );
 }
+
+export default Send

@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image";
 import {
   Copy,
@@ -7,7 +9,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { formatString } from "@/utils/common";
-import { getEnv } from "@/settings/env";
 import { enqueueSnackbar } from "notistack";
 
 export enum TRANSACTION_TYPE {

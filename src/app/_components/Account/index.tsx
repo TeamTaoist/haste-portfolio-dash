@@ -1,6 +1,8 @@
+"use client"
+
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store'; // 确保路径正确
+import { RootState } from '@/store/store'; 
 import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon, Component1Icon, FileTextIcon, GearIcon, GridIcon, PaperPlaneIcon, PlusIcon, ThickArrowLeftIcon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 import { formatString } from '@/utils/common';
@@ -24,7 +26,7 @@ const AccountSidebar: React.FC = () => {
   };
 
   useEffect(() => {
-    const walletsStr = localStorage.getItem('wallets');
+    const walletsStr = localStorage ? localStorage.getItem('wallets') : '';
 
     let wallets;
     try {

@@ -19,15 +19,14 @@ import {
 } from "@joyid/ckb";
 import {
   getCotaTypeScript,
-  isTestNet,
   mainConfig,
   testConfig,
 } from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
-import { accountStore } from "@/store/AccountStore";
 import store from "@/store/store";
+import { getEnv } from "@/settings/env";
 
-const cfg = isTestNet() ? testConfig : mainConfig;
+const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
 const isMainnet = cfg.isMainnet;
 
 export interface CellCollector {
@@ -44,10 +43,8 @@ class JoyIDCellCollector {
   private readonly cellCollector: CellCollector;
 
   constructor(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fromAddr: any,
     cellProvider: CellProvider,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     { queryOptions = {} }: any
   ) {
     if (!cellProvider) {
@@ -217,7 +214,6 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
             }
             const cotaCell = cotaCells[0];
             const cotaCellDep: CellDep = {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               outPoint: cotaCell.outPoint as any,
               depType: "code",
             };

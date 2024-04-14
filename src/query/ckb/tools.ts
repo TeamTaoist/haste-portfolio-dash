@@ -117,8 +117,7 @@ export const getXudtAndSpore = async(address: string) => {
     for await (const sporeCell of spore_collector.collect()) {
       if (sporeCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
-
-
+        //@ts-ignore
         sporeList.push({
           symbol: "DOBs",
           amount: sporeCell.cellOutput.type.args,

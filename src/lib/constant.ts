@@ -28,6 +28,7 @@ export const Test_Config: AppConfig = {
     ckbIndexerUrl: Test_CKB_INDEX_URL,
     scripts: {
       Spore: {
+        //@ts-ignore
         script: {
           codeHash:
             '0x5e063b4c0e7abeaa6a428df3b693521a3050934cf3b0ae97a800d1bc31449398',
@@ -44,6 +45,7 @@ export const Test_Config: AppConfig = {
         versions: [],
       },
       Cluster: {
+        //@ts-ignore
         script: {
           codeHash:
             '0xbbad126377d45f90a8ee120da988a2d7332c78ba8fd679aab478a19d6c133494',
@@ -76,6 +78,7 @@ export const Main_Config: AppConfig = {
     ckbIndexerUrl: Main_CKB_INDEX_URL,
     scripts: {
       Spore: {
+        //@ts-ignore
         script: {
           codeHash:
             '0x4a4dce1df3dffff7f8b2cd7dff7303df3b6150c9788cb75dcf6747247132b9f5',
@@ -92,6 +95,7 @@ export const Main_Config: AppConfig = {
         versions: [],
       },
       Cluster: {
+        //@ts-ignore
         script: {
           codeHash:
             '0x7366a61534fa7c7e6225ecc0d828ea3b5366adec2b58206f2ee84995fe030075',

@@ -47,9 +47,6 @@ class AssetInfoManager {
           name: info.name,
           decimal: parseInt(info.decimal),
         };
-
-        localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
-
         EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
       }
     } else if (
@@ -65,7 +62,6 @@ class AssetInfoManager {
         const info = unserializeTokenInfo(outputData.data.attributes.data);
         this.infoData[hash] = info;
 
-        localStorage.setItem(hash, JSON.stringify(this.infoData[hash]));
 
         EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
       }
@@ -79,7 +75,7 @@ class AssetInfoManager {
       return this.infoData[hash];
     }
 
-    const info = localStorage.getItem(hash);
+    const info = localStorage ? localStorage.getItem(hash): '';
     if (!info) {
       if (!this.checking[hash]) {
         this.checking[hash] = true;

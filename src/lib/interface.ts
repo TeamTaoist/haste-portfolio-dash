@@ -61,7 +61,6 @@ export interface ckb_TxInfo {
     cells: string[][];
   }[];
   lastCursor: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   attributes?: any;
 }
 

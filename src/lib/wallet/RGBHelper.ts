@@ -25,7 +25,7 @@ import { blockchain } from "@ckb-lumos/base";
 import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 // import { accountStore } from "@/store/AccountStore";
-import { isTestNet, mainConfig, testConfig } from "./constants";
+import { mainConfig, testConfig } from "./constants";
 import store from "@/store/store";
 import {getEnv} from "@/settings/env";
 import {BitcoinUnit} from "bitcoin-units";
@@ -104,6 +104,7 @@ export class RGBHelper {
     btcTxIdx: number,
     toAddress: string,
     typeScript: Script,
+    //@ts-ignore
     amount: bigint = 0n
   ) {
     // const curAccount = DataManager.instance.getCurAccount();
@@ -140,6 +141,7 @@ export class RGBHelper {
     btcTxHash: string,
     btcTxIdx: number,
     typeScript: Script,
+    //@ts-ignore
     amount: bigint = 0n
   ) {
 
@@ -217,6 +219,7 @@ export class RGBHelper {
     toAddress: string,
     btc_wallet: WalletInfo,
     typeScript: Script,
+    //@ts-ignore
     transferAmount: bigint = 0n
   ) {
     const cfg = getEnv() ? testConfig : mainConfig;
@@ -280,6 +283,7 @@ export class RGBHelper {
     toRgbppLockArgs: string,
     ckb_wallet: WalletInfo,
     typeScript: Script,
+    //@ts-ignore
     amount: bigint = 0n
   ) {
     if (ckb_wallet.chain == "BTC") return;
@@ -326,7 +330,6 @@ export class RGBHelper {
     });
     const joyidScropt = getJoyIDLockScript(cfg.isMainnet);
     if (lock.codeHash == joyidScropt.codeHash) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let newWitnessArgs: any = {
         lock: "0x",
       };

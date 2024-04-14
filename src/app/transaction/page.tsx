@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AccountSidebar from "../_components/Account";
-import TransactionItem, { TRANSACTION_TYPE } from "../_components/Transaction";
+import AccountSidebar from "@/app/_components/Account";
+import TransactionItem, { TRANSACTION_TYPE } from "@/app/_components/TransactionComponent";
 import { getTx as getBTCTx } from "@/query/btc/memepool";
 import { getTx as getCKBTx } from "@/query/ckb/tools";
 import { RootState } from "@/store/store";
@@ -14,7 +14,7 @@ import Image from 'next/image';
 import { getEnv } from "@/settings/env";
 import Loading from "@/app/_components/loading";
 
-export default function Transaction() {
+const Transaction = () => {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
@@ -260,3 +260,5 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
     </main>
   );
 }
+
+export default Transaction

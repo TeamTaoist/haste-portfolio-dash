@@ -99,6 +99,7 @@ export default function SendContent() {
   }
 
   const send_Spore = () =>{
+    console.log(isToCKB(to));
       switch (true) {
           case selectWallet.chain === "ckb" && isToCKB(to):
               send_ckb2ckb_Spore()
@@ -140,7 +141,7 @@ export default function SendContent() {
       const { txSkeleton } = await transferSpore({
         outPoint: sporeCell.outPoint!!,
         fromInfos: [selectWallet.address],
-        toLock: helpers.parseAddress(to),
+        toLock: helpers.parseAddress(to, {config: sporeConfig.lumos}),
         config: sporeConfig
       });
       const tx = helpers.createTransactionFromSkeleton(txSkeleton);
@@ -237,7 +238,7 @@ export default function SendContent() {
                 enqueueSnackbar("Transfer Error", {variant: "error"})
             });
     }
-
+    //@ts-ignore
     const handleSelect = (w) =>{
         setSelectWallet(w)
         dispatch(setCurrentWalletAddress(w.address))
