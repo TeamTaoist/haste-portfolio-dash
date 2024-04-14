@@ -12,6 +12,7 @@ import { BI, BIish } from "@ckb-lumos/lumos";
 import { formatUnit } from "@ckb-lumos/bi";
 import Image from 'next/image';
 import { getEnv } from "@/settings/env";
+import Loading from "@/app/_components/loading";
 
 export default function Transaction() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
@@ -172,6 +173,9 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
   return (
     <main className="flex flex-col flex-1 h-full bg-gray-100 text-black">
+        {
+            isListLoading && <Loading />
+        }
       <div className="h-full w-full flex flex-col">
         <div className="sm:mt-20 flex text-black text-hd1mb border-b border-gray-300 w-full py-10 px-8 font-Montserrat font-bold">
           Transaction

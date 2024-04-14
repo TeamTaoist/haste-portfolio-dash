@@ -31,7 +31,7 @@ const TokenBlock = ({
         height={32}
         src={`/img/${token}.png`}
         alt="USDT"
-        className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+        className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
       />
       <div className="">
         {type === TRANSACTION_TYPE.RECEIVE ? (
@@ -53,7 +53,7 @@ const AccountBlock = ({token, address,type}:{ token: string, address: string,typ
         height={32}
         src={`/img/${token}.png`}
         alt=""
-        className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+        className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
       />
       <div className="">
         <span>{type === TRANSACTION_TYPE.SEND ? "To" : "From"}</span>
