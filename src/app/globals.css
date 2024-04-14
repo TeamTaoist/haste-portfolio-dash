@@ -10,6 +10,7 @@ html, body {
   padding: 0;
   height: 100%;
   font-family:din_regular,Roboto-Regular;
+  overflow-x: hidden;
 }
 ul,li,dl,dd,dt{
   padding: 0;

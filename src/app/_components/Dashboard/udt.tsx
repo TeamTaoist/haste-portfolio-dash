@@ -75,7 +75,7 @@ export default function UDTList() {
         <tbody className="text-black">
           {isLoading ? (
             Array.from(new Array(5)).map((_, index) => (
-              <tr key={index} className="hover:bg-gray-100 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-lg">
+              <tr key={index} className="hover:bg-gray-200 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-lg">
                 <td className="col-span-7 lg:col-span-5 px-8">
                   <div className="flex gap-3 items-center">
                     <div className="w-8 h-8 rounded-full bg-gray-300 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-200% animate-shimmer"></div>
@@ -93,7 +93,7 @@ export default function UDTList() {
             ))
           ) : (
             xudtList.map((xudt, index) => (
-              <tr key={index} className="hover:bg-gray-100 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-l ">
+              <tr key={index} className="hover:bg-gray-200 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-l ">
                 <td className="col-span-7 lg:col-span-5 px-8">
                   <div className="flex gap-3 items-center">
                     <div>

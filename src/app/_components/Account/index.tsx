@@ -60,7 +60,7 @@ const AccountSidebar: React.FC = () => {
                     <div className='border-1 rounded-full bg-white w-6 h-6 flex justify-center items-center cursor-pointer' onClick={() => {
                       setIsOpenWalletModal(true)
                     }}>
-                      <PlusIcon className='w-4 h-4' />
+                      <PlusIcon className='w-4 h-4 ' />
                     </div>
                     {/*<div className='w-6 h-6 flex justify-center items-center'>*/}
                     {/*  <GearIcon className='w-6 h-6' />*/}
@@ -69,17 +69,17 @@ const AccountSidebar: React.FC = () => {
                 </div>
               </>}
               {!isColleapse && <>
-                <div className='border-2 rounded-full w-6 h-6 flex justify-center items-center'>
+                <div className='border-2 rounded-full w-6 h-6 flex justify-center items-center bg-white'>
                   <PlusIcon className='w-4 h-4' />
                 </div>
               </>}
             </div>
             <div
-              className='cursor-pointer absolute right-[-10px] w-6 h-6 flex justify-center items-center rounded-full border-2 border-white001 opacity-10 bg-white group-hover:opacity-100 transition-opacity duration-200'
+              className='cursor-pointer absolute right-[-10px] w-6 h-6 flex justify-center items-center rounded-full border-2 border-white001  bg-white transition-opacity duration-200'
               onClick={toggleSidebar}
             >
             {
-              isColleapse ? <ChevronsLeft/> : <ChevronsRight />
+              isColleapse ? <ChevronsLeft className="opacity-10 group-hover:opacity-100 "/> : <ChevronsRight className="opacity-10 group-hover:opacity-100 " />
             }
           </div>
           </div>
@@ -105,7 +105,7 @@ const AccountSidebar: React.FC = () => {
                       {/* <div className=' font-SourceSanPro font-semibold text-primary003'> ${wallet}</div> */}
                     </div>
                     <div className='flex'>
-                      <div className='font-SourceSanPro text-black opacity-30 '>{wallet.chain} {wallet.balance}</div>
+                      <div className='font-SourceSanPro text-black opacity-30 uppercase'>{wallet.chain} {wallet.balance}</div>
                     </div>
                   </div>
                   <div

@@ -63,7 +63,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       setIsLoading(false);
       onClose();
     }
-    
+
   };
   const connectOKXWallet = async () => {
     setIsLoading(true);
@@ -110,59 +110,59 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
 
 
   useEffect(() => {console.log(wallets)}, [wallets])
-  
+
   return (
     <>
       {
         isLoading &&
-        <div className='absolute w-full h-full z-10  bg-opacity-80 rounded-lg bg-black flex flex-col justify-center items-center gap-4'>
+        <div className='absolute w-full h-full z-10  bg-opacity-80 rounded-lg bg-black flex flex-col justify-center items-center gap-4 pb-5'>
           <Image
             src={'/img/joker.png'}
             width={128}
             height={128}
             alt='joker loading'
           />
-          <p className='text-white001 font-Montserrat'>Your Wallet is Connecting……</p>
+          <p className='text-black font-Montserrat'>Your Wallet is Connecting……</p>
         </div>
       }
       <div
-      className="w-96 p-4  flex flex-col gap-4 relative" 
-    > 
-      <div className="font-Montserrat text-primary001">Connect a Wallet</div>
+      className="w-96 p-4  flex flex-col gap-4 relative"
+    >
+      <div className="font-Montserrat text-black">Connect a Wallet</div>
       <div className="flex items-center justify-center">
         <div className="w-10 border-t border-gray-400"></div>
-        <span className="mx-4 text-white001 font-SourceSanPro">BTC</span>
+        <span className="mx-4 text-black font-SourceSanPro">BTC</span>
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 relative cursor-pointer' onClick={connectOKXWallet}>
+        <div className='flex items-center gap-4 rounded py-2 px-2 bg-white relative cursor-pointer' onClick={connectOKXWallet}>
           <Image className='rounded-full' src={'/img/okx.png'} width={40} height={40} alt={'btc-okx'}/>
-          <p className='text-white001 font-Montserrat'>OKX</p>
+          <p className='text-black font-Montserrat'>OKX</p>
           {/* <div className='w-9 h-9 bg-success-function rounded-full flex items-center justify-center absolute right-4'>
             <CheckIcon className='w-7 h-7' color='#ffffff'/>
           </div> */}
         </div>
-        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectUnisatWallet}>
+        <div className='flex items-center gap-4 rounded py-2 px-2 bg-white cursor-pointer' onClick={connectUnisatWallet}>
           <Image className='rounded-full' src={'/img/unisat.png'} width={40} height={40} alt={'btc-unisat'}/>
-          <p className='text-white001 font-Montserrat'>Unisat</p>
+          <p className='text-black font-Montserrat'>Unisat</p>
         </div>
-        <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectJoyIDBTCWallet}>
+        <div className='flex items-center gap-4 rounded py-2 px-2 bg-white cursor-pointer' onClick={connectJoyIDBTCWallet}>
           <Image className='rounded-full' src={'/img/joyid.png'} width={40} height={40} alt={'btc-joyid'}/>
-          <p className='text-white001 font-Montserrat'>JoyID</p>
-        </div>  
+          <p className='text-black font-Montserrat'>JoyID</p>
+        </div>
       </div>
       <div className="flex items-center justify-center">
         <div className="w-10 border-t border-gray-400"></div>
-        <span className="mx-4 text-white001 font-SourceSanPro">CKB</span>
+        <span className="mx-4 text-black font-SourceSanPro">CKB</span>
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
-      <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectJoyIDCKBWallet}>
+      <div className='flex items-center gap-4 rounded py-2 px-2 bg-white cursor-pointer' onClick={connectJoyIDCKBWallet}>
         <Image className='rounded-full' src={'/img/joyid.png'} width={40} height={40} alt={'ckb-joyid'}/>
-        <p className='text-white001 font-Montserrat'>OKX</p>
-      </div> 
+        <p className='text-black font-Montserrat'>JoyID</p>
+      </div>
     </div>
     </>
-    
+
   )
 }
 

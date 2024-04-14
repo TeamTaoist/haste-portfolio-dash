@@ -55,7 +55,7 @@ export default function AssetModal({
   return (
     <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black/50">
       <div
-        className="relative w-auto mx-auto max-w-full bg-primary009 p-6 rounded-2xl"
+        className="relative w-auto mx-auto max-w-full bg-white p-6 rounded-2xl"
         style={{ width: "644px" }}
       >
         <div className="relative text-xl font-semibold">
@@ -68,10 +68,10 @@ export default function AssetModal({
           </span>
         </div>
         <div className="mt-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-[10px]">
-            <div className="flex p-0.5 border rounded-full transition-colors w-full sm:max-w-[220px] h-[46px] sm:space-x-0 border-muted">
+          <div className="flex md:flex-col sm:flex-col justify-between items-center gap-4 sm:gap-[10px]">
+            <div className="flex p-0.5 border rounded-full transition-colors w-full h-[46px] sm:space-x-0 border-muted">
               <button
-                className={`w-full py-2 text-sm leading-5 px-3 rounded-full font-medium text-white ${
+                className={`w-full py-2 text-sm leading-5 px-3 rounded-full font-medium text-black ${
                   selectType === ASSET_TYPE.UDT ? "bg-primary011" : ""
                 } focus:outline-none focus:ring-0 sm:px-4 md:px-4`}
                 onClick={() => setSelectType(ASSET_TYPE.UDT)}
@@ -79,10 +79,11 @@ export default function AssetModal({
                 {selectWallet?.chain === 'btc'?"RGB++":"UDT"}
               </button>
               <button
-                className={`w-full py-2 text-sm leading-5 px-3 rounded-full font-medium text-white ${
+                className={`w-full py-2 text-sm leading-5 px-3 rounded-full font-medium text-black ${
                   selectType === ASSET_TYPE.SPORE ? "bg-primary011" : ""
                 } focus:outline-none focus:ring-0 sm:px-4 md:px-4 whitespace-nowrap`}
                 onClick={() => setSelectType(ASSET_TYPE.SPORE)}
+                disabled={selectWallet?.chain === 'btc'}
               >
                 {selectWallet?.chain === 'btc'?"RGB++ Spore":"Spore"}
               </button>
@@ -172,11 +173,11 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   return <>{ isLoading ? (
       Array.from({ length: 3 }, (_, index) => (
           <div key={index}
-               className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
+               className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary011"
           >
             <button
                 key={index}
-                className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
+                className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary011"
             >
               <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
                 <div
@@ -194,7 +195,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   ) :xudtList.map((udt, index) => (
     <button
       key={index}
-      className="group group flex rounded-md items-center justify-between w-full space-x-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
+      className="group group flex rounded-md items-center justify-between w-full space-x-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary011 hover:text-white"
       onClick={() => onSelect({ type: ASSET_TYPE.UDT, data: {...udt,...udt?.ckbCellInfo} })}
     >
       <div className="flex text-left items-center gap-2">
@@ -203,7 +204,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
           height={32}
           src="/img/btc.png"
           alt="USDT"
-          className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+          className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
         />
         <div>
           <p className="text-xs sm:text-sm leading-5 font-semibold">{udt?.ckbCellInfo?getSymbol(udt?.ckbCellInfo?.type_script):getSymbol(udt?.type_script)}</p>

@@ -12,6 +12,7 @@ import { BI, BIish } from "@ckb-lumos/lumos";
 import { formatUnit } from "@ckb-lumos/bi";
 import Image from 'next/image';
 import { getEnv } from "@/settings/env";
+import Loading from "@/app/_components/loading";
 
 export default function Transaction() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
@@ -76,7 +77,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
     //@ts-ignore
     if(outputValue[currentAddress!!]) {
       //@ts-ignore
-      value = outputValue[currentAddress!!].sub(inputValue[currentAddress] || 0).toString() 
+      value = outputValue[currentAddress!!].sub(inputValue[currentAddress] || 0).toString()
     } else {
       //@ts-ignore
       value = '-' + inputValue[currentAddress!!].toString()
@@ -172,6 +173,9 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
   return (
     <main className="flex flex-col flex-1 h-full bg-gray-100 text-black">
+        {
+            isListLoading && <Loading />
+        }
       <div className="h-full w-full flex flex-col">
         <div className="sm:mt-20 flex text-black text-hd1mb border-b border-gray-300 w-full py-10 px-8 font-Montserrat font-bold">
           Transaction
@@ -226,10 +230,10 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
             {
                 (chain && chain === 'btc' && !isEmptyList) &&
 
-                <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
+                <div className="pb-10 flex-1 pr-4 ">
                     {btcGroupData && Object.keys(btcGroupData).map(date => (
                         <div key={date} className="top-0 font-medium text-sm py-4">
-                            <div className="px-4 text-sm text-subdued mb-2">
+                            <div className="px-4 text-sm text-subdued mb-2 capitalize">
                                 {date}
                             </div>
                             {btcGroupData[date].map((transaction, index) => (
