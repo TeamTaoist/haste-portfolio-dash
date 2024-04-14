@@ -7,6 +7,11 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    screens: {
+      sm: { max: '866px', min: '1px' },
+      md: { min: '867px', 'max': '1279px'},
+      lg: { min: '1280px'}
+    },
     extend: {
       keyframes: {
         shimmer: {

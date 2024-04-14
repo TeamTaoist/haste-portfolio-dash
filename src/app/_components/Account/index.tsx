@@ -39,7 +39,7 @@ const AccountSidebar: React.FC = () => {
   }, [setIsOpenWalletModal, wallets]);
 
   return (
-    <div className='h-full'>
+    <div className='h-full bg-primary011'>
       <CustomModal isOpen={isOpenWalletModal} 
         onClose={() => {
           setIsOpenWalletModal(false)

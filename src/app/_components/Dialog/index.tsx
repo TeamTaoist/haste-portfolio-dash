@@ -21,7 +21,7 @@ const CustomModal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         onClick={onClose}
       >
       <div
-        className="bg-primary009 p-4 rounded-lg shadow-lg"
+        className="bg-primary009 rounded-lg shadow-lg relative"
         onClick={handleModalClick} 
       >
         {children}

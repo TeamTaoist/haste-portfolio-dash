@@ -1,3 +1,5 @@
+"use client"
+
 import ModalContext from '@/context/ModalContext';
 import { getBTC } from '@/query/btc/memepool';
 import { getBTCAsset } from '@/query/btc/tools';
@@ -6,7 +8,7 @@ import { addWalletItem } from '@/store/wallet/walletSlice';
 import { JoyIDBTCconnect, JoyIDCKBConnect, OKXConnect, UnisatConnect } from '@/utils/connect';
 import Image from 'next/image';
 import { enqueueSnackbar } from 'notistack';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { AccountData } from '../../../../types/BTC';
@@ -20,6 +22,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
   const { onClose } = useContext(ModalContext);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const dispatch = useDispatch()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const _getBTCBalance = async (address: string) => {
     const rlt = await getBTCAsset(address);
@@ -56,10 +59,13 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
         pubKey: props.pubKey,
         balance: balance ? balance.toString() : '',
       }))
+      setIsLoading(false);
+      onClose();
     }
     
   };
   const connectOKXWallet = async () => {
+    setIsLoading(true);
     let rlt = await OKXConnect();
 
     checkWalletByAddress({
@@ -105,9 +111,22 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
   useEffect(() => {console.log(wallets)}, [wallets])
   
   return (
-    <div
-      className="w-96 flex flex-col gap-4" 
-    >
+    <>
+      {
+        isLoading &&
+        <div className='absolute w-full h-full z-10  bg-opacity-80 rounded-lg bg-black flex flex-col justify-center items-center gap-4'>
+          <Image
+            src={'/img/joker.png'}
+            width={128}
+            height={128}
+            alt='joker loading'
+          />
+          <p className='text-white001 font-Montserrat'>Your Wallet is Connecting……</p>
+        </div>
+      }
+      <div
+      className="w-96 p-4  flex flex-col gap-4 relative" 
+    > 
       <div className="font-Montserrat text-primary001">Connect a Wallet</div>
       <div className="flex items-center justify-center">
         <div className="w-10 border-t border-gray-400"></div>
@@ -123,11 +142,11 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
           </div> */}
         </div>
         <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectUnisatWallet}>
-          <Image className='rounded-full' src={'/img/unisat.png'} width={40} height={40} alt={'btc-okx'}/>
+          <Image className='rounded-full' src={'/img/unisat.png'} width={40} height={40} alt={'btc-unisat'}/>
           <p className='text-white001 font-Montserrat'>Unisat</p>
         </div>
         <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectJoyIDBTCWallet}>
-          <Image className='rounded-full' src={'/img/joyid.png'} width={40} height={40} alt={'btc-okx'}/>
+          <Image className='rounded-full' src={'/img/joyid.png'} width={40} height={40} alt={'btc-joyid'}/>
           <p className='text-white001 font-Montserrat'>JoyID</p>
         </div>  
       </div>
@@ -137,24 +156,12 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
       <div className='flex items-center gap-4 border rounded-2xl py-2 px-2 bg-primary008 cursor-pointer' onClick={connectJoyIDCKBWallet}>
-        <Image className='rounded-full' src={'/img/okx.png'} width={40} height={40} alt={'btc-okx'}/>
+        <Image className='rounded-full' src={'/img/joyid.png'} width={40} height={40} alt={'ckb-joyid'}/>
         <p className='text-white001 font-Montserrat'>OKX</p>
       </div> 
-      <div className='flex justify-between'>
-        <div 
-          className='w-[48%] text-primary001 border rounded-lg py-2 font-Montserrat text-center cursor-pointer'
-          onClick={onClose}
-        >
-          cancel
-        </div>
-        <div 
-          className='w-[48%] bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer'
-          onClick={onClose}
-        >
-          Confirm
-        </div>
-      </div>
     </div>
+    </>
+    
   )
 }
 

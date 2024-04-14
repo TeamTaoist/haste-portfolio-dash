@@ -10,14 +10,17 @@ import { useSelector } from "react-redux";
 import { btc_TxInfo, btcGroupedTransaction, BTCTxInfo, ckb_TxInfo, groupedTransaction, GroupedTransactions, BitcoinTransaction, TransactionDetails } from "@/types/BTC";
 import { BI, BIish } from "@ckb-lumos/lumos";
 import { formatUnit } from "@ckb-lumos/bi";
+import Image from 'next/image';
 
 export default function Transaction() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
   const [chain, setChain] = useState<string>("");
-  const [groupedData, setGroupedData] = useState<groupedTransaction>()
-  const [btcGroupData, setBtcGroupData] = useState<GroupedTransactions> ()
+  const [groupedData, setGroupedData] = useState<groupedTransaction | null>()
+  const [btcGroupData, setBtcGroupData] = useState<GroupedTransactions | null> ()
+  const [isListLoading, setIsListLoading] = useState<boolean>(false)
+  const [isEmptyList, setIsEmptyList] = useState<boolean>(false)
 
   const groupTransaction = (transactions: ckb_TxInfo[]) => {
     const grouped: groupedTransaction = {};
@@ -107,18 +110,44 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
 
 
-  const _getCKBTx = async() => {
-    const list = await getCKBTx(currentAddress!!);
-    const groupedTx = groupTransaction(list.data);
-    setGroupedData(groupedTx);
+  const _getCKBTx = async () => {
+      setIsListLoading(true); 
+      setIsEmptyList(true);   
+      setGroupedData(null);
+      try {
+          const list = await getCKBTx(currentAddress!!);
+          const groupedTx = groupTransaction(list.data); 
+          setIsEmptyList(list.data.length === 0);
+          setGroupedData(groupedTx);
+      } catch (error) {
+          console.error("Failed to fetch CKB transactions:", error);
+          setIsEmptyList(true); 
+      } finally {
+          setIsListLoading(false); 
+      }
   }
 
-  const _getBTCTx = async() => {
-    const list = await getBTCTx(currentAddress!!);
-    if(!list) return
-    console.log(list);
-    setBtcGroupData(groupTransactionsByDate(list!!));
+  const _getBTCTx = async () => {
+      setIsListLoading(true);  
+      setIsEmptyList(true);   
+      setBtcGroupData(null);
+      try {
+          const list = await getBTCTx(currentAddress!!);
+          if (list && list.length > 0) {
+              setBtcGroupData(groupTransactionsByDate(list));
+              setIsEmptyList(false); 
+          } else {
+              setIsEmptyList(true); 
+
+          }
+      } catch (error) {
+          console.error("Failed to fetch BTC transactions:", error);
+          setIsEmptyList(true); 
+      } finally {
+          setIsListLoading(false); 
+      }
   }
+
 
   useEffect(() => {
     let chainName = currentWallet?.chain
@@ -133,21 +162,37 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
       _getBTCTx();
     }
   }, [currentAddress])
+
   return (
     <main className="flex flex-col flex-1 h-full bg-primary008 text-white001">
       <div className="h-full w-full flex flex-col">
-        <div className="md:mx-4 lg:mx-8 text-hd1mb py-4 px-4 font-Montserrat my-4">
+        <div className="sm:mt-12 md:mx-4 lg:mx-8 text-hd1mb pt-4 px-4 font-Montserrat my-4">
           Transaction
         </div>
-        <div className="w-full h-full flex flex-1 min-h-0 overflow-y-auto no-scrollbar">
-          <div className="border-t border-primary004">
+        <div className="w-full h-full flex flex-1 min-h-0 no-scrollbar">
+          <div className="border-t border-primary004 h-full bg-primary010">
             <AccountSidebar />
           </div>
-          <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
+          <div className="flex-1 sm:pr-0 sm:border-none border-l border-t border-primary004 overflow-scroll no-scrollbar">
             {
-                (chain && chain === 'ckb') && 
+              (isListLoading || isEmptyList) && 
+              <div className="w-full h-full flex flex-col items-center justify-center gap-8">
+                <Image 
+                  src={'/img/joker.png'}
+                  width={256}
+                  height={256}
+                  alt="is empty"
+                />
+                <div className="text-white001 font-Montserrat">
+                  {isListLoading && 'Your data is on the way from Gottam'}
+                  {(!isListLoading && isEmptyList) && 'Your Wallet in Gottam is empty'}
+                </div>
+              </div>
+            }
+            {
+                (chain && chain === 'ckb' && !isEmptyList) && 
                 
-                <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
+                <div className="pb-10 flex-1 lg:pr-4 md:pr-4 sm:border-none border-l border-t border-primary004">
                     {groupedData && Object.keys(groupedData).map(date => (
                         <div key={date} className="top-0 font-medium text-sm py-4">
                             <div className="px-4 text-sm text-subdued mb-2">
@@ -172,7 +217,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                 </div>
             }
             {
-                (chain && chain === 'btc') && 
+                (chain && chain === 'btc' && !isEmptyList) && 
                 
                 <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
                     {btcGroupData && Object.keys(btcGroupData).map(date => (

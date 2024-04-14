@@ -741,24 +741,24 @@
     lodash "^4.17.21"
 
 "@rgbpp-sdk/ckb@^0.0.0-snap-20240403090049", "@rgbpp-sdk/ckb@^0.0.0-snap-20240412031003":
-  version "0.0.0-snap-20240412031003"
-  resolved "https://registry.npmjs.org/@rgbpp-sdk/ckb/-/ckb-0.0.0-snap-20240412031003.tgz"
-  integrity sha512-JA5DlAwsqvVY5od+/bQLVNoWnyBvB0BG25LirEe5jw9zk1WPjzHiahp2woM0dd5FNFyYTzZKvKUIqjt4veP2vA==
+  version "0.0.0-snap-20240413015029"
+  resolved "https://registry.npmjs.org/@rgbpp-sdk/ckb/-/ckb-0.0.0-snap-20240413015029.tgz"
+  integrity sha512-vJvhAD+c2wUbo+88elEwe0vUE+zqnl9ZES6ebk6mn1LTucfATD8oCTi/MfT1nb2ehMROGAMY2IJnELfBcmpH2Q==
   dependencies:
     "@ckb-lumos/base" "0.21.1"
     "@ckb-lumos/codec" "0.22.0-next.5"
     "@nervosnetwork/ckb-sdk-core" "^0.109.1"
     "@nervosnetwork/ckb-sdk-utils" "^0.109.1"
     "@nervosnetwork/ckb-types" "^0.109.1"
-    "@rgbpp-sdk/service" "^0.0.0-snap-20240412031003"
+    "@rgbpp-sdk/service" "^0.0.0-snap-20240413015029"
     axios "^1.6.8"
     camelcase-keys "^7.0.2"
     js-sha256 "^0.11.0"
 
-"@rgbpp-sdk/service@^0.0.0-snap-20240412031003":
-  version "0.0.0-snap-20240412031003"
-  resolved "https://registry.npmjs.org/@rgbpp-sdk/service/-/service-0.0.0-snap-20240412031003.tgz"
-  integrity sha512-GAQNxaPExmm2EAW9Sqw6eMoi2ydr7e+bCJkLn2FET9GP8Id16WottWqO6Ul7nhmRr1LH5ZMMbJ0lEMdJS9LyBg==
+"@rgbpp-sdk/service@^0.0.0-snap-20240403090049", "@rgbpp-sdk/service@^0.0.0-snap-20240412031003", "@rgbpp-sdk/service@^0.0.0-snap-20240413015029":
+  version "0.0.0-snap-20240413015029"
+  resolved "https://registry.npmjs.org/@rgbpp-sdk/service/-/service-0.0.0-snap-20240413015029.tgz"
+  integrity sha512-ykLhDbP4DuOk+MLbM//dFazzklYUNwpAGR7zHY7S7kGyYAy5iyoarn43c8wCp5t0pnLGawXma8D7GPwfBrxhAw==
   dependencies:
     "@ckb-lumos/lumos" "0.22.0-next.5"
     "@nervosnetwork/ckb-types" "^0.109.1"
@@ -2266,6 +2266,15 @@ formidable@^2.1.2:
     once "^1.4.0"
     qs "^6.11.0"
 
+formidable@^3.5.1:
+  version "3.5.1"
+  resolved "https://registry.npmjs.org/formidable/-/formidable-3.5.1.tgz"
+  integrity sha512-WJWKelbRHN41m5dumb0/k8TeAx7Id/y3a+Z7QfhxP/htI9Js5zYaEDtG8uMgG0vM0lOlqnmjE99/kfpOYi/0Og==
+  dependencies:
+    dezalgo "^1.0.4"
+    hexoid "^1.0.0"
+    once "^1.4.0"
+
 fraction.js@^4.3.7:
   version "4.3.7"
   resolved "https://registry.npmjs.org/fraction.js/-/fraction.js-4.3.7.tgz"
@@ -3422,7 +3431,12 @@ randombytes@^2.1.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
-react-is@^16.13.1, react-is@^16.7.0:
+react-is@^16.13.1:
+  version "16.13.1"
+  resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
+  integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
+react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==

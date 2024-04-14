@@ -56,7 +56,7 @@ const AccountBlock = ({token, address}:{ token: string, address: string}) => {
         className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
       />
       <div className="">
-        <span>To</span>
+        <span>From</span>
         <div className="text-slate-300">{address}</div>
       </div>
     </div>
@@ -66,11 +66,11 @@ const AccountBlock = ({token, address}:{ token: string, address: string}) => {
 const ReceiveBlock = ({ amount, token, address }: { amount: number | string, token: string, address: string }) => {
   return (
     <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
-      <TokenBlock amount={amount} type={TRANSACTION_TYPE.RECEIVE} token={ token } />
+      <AccountBlock token={token} address={address} />
       <div className="mx-1 sm:mx-2 text-sm">
         <ChevronRight />
       </div>
-      <AccountBlock token={token} address={address} />
+      <TokenBlock amount={amount} type={TRANSACTION_TYPE.RECEIVE} token={ token } />
     </div>
   );
 };
@@ -78,11 +78,11 @@ const ReceiveBlock = ({ amount, token, address }: { amount: number | string, tok
 const SendBlock = ({ amount, token, address }: { amount: number | string, token: string, address: string }) => {
   return (
     <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
-      <AccountBlock token={token} address={address}/>
+      <TokenBlock amount={amount} type={TRANSACTION_TYPE.SEND} token={token} />
       <div className="mx-1 sm:mx-2 text-sm">
         <ChevronRight />
       </div>
-      <TokenBlock amount={amount} type={TRANSACTION_TYPE.SEND} token={token} />
+      <AccountBlock token={token} address={address}/>
     </div>
   );
 };
@@ -129,8 +129,8 @@ export default function TransactionItem({
         <div className="overflow-y-visible overflow-x-auto sm:overflow-x-visible whitespace-nowrap text-ellipsis flex flex-wrap flex-1 justify-between lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-center pl-4">
           <div className="flex items-center space-x-4 col-span-4 2xl:col-span-3">
             <div className="flex md:block">
-              <div className="font-semibold whitespace-nowrap">
-                {type === TRANSACTION_TYPE.SEND ? "Send" : "Receive"}
+              <div className="font-semibold whitespace-nowrap sm:pr-1">
+                {type === TRANSACTION_TYPE.SEND ? "Send " : "Receive "}
               </div>
               <div className="ml-4 sm:ml-0 text-slate-300 whitespace-nowrap">
                 {hours}
@@ -160,6 +160,13 @@ export default function TransactionItem({
             </a>
           </div>
         </div>
+      </div>
+      <div className="lg:hidden col-span-7 2xl:col-span-5 sm:flex-1 mt-4 visible bg-primary011 rounded-lg p-2">
+        {type === TRANSACTION_TYPE.SEND ? (
+          <SendBlock amount={amount} token={token} address={formatString(to, 5)}/>
+        ) : (
+          <ReceiveBlock amount={amount} token={token} address={formatString(from, 5)}/>
+        )}
       </div>
     </div>
   );

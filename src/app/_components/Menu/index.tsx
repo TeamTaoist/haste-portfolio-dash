@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store'; 
 import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon, Component1Icon, FileTextIcon, GridIcon, PaperPlaneIcon, ThickArrowLeftIcon } from '@radix-ui/react-icons';
 import { initializeWallets } from '@/store/wallet/walletSlice';
-import { ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';
+import { AlignJustify, ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,6 +11,11 @@ const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
   const deviceType = useSelector((state: RootState) => state.device.type);
   const activeTab = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMobile = () => {
+    setIsOpen(!isOpen)
+  }
 
   const toggleSidebar = () => {
     setIsColleapse(!isColleapse);
@@ -70,11 +75,42 @@ const ResponsiveSidebar: React.FC = () => {
         </div>
       ) : (
         // 移动视图
-        <div className="fixed top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center">
-          <button onClick={toggleSidebar} className="m-2 p-2 bg-gray-700 rounded">
-            Menu
-          </button>
-        </div>
+          <>
+            <div className="fixed top-0 px-4 left-0 w-full h-12 bg-primary011 text-white flex items-center z-50">
+                {
+                  isOpen ? <AlignJustify className='rotate-90' onClick={toggleMobile}/> : <AlignJustify onClick={toggleMobile}/>
+                }
+            </div>
+            <div className={`fixed top-0 left-0 bg-primary011 w-full text-white001 h-full z-40 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
+                <button onClick={toggleMobile} className="text-white p-4">Close</button>
+                <div>
+                  <Link className='flex flex-col' href="/">
+                    <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
+                      <LayoutDashboard />
+                      {
+                        isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/' ? 'font-semibold': ''}`}>Dashboard</p>
+                      }
+                    </div>
+                  </Link>
+                  <Link className='flex flex-col' href="transaction">
+                    <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
+                      <NotebookText />
+                      {
+                        isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/transaction' ? 'font-semibold': ''}`}>Transaction</p>
+                      }
+                    </div>
+                  </Link>
+                  <Link className='flex flex-col' href="send">
+                    <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
+                      <SendToBack />
+                      {
+                        isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/send' ? 'font-semibold': ''}`}>Send & Receive</p>
+                      }
+                    </div>
+                  </Link>  
+                </div>
+            </div>
+          </>
       )}
     </div>
   );
