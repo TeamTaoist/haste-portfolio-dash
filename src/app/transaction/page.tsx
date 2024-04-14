@@ -73,7 +73,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
 
 
-    const transactionTime = new Date(transaction.status.block_time * 1000) ? new Date(transaction.status.block_time * 1000).toLocaleTimeString('en-US') : '';
+    const transactionTime = transaction.status.block_time ? new Date(transaction.status.block_time * 1000).toLocaleTimeString('en-US') : '';
 
     return {
         fromAddress: fromAddresses.join(', '),
@@ -89,15 +89,11 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
   function groupTransactionsByDate(transactions: BTCTxInfo[]): GroupedTransactions {
     const grouped: GroupedTransactions = {};
-
     transactions.forEach(transaction => {
       console.log(transaction)
       const transactionDetails = processTransaction(transaction);
-
-
-
       // Convert the block_time to a date string
-      const date = new Date(transaction.status.block_time * 1000) ? new Date(transaction.status.block_time * 1000).toISOString().split('T')[0]: '';
+      const date = transaction.status.block_time ? new Date(transaction.status.block_time * 1000).toISOString().split('T')[0]: 'pending transaction';
 
       // Initialize the date key if it does not exist
       if (!grouped[date]) {
