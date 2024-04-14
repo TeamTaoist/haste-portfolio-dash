@@ -71,15 +71,23 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
       }
     });
 
-
+    let value: string = '0';
+    if(!currentAddress) { value = '0'}
+    //@ts-ignore
+    if(outputValue[currentAddress!!]) {
+      //@ts-ignore
+      value = outputValue[currentAddress!!].sub(inputValue[currentAddress] || 0).toString() 
+    } else {
+      //@ts-ignore
+      value = '-' + inputValue[currentAddress!!].toString()
+    }
 
     const transactionTime = transaction.status.block_time ? new Date(transaction.status.block_time * 1000).toLocaleTimeString('en-US') : '';
 
     return {
         fromAddress: fromAddresses.join(', '),
         toAddress,
-        //@ts-ignore
-        value: outputValue[currentAddress!!].sub(inputValue[currentAddress] || 0).toString() ,
+        value: value ,
         txid: transaction.txid,
         transactionTime
     };
