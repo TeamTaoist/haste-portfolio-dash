@@ -105,7 +105,7 @@ const AccountSidebar: React.FC = () => {
                       {/* <div className=' font-SourceSanPro font-semibold text-primary003'> ${wallet}</div> */}
                     </div>
                     <div className='flex'>
-                      <div className='font-SourceSanPro text-black opacity-30 '>{wallet.chain} {wallet.balance}</div>
+                      <div className='font-SourceSanPro text-black opacity-30 uppercase'>{wallet.chain} {wallet.balance}</div>
                     </div>
                   </div>
                   <div

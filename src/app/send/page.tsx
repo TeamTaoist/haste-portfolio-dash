@@ -23,21 +23,21 @@ export default function Send() {
   }, [tab]);
 
   return (
-    <main className="flex flex-col flex-1 min-h-screen bg-gray-100 text-black">
-      <div className="pb-10 md:mx-4 my-4 lg:mx-8 lg:my-0 h-full">
+    <main className="flex flex-col flex-1 min-h-screen bg-gray-100 text-black h-full">
+      <div className="pb-10 md:mx-4 my-4 lg:mx-8 lg:my-0 h-full flex flex-col">
         <div className=" text-hd1mb w-full py-4 px-4 font-Montserrat my-4">
           Send & Receive
         </div>
-        <div className="flex items-center justify-center w-full flex-1">
-          <div className="rounded-2xl bg-white p-4rounded-2xl py-5 px-4 sm:px-6 h-auto w-[420px] py-8">
-            <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-4 bg-inherit  border-none z-1 static">
+        <div className="flex items-center justify-center w-full flex-1 flex-grow">
+          <div className="rounded-2xl bg-white p-4  px-4 sm:px-6 h-auto w-[420px] py-8">
+            <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-2 bg-inherit  border-none z-1 static px-4">
               <Link
                 href="/send?tab=send"
                 className={`${
                   currentTab === "receive"
-                    ? "border-transparent"
-                    : "border-primary-default"
-                } p-2 mx-2 font-medium border-b-2 text-default focus:outline-none focus:ring-0 w-full py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-center`}
+                    ? ""
+                    : "activeTab text-primary011 font-Montserrat"
+                } p-2 mx-2 font-medium relative text-default focus:outline-none focus:ring-0 py-0 pb-2  w-auto sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-left`}
               >
                 Send
               </Link>
@@ -45,14 +45,14 @@ export default function Send() {
                 href="/send?tab=receive"
                 className={`${
                   currentTab === "receive"
-                    ? "border-primary-default"
-                    : "border-transparent"
-                } p-2 mx-2 font-medium border-b-2 text-default focus:outline-none focus:ring-0 w-full py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-center`}
+                    ? "activeTab text-primary011 font-Montserrat"
+                    : ""
+                } p-2 mx-2 font-medium relative text-default focus:outline-none focus:ring-0 w-auto py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-left`}
               >
                 Receive
               </Link>
             </div>
-            <div className="flex flex-col gap-6 w-full pt-6 pb-2">
+            <div className="flex flex-col gap-6 w-full pt-6 pb-2 px-2">
               {tab === TABVALUE.RECEIVE ? <ReceiveContent /> : <SendContent />}
             </div>
           </div>

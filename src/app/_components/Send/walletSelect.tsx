@@ -44,7 +44,7 @@ export default function WalletSelect({
     <div className="relative" ref={selectRef}>
       <button
         type="button"
-        className="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6"
+        className="relative w-full cursor-pointer rounded-md py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6 bg-gray-100"
         aria-haspopup="listbox"
         aria-expanded="true"
         aria-labelledby="listbox-label"

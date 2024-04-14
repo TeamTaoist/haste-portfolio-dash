@@ -76,7 +76,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
     //@ts-ignore
     if(outputValue[currentAddress!!]) {
       //@ts-ignore
-      value = outputValue[currentAddress!!].sub(inputValue[currentAddress] || 0).toString() 
+      value = outputValue[currentAddress!!].sub(inputValue[currentAddress] || 0).toString()
     } else {
       //@ts-ignore
       value = '-' + inputValue[currentAddress!!].toString()
@@ -229,7 +229,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                 <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
                     {btcGroupData && Object.keys(btcGroupData).map(date => (
                         <div key={date} className="top-0 font-medium text-sm py-4">
-                            <div className="px-4 text-sm text-subdued mb-2">
+                            <div className="px-4 text-sm text-subdued mb-2 capitalize">
                                 {date}
                             </div>
                             {btcGroupData[date].map((transaction, index) => (

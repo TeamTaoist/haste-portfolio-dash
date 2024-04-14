@@ -257,7 +257,7 @@ export default function SendContent() {
               <p className="font-semibold">Send to</p>
               <input
                   type="text"
-                  className="w-full h-11 px-3 text-sm rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-primary-default"
+                  className="w-full h-11 px-3 text-sm rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-primary-default bg-gray-100"
                   placeholder="Receive Address"
                   value={to}
                   name="to"
@@ -269,9 +269,9 @@ export default function SendContent() {
               <p className="font-semibold">Native Token</p>
               <div className="relative">
                   <label className="inline-flex items-center cursor-pointer">
-                      <input type="checkbox" checked={isNative} className="sr-only peer" onChange={()=>setIsNative(!isNative)}/>
+                      <input type="checkbox" checked={isNative} className="sr-only peer outline-none 1" onChange={()=>setIsNative(!isNative)}/>
                       <div
-                          className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                          className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-white dark:peer-focus:ring-primary011 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary011"></div>
 
                   </label>
               </div>
@@ -283,7 +283,7 @@ export default function SendContent() {
                   <div className="relative">
                       <button
                           type="button"
-                          className="relative w-full cursor-pointer rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6"
+                          className="relative w-full cursor-pointer rounded-md bg-gray-100 py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6"
                           aria-haspopup="listbox"
                           aria-expanded="true"
                           aria-labelledby="listbox-label"
@@ -342,7 +342,7 @@ export default function SendContent() {
                   <p className="font-semibold">Amount</p>
                   <input
                       type="number"
-                      className="w-full h-11 px-3 text-sm rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-primary-default"
+                      className="w-full h-11 px-3 text-sm rounded-md text-gray-900 outline-none focus:ring-2 focus:ring-primary-default bg-gray-100"
                       placeholder="0.00"
                       value={amount}
                       name="amount"

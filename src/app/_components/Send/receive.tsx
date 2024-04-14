@@ -32,15 +32,15 @@ export default function ReceiveContent() {
         <div className="flex justify-center items-center mb-6">
           <QRCode
             value={selectWallet?.address}
-            style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+            style={{ height: "auto", maxWidth: "100%", width: "250px" }}
           />
         </div>
         <button
-          className="cursor-pointer disabled:cursor-auto transition px-5 py-2 rounded-full border flex items-center justify-center text-center text-sm border-default bg-inherit text-default hover:border-transparent"
+          className="cursor-pointer disabled:cursor-auto transition px-5 py-2 rounded-full border flex items-center justify-center text-center text-sm border-default bg-inherit text-default hover:border-transparent bg-primary011 text-white"
           onClick={onClickCopy}
         >
-          <Copy />
-          <span className="ml-2.5">Copy Address</span>
+          <Copy className="text-sm" />
+          <span className="ml-2.5 font-semibold font-Montserrat">Copy Address</span>
         </button>
       </div>
     </>

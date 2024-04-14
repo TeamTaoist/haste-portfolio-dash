@@ -46,7 +46,7 @@ export default function Dashboard() {
   }, [tab, tabs]);
   return (
     <div className="flex-1 h-full min-h-0 overflow-auto p-4">
-      <div className="flex sm:space-x-0 bg-inherit border-none z-1 static text-black">
+      <div className="flex sm:space-x-0 bg-inherit border-none z-1 static text-black gap-4">
         {tabs && tabs.map((tab) => (
           <Link
             key={tab.value}
@@ -55,7 +55,7 @@ export default function Dashboard() {
               currentTab === tab.value
                 ? "activeTab font-Montserrat text-primary011"
                 : "border-transparent"
-            } p-2 mx-2 font-medium relative text-default focus:outline-none focus:ring-0 w-[100px] py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-center`}
+            } p-2 mx-2 font-medium relative text-default focus:outline-none focus:ring-0 w-auto py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-left`}
           >
             {tab.label}
           </Link>
