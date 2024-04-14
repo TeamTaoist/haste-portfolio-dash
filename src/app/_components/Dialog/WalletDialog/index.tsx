@@ -42,7 +42,6 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     walletName: string,
     pubKey: string
   }) => {
-
     if(wallets.some(wallet => wallet.address === props.address)) {
       enqueueSnackbar("Account Already Connected", {variant: "error"})
     } else {

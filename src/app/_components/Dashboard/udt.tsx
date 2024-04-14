@@ -8,6 +8,8 @@ import { getBTCAsset } from "@/query/btc/tools";
 import { getXudtAndSpore } from "@/query/ckb/tools";
 import { ckb_SporeInfo, ckb_UDTInfo, RgbAssert } from "@/types/BTC";
 import { getRgbppAssert } from "@/query/rgbpp/tools";
+import { getSymbol } from "@/lib/utils";
+import { formatUnit } from "@ckb-lumos/bi";
 
 
 export default function UDTList() {
@@ -15,7 +17,7 @@ export default function UDTList() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
-
+  
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
     setXudtList(assetsList.xudtList);
@@ -24,7 +26,8 @@ export default function UDTList() {
 
   const _getRgbAsset = async(address: string) => {
     const assetsList = await getRgbppAssert(address);
-    const rgbAssetList = assetsList.map(asset => asset.ckbCellInfo);
+    const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
+    //@ts-ignore
     setXudtList(rgbAssetList)
     setIsLoading(false);
   }
@@ -91,20 +94,20 @@ export default function UDTList() {
                       />
                     </div>
                     <div>
-                      <p className="font-semibold">{xudt && xudt.symbol}</p>
+                      <p className="font-semibold">{xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}</p>
                       <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
-                        {xudt && xudt.symbol}
+                        {xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}
                       </p>
                     </div>
                   </div>
                 </td>
                 <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
                   <p className="text-sm sm:text-base text-default font-semibold truncate">
-                    {xudt && xudt.amount}
+                    {xudt && formatUnit(xudt.amount, 'ckb')}
                   </p>
-                  <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
+                  {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--
-                  </p>
+                  </p> */}
                 </td>
               </tr>
             ))

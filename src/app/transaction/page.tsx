@@ -72,7 +72,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
 
 
-    const transactionTime = new Date(transaction.status.block_time * 1000).toLocaleTimeString('en-US');
+    const transactionTime = transaction.status.block_time ? new Date(transaction.status.block_time * 1000).toLocaleTimeString('en-US') : '';
 
     return {
         fromAddress: fromAddresses.join(', '),
