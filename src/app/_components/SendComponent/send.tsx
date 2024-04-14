@@ -136,7 +136,6 @@ export default function SendContent() {
     const send_ckb2ckb_Spore = async () =>{
 
       const cfg = getEnv() === 'Mainnet' ? Main_Config.CKB_RPC_URL: Test_Config.CKB_RPC_URL ;
-      console.log(cfg);
       const rpc = new RPC(cfg);
       let sporeCell = await getSporeById(selectAsset?.data.amount, sporeConfig);
       const { txSkeleton } = await transferSpore({
