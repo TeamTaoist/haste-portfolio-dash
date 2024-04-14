@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import "./layout.css";
+@import "./loading.css";
 
 html, body {
   margin: 0;
