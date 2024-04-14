@@ -600,21 +600,20 @@ export class RGBHelper {
   }
 
   async retryBtcTxId(txId: string) {
-    setTimeout(async () => {
-      const cfg = isTestNet() ? testConfig : mainConfig;
+    const cfg = isTestNet() ? testConfig : mainConfig;
 
-      const service = BtcAssetsApi.fromToken(
-        cfg.BTC_ASSETS_API_URL,
-        cfg.BTC_ASSETS_TOKEN,
-        cfg.BTC_ASSETS_ORGIN
-      );
+    const service = BtcAssetsApi.fromToken(
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
+    );
 
-      const rs = await service.retryRgbppCkbTransaction({
-        btc_txid: txId,
-      });
+    const rs = await service.retryRgbppCkbTransaction({
+      btc_txid: txId,
+    });
 
-      console.log("retry rs", rs);
-    }, 200);
+    console.log("retry rs", rs);
+    return rs;
   }
 
   async getRgbAssertByService(txId: string, address: string) {
