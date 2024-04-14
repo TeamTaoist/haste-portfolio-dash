@@ -114,23 +114,14 @@ export class CkbHepler {
       throw new Error("Please choose a wallet");
     }
 
-    console.log("==========wallet",wallet)
-
     const unsigned = await this.buildTransfer(options);
-
-
-    console.log("==========unsigned",unsigned)
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    if (wallet.walletName == "joyidckb") {
+    if (wallet.walletName.indexOf("joyid")>-1) {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
         options.from
       );
-
-      console.log("sign raw tx", signed);
-
-      console.log("amount", options.amount.toString());
 
       return this.sendTransaction(signed);
     }

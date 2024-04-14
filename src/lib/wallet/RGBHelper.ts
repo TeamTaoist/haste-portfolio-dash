@@ -28,6 +28,7 @@ import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { isTestNet, mainConfig, testConfig } from "./constants";
 import store from "@/store/store";
 import {getEnv} from "@/settings/env";
+import {BitcoinUnit} from "bitcoin-units";
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -41,58 +42,62 @@ export class RGBHelper {
   }
 
   // transfer btc
-  // async transferBTC(toAddress: string, amount: BI) {
-  //   const curAccount = DataManager.instance.getCurAccount();
-  //
-  //   if (!curAccount) {
-  //     throw new Error("Please choose a wallet");
-  //   }
-  //
-  //   const wallet = accountStore.getWallet(curAccount);
-  //   if (!wallet) {
-  //     throw new Error("Please choose a wallet");
-  //   }
-  //
-  //   const txHash = await this.buildSendBTC(
-  //     wallet as WalletInfo,
-  //     toAddress,
-  //     amount
-  //   );
-  //
-  //   return txHash;
-  // }
+  async transferBTC(toAddress: string, amount: number) {
+    const curAccount = store.getState().wallet.currentWalletAddress;
+    // const curAccount = DataManager.instance.getCurAccount();
 
-  // async buildSendBTC(wallet: WalletInfo, toAddress: string, amount: BI) {
-  //   const cfg = isTestNet() ? testConfig : mainConfig;
-  //
-  //   const networkType = cfg.rgb_networkType;
-  //   const service = BtcAssetsApi.fromToken(
-  //     cfg.BTC_ASSETS_API_URL,
-  //     cfg.BTC_ASSETS_TOKEN,
-  //     cfg.BTC_ASSETS_ORGIN
-  //   );
-  //   const source = new DataSource(service, networkType);
-  //
-  //   const psbt = await sendBtc({
-  //     tos: [
-  //       {
-  //         address: toAddress,
-  //         value: amount.toNumber(),
-  //       },
-  //     ],
-  //     source,
-  //     from: wallet.address,
-  //     fromPubkey: wallet.pubkey,
-  //   });
-  //
-  //   const psbtHex = await BtcHepler.instance.signPsdt(
-  //     psbt.toHex(),
-  //     wallet.type
-  //   );
-  //   const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, wallet.type);
-  //
-  //   return btcTxId;
-  // }
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const wallets = store.getState().wallet.wallets;
+
+    const wallet = wallets.find((wallet) => wallet.address === curAccount);
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+    let formatAmount = new BitcoinUnit(amount, 'BTC').to('sats').getValue();
+
+    const txHash = await this.buildSendBTC(
+      wallet as WalletInfo,
+      toAddress,
+      BI.from(formatAmount)
+    );
+
+    return txHash;
+  }
+
+  async buildSendBTC(wallet: WalletInfo, toAddress: string, amount: BI) {
+    const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
+
+    const networkType = cfg.rgb_networkType;
+    const service = BtcAssetsApi.fromToken(
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
+    );
+    const source = new DataSource(service, networkType);
+
+    const psbt = await sendBtc({
+      tos: [
+        {
+          address: toAddress,
+          value: amount.toNumber(),
+        },
+      ],
+      source,
+      from: wallet.address,
+      fromPubkey: wallet.pubkey,
+    });
+
+    const psbtHex = await BtcHepler.instance.signPsdt(
+      psbt.toHex(),
+      wallet.walletName!
+    );
+    const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex,wallet.walletName!);
+
+    return btcTxId;
+  }
 
   async transfer_btc_to_btc(
     btcTxHash: string,
@@ -118,8 +123,6 @@ export class RGBHelper {
 
     }
 
-    console.log("=====wallet===",wallet)
-
     if (wallet.chain.toUpperCase() != "BTC") return;
 
     const txHash = await this.btc_to_btc_buildTx(
@@ -129,7 +132,6 @@ export class RGBHelper {
       typeScript,
       amount
     );
-  console.log("=====txHash===",txHash)
 
     return txHash;
   }
@@ -154,15 +156,13 @@ export class RGBHelper {
       throw new Error("Please choose a wallet");
     }
 
-    console.log("cur wallet", curAccount, wallet);
-
     const unsignedRawTx = await this.ckb_to_btc_buildTx(
       buildRgbppLockArgs(btcTxIdx, btcTxHash),
       wallet as WalletInfo,
       typeScript,
       amount
     );
-    console.log("===unsignedRawTxckb_to_btc_buildTx=",unsignedRawTx,wallet)
+
 
     if (wallet.walletName.indexOf("joyid") > -1 ) {
       const signed = await signRawTransaction(
@@ -220,10 +220,6 @@ export class RGBHelper {
     transferAmount: bigint = 0n
   ) {
     const cfg = getEnv() ? testConfig : mainConfig;
-
-
-    console.log("===cfg",cfg)
-
     const collector = new Collector({
       ckbNodeUrl: cfg.CKB_RPC_URL,
       ckbIndexerUrl: cfg.CKB_INDEX_URL,
@@ -236,8 +232,6 @@ export class RGBHelper {
       cfg.BTC_ASSETS_ORGIN
     );
 
-    console.log("===service",service)
-
     const source = new DataSource(service, networkType);
 
     const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
@@ -248,22 +242,8 @@ export class RGBHelper {
       isMainnet: cfg.isMainnet,
     });
 
-    console.log("======btc_wallet=====",btc_wallet)
-
-    console.log("===ckbVirtualTxResult",ckbVirtualTxResult)
-
     const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
-    console.log("==sendRgbppUtxos===",{
-      ckbVirtualTx: ckbRawTx,
-      commitment,
-      tos: [toAddress],
-      feeRate:1,
-      ckbCollector: collector,
-      from: btc_wallet.address!,
-      fromPubkey: btc_wallet.pubkey || btc_wallet.pubKey,
-      source,
-    })
 
     // Send BTC tx
     const psbt = await sendRgbppUtxos({
@@ -277,25 +257,20 @@ export class RGBHelper {
       source,
     });
 
-    console.log("===psbt",psbt)
 
     const psbtHex = await BtcHepler.instance.signPsdt(
       psbt.toHex(),
       btc_wallet?.walletName!
     );
 
-    console.log("===psbtHex",psbtHex)
 
     const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex,  btc_wallet?.walletName!);
-
-
-    console.log("===btcTxId",btcTxId)
 
     const rgbppState = await service.sendRgbppCkbTransaction({
       btc_txid: btcTxId,
       ckb_virtual_result: ckbVirtualTxResult,
     });
-    console.log("rgbppState", rgbppState);
+
 
     await this.retryBtcTxId(btcTxId);
 
