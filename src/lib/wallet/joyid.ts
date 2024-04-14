@@ -19,7 +19,8 @@ import {
   // connect,
 } from "@joyid/ckb";
 import {
-  getCotaTypeScript,
+  getCotaCellDep,
+  // getCotaTypeScript,
   // getCotaTypeScript,
   isTestNet,
   mainConfig,
@@ -187,29 +188,27 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
               outputType: "0x" + unlockEntry,
             };
 
-            const cotaType = getCotaTypeScript(
+            // const cotaType = getCotaTypeScript(
+            //   getConfig().network === "mainnet"
+            // );
+            // const cotaCollector = txSkeleton
+            //   .get("cellProvider")
+            //   ?.collector({ lock: lock, type: cotaType });
+
+            // const cotaCells: Cell[] = [];
+            // if (cotaCollector) {
+            //   for await (const cotaCell of cotaCollector.collect()) {
+            //     cotaCells.push(cotaCell);
+            //   }
+            // }
+
+            // if (!cotaCells || cotaCells.length === 0) {
+            //   throw new Error("Cota cell doesn't exist");
+            // }
+            // const cotaCell = cotaCells[0];
+            const cotaCellDep: CellDep = getCotaCellDep(
               getConfig().network === "mainnet"
             );
-            const cotaCollector = txSkeleton
-              .get("cellProvider")
-              ?.collector({ lock: lock, type: cotaType });
-
-            const cotaCells: Cell[] = [];
-            if (cotaCollector) {
-              for await (const cotaCell of cotaCollector.collect()) {
-                cotaCells.push(cotaCell);
-              }
-            }
-
-            if (!cotaCells || cotaCells.length === 0) {
-              throw new Error("Cota cell doesn't exist");
-            }
-            const cotaCell = cotaCells[0];
-            const cotaCellDep: CellDep = {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              outPoint: cotaCell.outPoint as any,
-              depType: "code",
-            };
 
             // note: COTA cell MUST put first
             txSkeleton = addCellDep(txSkeleton, cotaCellDep);
