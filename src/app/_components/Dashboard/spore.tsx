@@ -97,7 +97,7 @@ export default function SporeList() {
                 spore.url && <img src={spore.url} alt="" className="w-full object-cover block" /> 
               }
               {
-                (!spore.type?.startsWith('image') && !spore.url) && <p>{spore.textContent}</p> 
+                (!spore.type?.startsWith('image') && !spore.url) && <p>{spore.textContent}  </p> 
               }
             </div>
             <div className="p-3">{formatString(spore.amount, 5)}</div>

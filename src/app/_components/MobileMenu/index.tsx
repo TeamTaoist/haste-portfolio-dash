@@ -43,8 +43,8 @@ const DropdownSelect: React.FC = () => {
                     {wallets.map((wallet, index) => (
                         <div key={index}
                         className={`
-                          ${wallet.address === currentAddress ? 'bg-primary007 rounded-md': ''}
-                          flex items-center justify-between text-white p-2 hover:bg-gray-600`
+                          ${wallet.address === currentAddress ? 'bg-primary009 rounded-md': ''}
+                          flex items-center text-black justify-between p-2 hover:bg-primary011`
                         }
                         onClick={() => {
                           dispatch(setCurrentWalletAddress(wallet.address))
