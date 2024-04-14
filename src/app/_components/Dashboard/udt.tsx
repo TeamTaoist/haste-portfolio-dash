@@ -10,13 +10,14 @@ import { ckb_SporeInfo, ckb_UDTInfo, RgbAssert } from "@/types/BTC";
 import { getRgbppAssert } from "@/query/rgbpp/tools";
 import { getSymbol } from "@/lib/utils";
 import { formatUnit } from "@ckb-lumos/bi";
-
+import Loading from "@/app/_components/loading";
 
 export default function UDTList() {
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
+  const [loadingPage,setLoadingPage] = useState(false)
 
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
@@ -33,22 +34,33 @@ export default function UDTList() {
   }
 
   const getCurrentAssets = async() => {
-    const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
-    const chain = currentWallet?.chain;
-    if ( chain && chain === 'btc') {
-      await _getRgbAsset(currentWallet?.address!!)
-    } else if (chain && chain === 'ckb') {
-      const list = await _getSporeAndXudt(currentWallet?.address!!);
+    try{
+      const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
+      const chain = currentWallet?.chain;
+      if ( chain && chain === 'btc') {
+        await _getRgbAsset(currentWallet?.address!!)
+      } else if (chain && chain === 'ckb') {
+        const list = await _getSporeAndXudt(currentWallet?.address!!);
+      }
+    }catch (e) {
+      console.error("getCurrentAssets",e)
+    }finally {
+      setLoadingPage(false)
     }
+
   }
 
   useEffect(() => {
+    setLoadingPage(true)
     getCurrentAssets()
   }, [currentAddress])
 
 
   return (
     <div className="w-full">
+      {
+        loadingPage && <Loading />
+      }
       <table className="w-full">
         <thead>
           <tr className="font-SourceSanPro font-semibold text-black opacity-30 grid grid-cols-12 py-2 text-left">
@@ -63,7 +75,7 @@ export default function UDTList() {
         <tbody className="text-black">
           {isLoading ? (
             Array.from(new Array(5)).map((_, index) => (
-              <tr key={index} className="hover:bg-gray-100 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-l ">
+              <tr key={index} className="hover:bg-gray-100 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-lg">
                 <td className="col-span-7 lg:col-span-5 px-8">
                   <div className="flex gap-3 items-center">
                     <div className="w-8 h-8 rounded-full bg-gray-300 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-200% animate-shimmer"></div>

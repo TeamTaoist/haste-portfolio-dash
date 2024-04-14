@@ -115,9 +115,9 @@ export default function TransactionItem({
       enqueueSnackbar('Copied Fail', {variant: 'error'})
     }
   };
-  
+
   return (
-    <div className="hover:bg-primary010 cursor-pointer p-4 sm:border-b last:border-none border-gray-500">
+    <div className="hover:bg-gray-100 cursor-pointer p-4 sm:border-b last:border-none border-gray-500 bg-white  rounded-lg mb-4 ml-4">
       <div className="flex items-center">
         <div className="relative rounded-full flex w-8 h-8 items-center justify-center">
           {type === TRANSACTION_TYPE.SEND ? (

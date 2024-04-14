@@ -168,14 +168,14 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
   return (
     <main className="flex flex-col flex-1 h-full bg-gray-100 text-black">
       <div className="h-full w-full flex flex-col">
-        <div className="sm:mt-20 md:mx-4 lg:mx-8 text-hd1mb pt-4 px-4 font-Montserrat my-4">
+        <div className="sm:mt-20 flex text-black text-hd1mb border-b border-gray-300 w-full py-10 px-8 font-Montserrat font-bold">
           Transaction
         </div>
         <div className="w-full h-full flex flex-1 min-h-0 no-scrollbar">
-          <div className="border-t border-primary004 h-full bg-primary010">
+          <div className=" h-full bg-primary010">
             <AccountSidebar />
           </div>
-          <div className="flex-1 sm:pr-0 sm:border-none border-l border-t border-primary004 overflow-scroll no-scrollbar">
+          <div className="flex-1 sm:pr-0 sm:border-none overflow-scroll no-scrollbar">
             {
               (isListLoading || isEmptyList) &&
               <div className="w-full h-full flex flex-col items-center justify-center gap-8">
@@ -185,7 +185,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                   height={256}
                   alt="is empty"
                 />
-                <div className="text-white001 font-Montserrat">
+                <div className="text-black opacity-30 uppercase">
                   {isListLoading && 'Your data is on the way from Gottam'}
                   {(!isListLoading && isEmptyList) && 'Your Wallet in Gottam is empty'}
                 </div>
@@ -194,10 +194,10 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
             {
                 (chain && chain === 'ckb' && !isEmptyList) &&
 
-                <div className="pb-10 flex-1 lg:pr-4 md:pr-4 sm:border-none border-l border-t border-primary004">
+                <div className="pb-10 flex-1 lg:pr-4 md:pr-4 sm:border-none ">
                     {groupedData && Object.keys(groupedData).map(date => (
                         <div key={date} className="top-0 font-medium text-sm py-4">
-                            <div className="px-4 text-sm text-subdued mb-2">
+                            <div className="px-6 text-sm text-subdued mb-2 font-din font-semibold">
                                 {date}
                             </div>
                             {groupedData[date].map((transaction, index) => (
