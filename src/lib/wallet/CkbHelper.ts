@@ -302,7 +302,7 @@ export class CkbHepler {
       txSkeleton = await commons.common.payFee(
         txSkeleton,
         [fromAddress],
-        1000,
+        MAX_FEE,
         undefined,
         { config: cfg.CONFIG }
       );
@@ -395,7 +395,7 @@ export class CkbHepler {
     const needCapacity = output_sumCapacity
       .sub(spore_sumCapacity)
       .add(minEmptyCapacity)
-      .add(2000); // fee
+      .add(MAX_FEE); // fee
 
     // find ckb
     // <<
