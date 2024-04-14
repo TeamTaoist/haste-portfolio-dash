@@ -480,13 +480,6 @@ export class CkbHepler {
 
     console.log(toAddress);
 
-    // const sudt_from = await this.sudtBalance(fromAddress, sudtToken);
-    // const sudt_to = await this.sudtBalance(toAddress, sudtToken);
-
-    // const ckb_from = await this.capacityOf(fromAddress);
-
-    // console.log(sudt_from.toString(), sudt_to.toString(), ckb_from.toString());
-
     let sudt_cellDeps = helpers.locateCellDep(sudtToken);
     if (sudt_cellDeps == null) {
       if (isXUDT) {
@@ -594,47 +587,63 @@ export class CkbHepler {
       );
     }
 
-    const needCapacity = outputCapacity.add(MAX_FEE); // fee
-
-    // find ckb
-    // <<
-    const collect_ckb = CkbHepler.instance.indexer.collector({
-      lock: {
-        script: fromScript,
-        searchMode: "exact",
-      },
-      type: "empty",
-    });
-    const inputs_ckb: Cell[] = [];
-    let ckb_sum = BI.from(0);
-    for await (const collect of collect_ckb.collect()) {
-      inputs_ckb.push(collect);
-      ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
-      if (ckb_sum.gte(needCapacity)) {
-        break;
+    let needCapacity = outputCapacity.add(MAX_FEE); // fee
+    if (needCapacity.lt(sudt_sumCapacity)) {
+      const ckb_change = sudt_sumCapacity.sub(needCapacity);
+      if (ckb_change.gt(0)) {
+        const output_ckb_change: Cell = {
+          cellOutput: {
+            lock: fromScript,
+            capacity: ckb_change.toHexString(),
+          },
+          data: "0x",
+        };
+        txSkeleton = txSkeleton.update("outputs", (outputs) =>
+          outputs.push(output_ckb_change)
+        );
       }
-    }
-    // >>
-    if (ckb_sum.lt(needCapacity)) {
-      throw new Error("No enough capacity");
-    }
-    for (let i = 0; i < inputs_ckb.length; i++) {
-      const element = inputs_ckb[i];
-      element.cellOutput.capacity = "0x0";
-      txSkeleton = await commons.common.setupInputCell(txSkeleton, element);
-    }
-    const ckb_change = ckb_sum.sub(needCapacity);
-    if (ckb_change.gt(0)) {
-      const output_ckb_change: Cell = {
-        cellOutput: {
-          lock: fromScript,
-          capacity: ckb_change.toHexString(),
+    } else {
+      needCapacity = needCapacity.sub(sudt_sumCapacity);
+      // find ckb
+      // <<
+      const collect_ckb = CkbHepler.instance.indexer.collector({
+        lock: {
+          script: fromScript,
+          searchMode: "exact",
         },
-        data: "0x",
-      };
-      txSkeleton = txSkeleton.update("outputs", (outputs) =>
-        outputs.push(output_ckb_change)
-      );
+        type: "empty",
+      });
+      const inputs_ckb: Cell[] = [];
+      let ckb_sum = BI.from(0);
+      for await (const collect of collect_ckb.collect()) {
+        inputs_ckb.push(collect);
+        ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
+        if (ckb_sum.gte(needCapacity)) {
+          break;
+        }
+      }
+      // >>
+      if (ckb_sum.lt(needCapacity)) {
+        throw new Error("No enough capacity");
+      }
+      for (let i = 0; i < inputs_ckb.length; i++) {
+        const element = inputs_ckb[i];
+        element.cellOutput.capacity = "0x0";
+        txSkeleton = await commons.common.setupInputCell(txSkeleton, element);
+      }
+      const ckb_change = ckb_sum.sub(needCapacity);
+      if (ckb_change.gt(0)) {
+        const output_ckb_change: Cell = {
+          cellOutput: {
+            lock: fromScript,
+            capacity: ckb_change.toHexString(),
+          },
+          data: "0x",
+        };
+        txSkeleton = txSkeleton.update("outputs", (outputs) =>
+          outputs.push(output_ckb_change)
+        );
+      }
     }
 
     return txSkeleton;
