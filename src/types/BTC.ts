@@ -158,9 +158,12 @@ export interface ckb_SporeInfo {
   symbol: string;
   amount: string;
   type_hash: string;
+  type?: string;
   udt_icon_file?: string;
   udt_type: "spore_cell";
   decimal?: string;
+  url?: string;
+  textContent: string;
   display_name?: string;
   uan?: string;
   outPoint?:{

@@ -11,6 +11,7 @@ import { btc_TxInfo, btcGroupedTransaction, BTCTxInfo, ckb_TxInfo, groupedTransa
 import { BI, BIish } from "@ckb-lumos/lumos";
 import { formatUnit } from "@ckb-lumos/bi";
 import Image from 'next/image';
+import { getEnv } from "@/settings/env";
 
 export default function Transaction() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
@@ -96,7 +97,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
 
       // Convert the block_time to a date string
-      const date = new Date(transaction.status.block_time * 1000).toISOString().split('T')[0];
+      const date = new Date(transaction.status.block_time * 1000) ? new Date(transaction.status.block_time * 1000).toISOString().split('T')[0]: '';
 
       // Initialize the date key if it does not exist
       if (!grouped[date]) {
@@ -203,7 +204,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                             {groupedData[date].map((transaction, index) => (
                                 <TransactionItem
                                     key={index}
-                                    transaction={transaction.attributes.transaction_hash}
+                                    transaction={`https://${getEnv() === 'Mainnet' ? '': 'pudge.'}explorer.nervos.org/transaction/${transaction.attributes.transaction_hash}`}
                                     from={transaction.attributes.display_inputs[0].address_hash}
                                     to={transaction.attributes.display_outputs[0].address_hash}
                                     hours={transaction.attributes.created_at.split(' ')[1]}
@@ -230,7 +231,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                             {btcGroupData[date].map((transaction, index) => (
                                 <TransactionItem
                                     key={index}
-                                    transaction={transaction.txid}
+                                    transaction={`https://mempool.space/${getEnv() === 'Testnet' && 'testnet'}/tx/${transaction.txid}`}
                                     from={transaction.fromAddress}
                                     to={transaction.toAddress!!}
                                     hours={transaction.transactionTime}

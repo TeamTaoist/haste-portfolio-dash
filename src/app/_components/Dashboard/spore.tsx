@@ -7,7 +7,8 @@ import { RootState } from "@/store/store";
 import { CkbHepler } from "@/query/ckb/ckbRequest";
 import { getSpore, getXudtAndSpore } from "@/query/ckb/tools";
 import { ckb_SporeInfo } from "@/types/BTC";
-import { formatString } from "@/utils/common";
+import { formatString, isImageMIMEType } from "@/utils/common";
+import Image from "next/image";
 
 export default function SporeList() {
   const [spores, setSpores] = useState<ckb_SporeInfo[]>([]);
@@ -15,9 +16,30 @@ export default function SporeList() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
 
+  const getSporeTypeScript = async(id:string) => {
+    let contentType = await fetch(`/api/media/${id}`);
+    let blob = await contentType.blob();
+    let isImage = isImageMIMEType(blob.type);
+    let textContent = '';
+    if (!isImage) {
+      textContent = await blob.text();
+    }
+    return { type: blob.type, url: contentType.url, textContent }
+  }
+  
+
+  const handleSporeList = async(list: ckb_SporeInfo[]) => {
+    const promises = list.map(async item => {
+        return {...item, type: (await getSporeTypeScript(item.amount)).type, textContent: (await getSporeTypeScript(item.amount)).textContent, url: (await getSporeTypeScript(item.amount)).url};
+    });
+    const updatedList = await Promise.all(promises);
+    return updatedList
+  }
+
   const _getSpore = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
-    setSpores(assetsList.sporeList);
+    const list = await handleSporeList(assetsList.sporeList)
+    setSpores(list);
     setIsLoading(false);
   }
 
@@ -58,11 +80,9 @@ export default function SporeList() {
             className="relative translate-y-0 hover:z-10 hover:shadow-2xl hover:-translate-y-0.5 bg-inherit rounded-lg shadow-xl transition-all cursor-pointer group bg-white"
           >
             <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-white ">
-              <img
-                src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
-                alt=""
-                className="w-full object-cover block"
-              />
+              {
+                spore.type?.startsWith('image') ? <img src={`/api/media/${spore.amount}`} alt="" className="w-full object-cover block" /> : <p>{spore.textContent}</p>
+              }
             </div>
             <div className="p-3">{formatString(spore.amount, 5)}</div>
           </div>

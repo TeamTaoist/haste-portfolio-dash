@@ -151,7 +151,7 @@ export default function TransactionItem({
           </div>
           <div className="flex items-center justify-end space-x-2 col-span-1 2xl:col-span-2">
             <a
-              href={`https://${getEnv() === 'Mainnet' ? 'pudege.': ''}explorer.nervos.org/transaction/${transaction}`}
+              href={transaction}
               className="text-slate-400 hover:bg-slate-600 p-2 rounded-full flex"
               target="_blank"
               rel="noopener noreferrer"
