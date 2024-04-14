@@ -12,7 +12,7 @@ import {getEnv} from "@/settings/env";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
-  private _network: string = isTestNet() ? "testnet" : "mainnet";
+  private _network: string = getEnv() ? "testnet" : "mainnet";
   private constructor() {}
 
   public static get instance() {
@@ -225,33 +225,6 @@ export class BtcHepler {
     }
 
     throw new Error("Please connect btc wallet");
-  }
-  async sendBtc (walletType: string,to:string,amount:number) {
-    let txHash;
-
-    let formatAmount = new BitcoinUnit(amount, 'BTC').to('sats').getValue();
-    console.log(formatAmount,walletType)
-
-    if (walletType == "unisat") {
-      const {unisat} = (window as any);
-      txHash = await unisat.sendBitcoin(to,formatAmount);
-    } else if (walletType == "okx") {
-
-      console.log("====to=====",to)
-
-      const {okxwallet} = (window as any);
-      txHash = okxwallet.bitcoin.sendBitcoin(to, formatAmount)
-
-    }else if(walletType.indexOf("joyid")>-1 ) {
-
-
-
-    }else{
-      throw new Error("Please connect btc wallet");
-    }
-
-    return txHash;
-
   }
 
 }

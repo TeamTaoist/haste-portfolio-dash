@@ -55,18 +55,19 @@ export default function SendContent() {
                 amount:parseUnit(amount.toString(), "ckb").toBigInt()
             },selectWallet.address)
                 .then((rs)=>{
+                    enqueueSnackbar("Transfer Successful", {variant: "success"})
                 console.log("ckb to ckb tx hash:", rs);
             }).catch((err) => {
                 console.error(err);
                 enqueueSnackbar("Transfer Error", {variant: "error"})
             });
         }else{
-            BtcHepler.instance.sendBtc(
-                selectWallet.walletName,
+            RGBHelper.instance.transferBTC(
                 to,
                 amount as number
             )
                 .then((rs)=>{
+                enqueueSnackbar("Transfer Successful", {variant: "success"})
                 console.log("btc to btc tx hash:", rs);
             }).catch((err) => {
                 console.error(err);
@@ -187,25 +188,11 @@ export default function SendContent() {
             )
             .then((rs) => {
                 console.log("btc to ckb tx hash:", rs);
-
-                // toast({
-                //     title: "Success",
-                //     description: rs,
-                // });
-                //
-                // handleCloseDialog();
-                // if (accountStore.currentAddress) {
-                //     HttpManager.instance.getAsset(accountStore.currentAddress);
-                // }
+                enqueueSnackbar("Transfer Successful", {variant: "success"})
             })
             .catch((err) => {
                 console.error(err);
-                //
-                // toast({
-                //     title: "Warning",
-                //     description: err.message,
-                //     variant: "destructive",
-                // });
+                enqueueSnackbar("Transfer Error", {variant: "error"})
             });
     }
     const send_btc2btc_UDT = () =>{
@@ -221,26 +208,11 @@ export default function SendContent() {
             )
             .then((rs) => {
                 console.log("btc to btc tx hash:", rs);
-
-                // toast({
-                //     title: "Success",
-                //     description: rs,
-                // });
-                //
-                // handleCloseDialog();
-                //
-                // if (accountStore.currentAddress) {
-                //     HttpManager.instance.getAsset(accountStore.currentAddress);
-                // }
+                enqueueSnackbar("Transfer Successful", {variant: "success"})
             })
             .catch((err) => {
                 console.error(err);
-
-                // toast({
-                //     title: "Warning",
-                //     description: err.message,
-                //     variant: "destructive",
-                // });
+                enqueueSnackbar("Transfer Error", {variant: "error"})
             });
 
 
