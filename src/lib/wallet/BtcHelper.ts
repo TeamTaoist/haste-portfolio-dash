@@ -1,5 +1,5 @@
 import superagent from "superagent";
-
+import { BitcoinUnit } from 'bitcoin-units';
 import { WalletType, btc_AddressInfo, btc_TxInfo } from "../interface";
 import { initConfig, sendPsbt } from "@joyid/bitcoin";
 import {
@@ -8,6 +8,7 @@ import {
   // signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
 import { isTestNet, mainConfig, testConfig } from "./constants";
+import {getEnv} from "@/settings/env";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
@@ -164,7 +165,7 @@ export class BtcHepler {
   }
 
   async getBTC(address: string): Promise<btc_AddressInfo | undefined> {
-    const cfg = isTestNet() ? testConfig : mainConfig;
+    const cfg = getEnv() ? testConfig : mainConfig;
 
     const result = await superagent
       .get(
@@ -208,7 +209,7 @@ export class BtcHepler {
         console.log(okxwallet.bitcoinTestnet);
 
         // {address publicKey}
-        const cfg = isTestNet() ? testConfig : mainConfig;
+        const cfg = getEnv() ? testConfig : mainConfig;
         if (cfg.isMainnet) {
           const result = await okxwallet.bitcoin.pushPsbt(psbtHex);
           return result;
@@ -218,11 +219,40 @@ export class BtcHepler {
       } else {
         throw new Error("OKX Wallet is no installed!");
       }
-    } else if (walletType == "joyid") {
+    } else if (walletType.indexOf("joyid")>-1 ) {
       const result = await sendPsbt(psbtHex);
       return result;
     }
 
     throw new Error("Please connect btc wallet");
   }
+  async sendBtc (walletType: string,to:string,amount:number) {
+    let txHash;
+
+    let formatAmount = new BitcoinUnit(amount, 'BTC').to('sats').getValue();
+    console.log(formatAmount,walletType)
+
+    if (walletType == "unisat") {
+      const {unisat} = (window as any);
+      txHash = await unisat.sendBitcoin(to,formatAmount);
+    } else if (walletType == "okx") {
+
+      console.log("====to=====",to)
+
+      const {okxwallet} = (window as any);
+      txHash = okxwallet.bitcoin.sendBitcoin(to, formatAmount)
+
+    }else if(walletType.indexOf("joyid")>-1 ) {
+
+
+
+    }else{
+      throw new Error("Please connect btc wallet");
+    }
+
+    return txHash;
+
+  }
+
 }
+
