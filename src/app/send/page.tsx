@@ -29,8 +29,8 @@ export default function Send() {
           Send & Receive
         </div>
         <div className="flex items-center justify-center w-full flex-1 flex-grow">
-          <div className="rounded-2xl bg-white p-4  px-4 sm:px-6 h-auto w-[420px] py-8">
-            <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-2 bg-inherit  border-none z-1 static px-4">
+          <div className="rounded-2xl bg-white p-4  px-4 sm:px-6 h-auto w-[420px] sm:w-full py-8">
+            <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-7 bg-inherit  border-none z-1 static px-4">
               <Link
                 href="/send?tab=send"
                 className={`${

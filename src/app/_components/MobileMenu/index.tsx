@@ -14,7 +14,7 @@ const DropdownSelect: React.FC = () => {
     const dispatch = useDispatch();
 
     const toggleDropdown = () => setIsOpen(!isOpen);
-    
+
     useEffect(() => {
       const current = wallets.find(wallet => wallet.address === currentAddress);
       setCurrentWallet(current!!)
@@ -22,16 +22,16 @@ const DropdownSelect: React.FC = () => {
 
     return (
         <div className="relative">
-            <div 
+            <div
               className={`
-                flex items-center justify-between border rounded-md bg-primary008 text-white px-4 py-2 gap-4 cursor-pointer
-              `} 
+                flex items-center justify-between border rounded-md bg-primary011 text-white px-4 py-2 gap-4 cursor-pointer
+              `}
               onClick={toggleDropdown}>
                 <Image
                   src={`/img/${currentWallet?.chain}.png`}
                   width={24}
                   height={24}
-                  className='rounded-full'
+                  className='rounded-full border border-gray-200'
                   alt={'icon'}
                 />
                 <div className=' font-SourceSanPro flex justify-center items-end flex-col'>
@@ -41,7 +41,7 @@ const DropdownSelect: React.FC = () => {
             {isOpen && (
                 <div className="absolute top-full w-full bg-primary008 mt-1 border border-primary002 rounded-md">
                     {wallets.map((wallet, index) => (
-                        <div key={index} 
+                        <div key={index}
                         className={`
                           ${wallet.address === currentAddress ? 'bg-primary007 rounded-md': ''}
                           flex items-center justify-between text-white p-2 hover:bg-gray-600`

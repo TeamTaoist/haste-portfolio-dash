@@ -86,36 +86,36 @@ const ResponsiveSidebar: React.FC = () => {
       ) : (
         // 移动视图
           <>
-            <div className="fixed top-0 px-4 left-0 w-full h-16 bg-white text-white flex justify-between items-center z-50">
+            <div className="fixed top-0 px-4 left-0 w-full h-16 bg-gray-100 text-black flex justify-between items-center z-50">
                 {
                   isOpen ? <AlignJustify className='rotate-90' onClick={toggleMobile}/> : <AlignJustify onClick={toggleMobile}/>
                 }
                 <DropdownSelect />
             </div>
-            <div className={`fixed top-0 left-0 bg-primary011 w-full text-white001 h-full z-40 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
-                <button onClick={toggleMobile} className="text-white p-4">Close</button>
+            <div className={`fixed top-0 left-0 bg-white w-full text-black h-full z-40 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
+                <button onClick={toggleMobile} className="text-black p-4">Close</button>
                 <div>
                   <Link className='flex flex-col' href="/">
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
-                      <LayoutDashboard />
+                      <LayoutDashboard className={` ${activeTab === '/' ? ' text-primary011': ''}`} />
                       {
-                        isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/' ? 'font-semibold': ''}`}>Dashboard</p>
+                        isColleapse && <p className={` text-body1mb ${activeTab === '/' ? 'font-Montserrat text-primary011': ''}`}>Dashboard</p>
                       }
                     </div>
                   </Link>
                   <Link className='flex flex-col' href="transaction">
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
-                      <NotebookText />
+                      <NotebookText className={` ${activeTab === '/transaction' ? ' text-primary011': ''}`} />
                       {
-                        isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/transaction' ? 'font-semibold': ''}`}>Transaction</p>
+                        isColleapse && <p className={`text-body1mb ${activeTab === '/transaction' ? 'font-Montserrat text-primary011': ''}`}>Transaction</p>
                       }
                     </div>
                   </Link>
                   <Link className='flex flex-col' href="send">
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
-                      <SendToBack />
+                      <SendToBack className={` ${activeTab === '/send' ? ' text-primary011': ''}`}  />
                       {
-                        isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/send' ? 'font-semibold': ''}`}>Send & Receive</p>
+                        isColleapse && <p className={`text-body1mb ${activeTab === '/send' ? 'font-Montserrat text-primary011': ''}`}>Send & Receive</p>
                       }
                     </div>
                   </Link>
