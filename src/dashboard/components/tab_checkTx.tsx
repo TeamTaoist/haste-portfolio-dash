@@ -15,6 +15,8 @@ export function TabCheckTx() {
   const [result, setResult] = useState("");
 
   const handleCheckTx = async (txHash: string) => {
+    setResult("");
+
     if (txHash.length <= 0) {
       toast({
         title: "Warning",
@@ -88,6 +90,7 @@ export function TabCheckTx() {
                 value={txHash}
                 onChange={(e) => {
                   setTxHash(e.target.value);
+                  setResult("");
                 }}
                 className="col-span-3"
               />
