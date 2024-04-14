@@ -8,7 +8,6 @@ import { CkbHepler } from "@/query/ckb/ckbRequest";
 import { getSpore, getXudtAndSpore } from "@/query/ckb/tools";
 import { ckb_SporeInfo } from "@/types/BTC";
 import { formatString, isImageMIMEType } from "@/utils/common";
-import Image from "next/image";
 
 export default function SporeList() {
   const [spores, setSpores] = useState<ckb_SporeInfo[]>([]);
@@ -20,17 +19,26 @@ export default function SporeList() {
     let contentType = await fetch(`/api/media/${id}`);
     let blob = await contentType.blob();
     let isImage = isImageMIMEType(blob.type);
-    let textContent = '';
+    let textContent: string = '';
+    let url: string = ''
     if (!isImage) {
       textContent = await blob.text();
     }
-    return { type: blob.type, url: contentType.url, textContent }
+    try {
+      let jsonData = JSON.parse(textContent);
+      url = jsonData.resource.url;
+    } catch {
+
+    }
+    
+    return { type: blob.type, url: url, textContent }
   }
   
 
   const handleSporeList = async(list: ckb_SporeInfo[]) => {
     const promises = list.map(async item => {
-        return {...item, type: (await getSporeTypeScript(item.amount)).type, textContent: (await getSporeTypeScript(item.amount)).textContent, url: (await getSporeTypeScript(item.amount)).url};
+        let sporeInfo = await getSporeTypeScript(item.amount)
+        return {...item, type: sporeInfo.type, textContent: sporeInfo.textContent, url: sporeInfo.url};
     });
     const updatedList = await Promise.all(promises);
     return updatedList
@@ -81,7 +89,15 @@ export default function SporeList() {
           >
             <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-white ">
               {
-                spore.type?.startsWith('image') ? <img src={`/api/media/${spore.amount}`} alt="" className="w-full object-cover block" /> : <p>{spore.textContent}</p>
+                // eslint-disable-next-line @next/next/no-img-element
+                spore.type?.startsWith('image') && <img src={`/api/media/${spore.amount}`} alt="" className="w-full object-cover block" /> 
+              }
+              {
+                // eslint-disable-next-line @next/next/no-img-element
+                spore.url && <img src={spore.url} alt="" className="w-full object-cover block" /> 
+              }
+              {
+                (!spore.type?.startsWith('image') && !spore.url) && <p>{spore.textContent}</p> 
               }
             </div>
             <div className="p-3">{formatString(spore.amount, 5)}</div>
