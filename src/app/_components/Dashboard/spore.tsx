@@ -25,7 +25,7 @@ export default function SporeList() {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
     const chain = currentWallet?.chain;
     if ( chain && chain === 'btc') {
-      
+
     } else if (chain && chain === 'ckb') {
       const list = await _getSpore(currentWallet?.address!!);
     }
@@ -36,11 +36,11 @@ export default function SporeList() {
   }, [currentAddress])
 
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-6 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 xl:gap-x-8 text-white">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-6 lg:grid-cols-6 xl:grid-cols-5 2xl:grid-cols-6 xl:gap-x-8 text-black mt-8">
       {isLoading ? (
         Array.from({ length: 3 }, (_, index) => (
           <div key={index}
-            className="relative bg-inherit rounded-lg shadow-xl transition-all border border-gray-500"
+            className="relative bg-inherit rounded-lg shadow-xl transition-all bg-white"
           >
             <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden bg-primary011 animate-shimmerSpore">
               <div className="w-full h-full bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 bg-200% animate-shimmerSpore"></div>
@@ -55,9 +55,9 @@ export default function SporeList() {
         spores.map((spore, index) => (
           <div
             key={spore.amount}
-            className="relative translate-y-0 hover:z-10 hover:shadow-2xl hover:-translate-y-0.5 bg-inherit rounded-lg shadow-xl transition-all cursor-pointer group border border-gray-500"
+            className="relative translate-y-0 hover:z-10 hover:shadow-2xl hover:-translate-y-0.5 bg-inherit rounded-lg shadow-xl transition-all cursor-pointer group bg-white"
           >
-            <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-primary011 ">
+            <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-white ">
               <img
                 src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
                 alt=""

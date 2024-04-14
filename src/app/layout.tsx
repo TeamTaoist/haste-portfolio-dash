@@ -36,7 +36,7 @@ setSporeConfig(sporeConfig);
 commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()])
   return (
     <html lang="en">
-      <body>     
+      <body>
         <ReduxProvider>
           <DeviceDetector />
             <div className="flex h-full">

@@ -17,7 +17,7 @@ export default function UDTList() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
-  
+
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
     setXudtList(assetsList.xudtList);
@@ -51,20 +51,20 @@ export default function UDTList() {
     <div className="w-full">
       <table className="w-full">
         <thead>
-          <tr className="font-SourceSanPro font-semibold text-primary003 grid grid-cols-12 py-2 text-left">
-            <th className="col-span-7 lg:col-span-5 cursor-pointer px-2">
+          <tr className="font-SourceSanPro font-semibold text-black opacity-30 grid grid-cols-12 py-2 text-left">
+            <th className="col-span-7 lg:col-span-5 cursor-pointer px-8">
               Token
             </th>
-            <th className="col-span-4 lg:col-span-2 cursor-pointer px-2">
+            <th className="col-span-4 lg:col-span-2 cursor-pointer px-8">
               Balance
             </th>
           </tr>
         </thead>
-        <tbody className="text-white">
+        <tbody className="text-black">
           {isLoading ? (
             Array.from(new Array(5)).map((_, index) => (
-              <tr key={index} className="hover:bg-primary-100 grid grid-cols-12 group py-2 border-t border-gray-500">
-                <td className="col-span-7 lg:col-span-5 px-2">
+              <tr key={index} className="hover:bg-gray-100 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-l ">
+                <td className="col-span-7 lg:col-span-5 px-8">
                   <div className="flex gap-3 items-center">
                     <div className="w-8 h-8 rounded-full bg-gray-300 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-200% animate-shimmer"></div>
                     <div>
@@ -81,8 +81,8 @@ export default function UDTList() {
             ))
           ) : (
             xudtList.map((xudt, index) => (
-              <tr key={index} className="hover:bg-primary010 grid grid-cols-12 group py-2 border-t border-gray-500">
-                <td className="col-span-7 lg:col-span-5 px-2">
+              <tr key={index} className="hover:bg-gray-100 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-l ">
+                <td className="col-span-7 lg:col-span-5 px-8">
                   <div className="flex gap-3 items-center">
                     <div>
                       <Image
@@ -94,16 +94,21 @@ export default function UDTList() {
                       />
                     </div>
                     <div>
+
                       <p className="font-semibold">{xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}</p>
+
+                      {/*<p className="font-bold">{xudt && xudt.symbol}</p>*/}
+
                       <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
                         {xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}
                       </p>
                     </div>
                   </div>
                 </td>
+
                 <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
-                  <p className="text-sm sm:text-base text-default font-semibold truncate">
-                    {xudt && formatUnit(xudt.amount, 'ckb')}
+                  <p className="text-sm sm:text-base text-default font-semibold truncate text-base font-din">
+                    {formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}
                   </p>
                   {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--

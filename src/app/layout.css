@@ -1,0 +1,19 @@
+.logo{
+    width: 100%;
+    box-sizing: border-box;
+}
+.logo img{
+    width: 30px;
+    height: 30px;
+
+}
+.activeTab:after{
+    position: absolute;
+    content:"";
+    left: calc( 50% - 10px);
+    bottom: 0;
+    width: 20px;
+    background: #f2882e;
+    height: 4px;
+    border-radius: 2px;
+}

@@ -2,23 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./layout.css";
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  font-family:din_regular,Roboto-Regular;
 }
-
-.universe-bg {
-  background-image: url('/svg/universe.svg'), linear-gradient(180deg, #252A48 0%, #0C0F1B 100%);
-  background-repeat: no-repeat;
-  
+ul,li,dl,dd,dt{
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.box-shadow-30{
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2)!important;
+}
+.font-Roboto-bold{
+  font-family: Roboto-Bold;
+}
+.font-din{
+  font-family: din_bold !important;
 }
 
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
 .no-scrollbar {
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
@@ -56,4 +67,24 @@ html, body {
   src: url('../../public/font/SourceSanPro/SourceSansPro-Black.otf') format('opentype');
   font-weight: 900;
   font-style: normal;
+}
+
+
+@font-face {
+  font-family: din_bold;
+  src: url(../assets/fonts/din_bold.otf);
+  unicode-range: U+30-39;
+}
+@font-face {
+  font-family:din_regular;
+  src: url(../assets/fonts/din_regular.otf);
+  unicode-range: U+30-39;
+}
+@font-face {
+  font-family: Roboto-Bold;
+  src: url(../assets/fonts/Roboto-Bold.ttf)
+}
+@font-face {
+  font-family:Roboto-Regular;
+  src: url(../assets/fonts/Roboto-Regular.ttf)
 }

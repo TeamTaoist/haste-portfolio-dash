@@ -23,13 +23,13 @@ export default function Send() {
   }, [tab]);
 
   return (
-    <main className="flex flex-col flex-1 min-h-screen bg-primary008 text-white001">
+    <main className="flex flex-col flex-1 min-h-screen bg-gray-100 text-black">
       <div className="pb-10 md:mx-4 my-4 lg:mx-8 lg:my-0 h-full">
         <div className=" text-hd1mb w-full py-4 px-4 font-Montserrat my-4">
           Send & Receive
         </div>
         <div className="flex items-center justify-center w-full flex-1">
-          <div className="rounded-2xl bg-primary009 p-4rounded-2xl py-5 px-4 sm:px-6 h-auto w-[420px] py-8">
+          <div className="rounded-2xl bg-white p-4rounded-2xl py-5 px-4 sm:px-6 h-auto w-[420px] py-8">
             <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-4 bg-inherit  border-none z-1 static">
               <Link
                 href="/send?tab=send"

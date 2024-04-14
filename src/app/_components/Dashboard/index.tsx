@@ -25,7 +25,7 @@ export default function Dashboard() {
   const [tabs, setTabs] = useState<TabsType[]>(TAB_LIST)
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
-  
+
   useEffect(() => {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
     if(currentWallet?.chain === 'ckb') {
@@ -46,16 +46,16 @@ export default function Dashboard() {
   }, [tab, tabs]);
   return (
     <div className="flex-1 h-full min-h-0 overflow-auto p-4">
-      <div className="flex sm:space-x-0 bg-inherit border-none z-1 static text-white001">
+      <div className="flex sm:space-x-0 bg-inherit border-none z-1 static text-black">
         {tabs && tabs.map((tab) => (
           <Link
             key={tab.value}
             href={`/?tab=${tab.value}`}
             className={`${
               currentTab === tab.value
-                ? "border-primary-default"
+                ? "activeTab font-Montserrat text-primary011"
                 : "border-transparent"
-            } p-2 mx-2 font-medium border-b-2 text-default focus:outline-none focus:ring-0 w-full py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-center`}
+            } p-2 mx-2 font-medium relative text-default focus:outline-none focus:ring-0 w-[100px] py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-center`}
           >
             {tab.label}
           </Link>

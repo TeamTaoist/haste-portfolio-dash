@@ -26,7 +26,7 @@ export default function Transaction() {
     const grouped: groupedTransaction = {};
     if(!transactions) return
     transactions.forEach(transaction => {
-        const date = transaction.attributes.created_at.split(' ')[0]; 
+        const date = transaction.attributes.created_at.split(' ')[0];
         if (!grouped[date]) {
             grouped[date] = [];
         }
@@ -54,7 +54,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
       } else {
         //@ts-ignore
         inputValue[input.prevout.scriptpubkey_address] = BI.from(input.prevout.value)
-      }    
+      }
     });
 
     // Calculate the value being transferred to different addresses
@@ -67,7 +67,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
       } else {
         //@ts-ignore
         outputValue[output.scriptpubkey_address] = BI.from(output.value)
-      }    
+      }
     });
 
 
@@ -92,7 +92,9 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
     transactions.forEach(transaction => {
       console.log(transaction)
       const transactionDetails = processTransaction(transaction);
-      
+
+
+
       // Convert the block_time to a date string
       const date = new Date(transaction.status.block_time * 1000).toISOString().split('T')[0];
 
@@ -111,40 +113,40 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
 
   const _getCKBTx = async () => {
-      setIsListLoading(true); 
-      setIsEmptyList(true);   
+      setIsListLoading(true);
+      setIsEmptyList(true);
       setGroupedData(null);
       try {
           const list = await getCKBTx(currentAddress!!);
-          const groupedTx = groupTransaction(list.data); 
+          const groupedTx = groupTransaction(list.data);
           setIsEmptyList(list.data.length === 0);
           setGroupedData(groupedTx);
       } catch (error) {
           console.error("Failed to fetch CKB transactions:", error);
-          setIsEmptyList(true); 
+          setIsEmptyList(true);
       } finally {
-          setIsListLoading(false); 
+          setIsListLoading(false);
       }
   }
 
   const _getBTCTx = async () => {
-      setIsListLoading(true);  
-      setIsEmptyList(true);   
+      setIsListLoading(true);
+      setIsEmptyList(true);
       setBtcGroupData(null);
       try {
           const list = await getBTCTx(currentAddress!!);
           if (list && list.length > 0) {
               setBtcGroupData(groupTransactionsByDate(list));
-              setIsEmptyList(false); 
+              setIsEmptyList(false);
           } else {
-              setIsEmptyList(true); 
+              setIsEmptyList(true);
 
           }
       } catch (error) {
           console.error("Failed to fetch BTC transactions:", error);
-          setIsEmptyList(true); 
+          setIsEmptyList(true);
       } finally {
-          setIsListLoading(false); 
+          setIsListLoading(false);
       }
   }
 
@@ -164,7 +166,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
   }, [currentAddress])
 
   return (
-    <main className="flex flex-col flex-1 h-full bg-primary008 text-white001">
+    <main className="flex flex-col flex-1 h-full bg-gray-100 text-black">
       <div className="h-full w-full flex flex-col">
         <div className="sm:mt-20 md:mx-4 lg:mx-8 text-hd1mb pt-4 px-4 font-Montserrat my-4">
           Transaction
@@ -175,9 +177,9 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
           </div>
           <div className="flex-1 sm:pr-0 sm:border-none border-l border-t border-primary004 overflow-scroll no-scrollbar">
             {
-              (isListLoading || isEmptyList) && 
+              (isListLoading || isEmptyList) &&
               <div className="w-full h-full flex flex-col items-center justify-center gap-8">
-                <Image 
+                <Image
                   src={'/img/joker.png'}
                   width={256}
                   height={256}
@@ -190,13 +192,13 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
               </div>
             }
             {
-                (chain && chain === 'ckb' && !isEmptyList) && 
-                
+                (chain && chain === 'ckb' && !isEmptyList) &&
+
                 <div className="pb-10 flex-1 lg:pr-4 md:pr-4 sm:border-none border-l border-t border-primary004">
                     {groupedData && Object.keys(groupedData).map(date => (
                         <div key={date} className="top-0 font-medium text-sm py-4">
                             <div className="px-4 text-sm text-subdued mb-2">
-                                {date} 
+                                {date}
                             </div>
                             {groupedData[date].map((transaction, index) => (
                                 <TransactionItem
@@ -205,10 +207,10 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                                     from={transaction.attributes.display_inputs[0].address_hash}
                                     to={transaction.attributes.display_outputs[0].address_hash}
                                     hours={transaction.attributes.created_at.split(' ')[1]}
-                                    type={BI.from(transaction.attributes.income.split('.')[0]).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND} 
+                                    type={BI.from(transaction.attributes.income.split('.')[0]).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND}
                                     amount={
                                       BI.from(transaction.attributes.income.split('.')[0]).abs().div((BI.from(10).pow(8))).toString()
-                                    } 
+                                    }
                                     token={transaction.type === 'ckb_transactions' ? 'ckb': 'btc'}
                                 />
                             ))}
@@ -217,13 +219,13 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                 </div>
             }
             {
-                (chain && chain === 'btc' && !isEmptyList) && 
-                
+                (chain && chain === 'btc' && !isEmptyList) &&
+
                 <div className="pb-10 flex-1 pr-4 border-l border-t border-primary004">
                     {btcGroupData && Object.keys(btcGroupData).map(date => (
                         <div key={date} className="top-0 font-medium text-sm py-4">
                             <div className="px-4 text-sm text-subdued mb-2">
-                                {date} 
+                                {date}
                             </div>
                             {btcGroupData[date].map((transaction, index) => (
                                 <TransactionItem
@@ -232,10 +234,10 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                                     from={transaction.fromAddress}
                                     to={transaction.toAddress!!}
                                     hours={transaction.transactionTime}
-                                    type={BI.from(transaction.value).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND} 
+                                    type={BI.from(transaction.value).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND}
                                     amount={
                                       formatUnit(transaction.value, 'ckb')
-                                    } 
+                                    }
                                     token={'btc'}
                                 />
                             ))}

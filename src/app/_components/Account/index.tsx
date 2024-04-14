@@ -22,10 +22,10 @@ const AccountSidebar: React.FC = () => {
   const toggleSidebar = () => {
     setIsColleapse(!isColleapse);
   };
-  
-  useEffect(() => { 
+
+  useEffect(() => {
     const walletsStr = localStorage.getItem('wallets');
-    
+
     let wallets;
     try {
       wallets = JSON.parse(walletsStr!!);
@@ -39,32 +39,32 @@ const AccountSidebar: React.FC = () => {
   }, [setIsOpenWalletModal, wallets]);
 
   return (
-    <div className='h-full bg-primary011'>
-      <CustomModal isOpen={isOpenWalletModal} 
+    <div className='h-full'>
+      <CustomModal isOpen={isOpenWalletModal}
         onClose={() => {
           setIsOpenWalletModal(false)
-        }}  
+        }}
       >
         <WalletModalContent onClose={() => setIsOpenWalletModal(false)}></WalletModalContent>
       </CustomModal>
       {deviceType === 'desktop' ? (
         <div className={`pt-8
             ${isColleapse ? 'left-0 w-72' : 'w-14'} 
-            h-full bg-primary010 text-white transition-width duration-300`}>
+            h-full bg-gray-100 transition-width duration-300 border-r border-gray-300`}>
           <div className='h-12 relative flex items-center justify-center group'>
             <div className={`w-full font-Montserrat text-hd2mb ${isColleapse ? '': 'flex justify-center'}`}>
               {isColleapse && <>
-                <div className='w-full flex justify-between px-6'>
+                <div className='w-full flex justify-between px-8'>
                   <p>Account</p>
                   <div className='flex items-center gap-2'>
-                    <div className='border-2 rounded-full w-6 h-6 flex justify-center items-center cursor-pointer' onClick={() => {
+                    <div className='border-1 rounded-full bg-white w-6 h-6 flex justify-center items-center cursor-pointer' onClick={() => {
                       setIsOpenWalletModal(true)
                     }}>
                       <PlusIcon className='w-4 h-4' />
                     </div>
-                    <div className='w-6 h-6 flex justify-center items-center'>
-                      <GearIcon className='w-6 h-6' />
-                    </div>
+                    {/*<div className='w-6 h-6 flex justify-center items-center'>*/}
+                    {/*  <GearIcon className='w-6 h-6' />*/}
+                    {/*</div>*/}
                   </div>
                 </div>
               </>}
@@ -74,8 +74,8 @@ const AccountSidebar: React.FC = () => {
                 </div>
               </>}
             </div>
-            <div 
-              className='cursor-pointer absolute right-[-10px] w-6 h-6 flex justify-center items-center rounded-full border-2 border-white001 opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+            <div
+              className='cursor-pointer absolute right-[-10px] w-6 h-6 flex justify-center items-center rounded-full border-2 border-white001 opacity-10 bg-white group-hover:opacity-100 transition-opacity duration-200'
               onClick={toggleSidebar}
             >
             {
@@ -83,33 +83,33 @@ const AccountSidebar: React.FC = () => {
             }
           </div>
           </div>
-          <div className='flex flex-col mt-8'>
+          <div className='flex flex-col mt-8 border-t border-gray-200'>
             {wallets.map(wallet => (
               <div key={wallet.address} className={` 
-                flex items-center py-2 border-b cursor-pointer group
-                ${wallet.address === currentWallet ? 'bg-primary008': 'bg-primary007'}
+                flex items-center py-2 border-b border-gray-200 ba cursor-pointer firstLi
+                ${wallet.address === currentWallet ? 'bg-white': 'bg-gray-100'}
               `}
                 onClick={() => {
                   dispatch(setCurrentWalletAddress(wallet.address))
                 }}
               >
               <div className='py-4 px-4'>
-                <Image className='border rounded-full overflow-hidden' src={`/img/${wallet.chain}.png`} width={40} height={40} alt={'btc'}></Image>
+                <Image className='border rounded-full overflow-hidden' src={`/img/${wallet.chain}.png`} width={40} height={40} alt={wallet.chain}></Image>
               </div>
               {
-                isColleapse && 
+                isColleapse &&
                 <>
                   <div className='w-full px-2 '>
                     <div className='w-full flex justify-between'>
-                      <div className=' font-SourceSanPro font-semibold text-primary003'>{formatString(wallet.address, 5)}</div>
+                      <div className=' font-SourceSanPro '>{formatString(wallet.address, 5)}</div>
                       {/* <div className=' font-SourceSanPro font-semibold text-primary003'> ${wallet}</div> */}
                     </div>
                     <div className='flex'>
-                      <div className='font-SourceSanPro text-primary003'>{wallet.chain} {wallet.balance}</div>
+                      <div className='font-SourceSanPro text-black opacity-30 '>{wallet.chain} {wallet.balance}</div>
                     </div>
                   </div>
-                  <div 
-                    className='pr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+                  <div
+                    className='pr-4 opacity-20 hover:opacity-100 transition-opacity duration-200 text-primary011 '
                     onClick={() => {
                       dispatch(removeWalletItem(wallet.address));
                     }}
@@ -124,7 +124,7 @@ const AccountSidebar: React.FC = () => {
         </div>
       ) : (
         // Mobile View
-        <div className="fixed top-0 left-0 w-full h-12 bg-gray-800 text-white flex items-center">
+        <div className="fixed top-0 left-0 w-full h-12 bg-gray-800 flex items-center">
           <button onClick={toggleSidebar} className="m-2 p-2 bg-gray-700 rounded">
             Menu
           </button>
