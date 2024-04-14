@@ -20,6 +20,8 @@ export const testConfig = {
   rgb_networkType: NetworkType.TESTNET,
 
   joyIdUrl: "https://testnet.joyid.dev",
+
+  aggregatorUrl: "https://cota.nervina.dev/aggregator",
 };
 
 // main config
@@ -42,6 +44,8 @@ export const mainConfig = {
   rgb_networkType: NetworkType.MAINNET,
 
   joyIdUrl: "https://app.joy.id/",
+
+  aggregatorUrl: "https://cota.nervina.dev/mainnet-aggregator",
 };
 
 export const backend: string = "https://blockchain-serverless.vercel.app";

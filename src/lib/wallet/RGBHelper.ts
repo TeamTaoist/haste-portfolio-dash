@@ -1,4 +1,4 @@
-import { BI, Script, helpers, utils } from "@ckb-lumos/lumos";
+import { BI, Cell, CellDep, Script, helpers, utils } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -24,8 +24,13 @@ import { bytes } from "@ckb-lumos/codec";
 import { blockchain } from "@ckb-lumos/base";
 import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
-import { accountStore } from "@/store/AccountStore";
-import { isTestNet, mainConfig, testConfig } from "./constants";
+import { AccountType, accountStore } from "@/store/AccountStore";
+import {
+  getCotaTypeScript,
+  isTestNet,
+  mainConfig,
+  testConfig,
+} from "./constants";
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -142,7 +147,7 @@ export class RGBHelper {
 
     const unsignedRawTx = await this.ckb_to_btc_buildTx(
       buildRgbppLockArgs(btcTxIdx, btcTxHash),
-      wallet as WalletInfo,
+      wallet as AccountType,
       typeScript,
       amount
     );
@@ -252,7 +257,7 @@ export class RGBHelper {
 
   async ckb_to_btc_buildTx(
     toRgbppLockArgs: string,
-    ckb_wallet: WalletInfo,
+    ckb_wallet: AccountType,
     typeScript: Script,
     amount: bigint = 0n
   ) {
@@ -302,10 +307,10 @@ export class RGBHelper {
       let newWitnessArgs: any = {
         lock: "0x",
       };
-      if (DataManager.instance.joyIdConnectionType == "sub_key") {
-        const aggregator = new Aggregator(
-          "https://cota.nervina.dev/aggregator"
-        );
+
+      let cotaCellDep: CellDep | undefined = undefined;
+      if (ckb_wallet.keyType == "sub_key") {
+        const aggregator = new Aggregator(cfg.aggregatorUrl);
         const pubkeyHash = bytes
           .bytify(utils.ckbHash("0x" + ckb_wallet.pubkey))
           .slice(0, 20);
@@ -324,6 +329,31 @@ export class RGBHelper {
           inputType: "0x",
           outputType: "0x" + unlockEntry,
         };
+
+        const cotaType = getCotaTypeScript(isTestNet() ? false : true);
+        const cotaCollector = CkbHepler.instance.indexer.collector({
+          lock: lock,
+          type: cotaType,
+        });
+
+        const cotaCells: Cell[] = [];
+        if (cotaCollector) {
+          for await (const cotaCell of cotaCollector.collect()) {
+            cotaCells.push(cotaCell);
+          }
+        }
+
+        if (!cotaCells || cotaCells.length === 0) {
+          throw new Error("Cota cell doesn't exist");
+        }
+        const cotaCell = cotaCells[0];
+        cotaCellDep = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          outPoint: cotaCell.outPoint as any,
+          depType: "code",
+        };
+
+        // note: COTA cell MUST put first
       }
 
       const witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
@@ -336,6 +366,10 @@ export class RGBHelper {
         ],
         witnesses: [witness, ...ckbRawTx.witnesses.slice(1)],
       };
+
+      if (cotaCellDep != undefined) {
+        unsignedTx.cellDeps.unshift(cotaCellDep);
+      }
 
       return unsignedTx;
     }

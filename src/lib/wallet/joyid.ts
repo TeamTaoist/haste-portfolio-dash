@@ -6,6 +6,7 @@ import {
   helpers,
   Script,
   Cell,
+  // CellDep,
   utils,
   CellDep,
 } from "@ckb-lumos/lumos";
@@ -13,12 +14,13 @@ import type * as api from "@ckb-lumos/base";
 import {
   getJoyIDLockScript,
   getJoyIDCellDep,
-  Aggregator,
   getConfig,
+  Aggregator,
   // connect,
 } from "@joyid/ckb";
 import {
   getCotaTypeScript,
+  // getCotaTypeScript,
   isTestNet,
   mainConfig,
   testConfig,
@@ -166,9 +168,7 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
           };
 
           if (wallet.keyType === "sub_key") {
-            const aggregator = new Aggregator(
-              "https://cota.nervina.dev/aggregator"
-            );
+            const aggregator = new Aggregator(cfg.aggregatorUrl);
 
             const pubkeyHash = bytes
               .bytify(utils.ckbHash("0x" + wallet.pubkey))
