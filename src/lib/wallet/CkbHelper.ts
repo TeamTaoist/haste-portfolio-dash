@@ -594,11 +594,7 @@ export class CkbHepler {
       );
     }
 
-    const minEmptyCapacity = calculateEmptyCellMinCapacity(fromScript);
-    const needCapacity = outputCapacity
-      .sub(sudt_sumCapacity)
-      .add(minEmptyCapacity)
-      .add(2000); // fee
+    const needCapacity = outputCapacity.add(MAX_FEE); // fee
 
     // find ckb
     // <<

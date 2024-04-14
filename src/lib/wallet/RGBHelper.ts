@@ -1,4 +1,4 @@
-import { BI, Script, helpers, utils } from "@ckb-lumos/lumos";
+import { BI, Cell, CellDep, Script, helpers, utils } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -25,7 +25,12 @@ import { blockchain } from "@ckb-lumos/base";
 import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { AccountType, accountStore } from "@/store/AccountStore";
-import { isTestNet, mainConfig, testConfig } from "./constants";
+import {
+  getCotaTypeScript,
+  isTestNet,
+  mainConfig,
+  testConfig,
+} from "./constants";
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -302,6 +307,8 @@ export class RGBHelper {
       let newWitnessArgs: any = {
         lock: "0x",
       };
+
+      let cotaCellDep: CellDep | undefined = undefined;
       if (ckb_wallet.keyType == "sub_key") {
         const aggregator = new Aggregator(cfg.aggregatorUrl);
         const pubkeyHash = bytes
@@ -322,6 +329,31 @@ export class RGBHelper {
           inputType: "0x",
           outputType: "0x" + unlockEntry,
         };
+
+        const cotaType = getCotaTypeScript(isTestNet() ? false : true);
+        const cotaCollector = CkbHepler.instance.indexer.collector({
+          lock: lock,
+          type: cotaType,
+        });
+
+        const cotaCells: Cell[] = [];
+        if (cotaCollector) {
+          for await (const cotaCell of cotaCollector.collect()) {
+            cotaCells.push(cotaCell);
+          }
+        }
+
+        if (!cotaCells || cotaCells.length === 0) {
+          throw new Error("Cota cell doesn't exist");
+        }
+        const cotaCell = cotaCells[0];
+        cotaCellDep = {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          outPoint: cotaCell.outPoint as any,
+          depType: "code",
+        };
+
+        // note: COTA cell MUST put first
       }
 
       const witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
@@ -334,6 +366,10 @@ export class RGBHelper {
         ],
         witnesses: [witness, ...ckbRawTx.witnesses.slice(1)],
       };
+
+      if (cotaCellDep != undefined) {
+        unsignedTx.cellDeps.unshift(cotaCellDep);
+      }
 
       return unsignedTx;
     }
