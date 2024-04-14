@@ -13,6 +13,8 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { AccountData } from '../../../../types/BTC';
 import { getCKBCapacity } from '@/query/ckb/tools';
+import { BI } from '@ckb-lumos/lumos';
+import { formatUnit } from '@ckb-lumos/bi';
 
 interface walletModalProps {
   onClose: () => void
@@ -47,7 +49,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       let balance;
       if(props.chain === 'btc') {
         let accountData = await _getBTCBalance(props.address);
-        balance = accountData?.chain_stats.funded_txo_sum;
+        balance = formatUnit(accountData?.chain_stats.funded_txo_sum!!, 'ckb');
       } else if (props.chain === 'ckb') {
         balance = await _getCKBCapacity(props.address);
         balance = (balance.toNumber() / (10 ** 8)).toFixed(2);
