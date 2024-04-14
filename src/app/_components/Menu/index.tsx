@@ -6,6 +6,7 @@ import { initializeWallets } from '@/store/wallet/walletSlice';
 import { AlignJustify, ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import DropdownSelect from '../MobileMenu';
 
 const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
@@ -76,10 +77,11 @@ const ResponsiveSidebar: React.FC = () => {
       ) : (
         // 移动视图
           <>
-            <div className="fixed top-0 px-4 left-0 w-full h-12 bg-primary011 text-white flex items-center z-50">
+            <div className="fixed top-0 px-4 left-0 w-full h-16 bg-primary011 text-white flex justify-between items-center z-50">
                 {
                   isOpen ? <AlignJustify className='rotate-90' onClick={toggleMobile}/> : <AlignJustify onClick={toggleMobile}/>
                 }
+                <DropdownSelect />
             </div>
             <div className={`fixed top-0 left-0 bg-primary011 w-full text-white001 h-full z-40 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
                 <button onClick={toggleMobile} className="text-white p-4">Close</button>

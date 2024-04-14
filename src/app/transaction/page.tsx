@@ -166,7 +166,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
   return (
     <main className="flex flex-col flex-1 h-full bg-primary008 text-white001">
       <div className="h-full w-full flex flex-col">
-        <div className="sm:mt-12 md:mx-4 lg:mx-8 text-hd1mb pt-4 px-4 font-Montserrat my-4">
+        <div className="sm:mt-20 md:mx-4 lg:mx-8 text-hd1mb pt-4 px-4 font-Montserrat my-4">
           Transaction
         </div>
         <div className="w-full h-full flex flex-1 min-h-0 no-scrollbar">

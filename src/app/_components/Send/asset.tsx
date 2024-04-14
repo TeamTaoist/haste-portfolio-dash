@@ -139,7 +139,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   const _getRgbAsset = async(address: string) => {
     const assetsList = await getRgbppAssert(address);
     const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
-    console.log("==rgbAssetList==",rgbAssetList)
+    //@ts-ignore
     setXudtList(rgbAssetList)
     setIsLoading(false);
   }

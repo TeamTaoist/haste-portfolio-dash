@@ -76,6 +76,7 @@ import {
   serializeWitnessArgs,
 } from "@nervosnetwork/ckb-sdk-utils";
 import {getEnv} from "@/settings/env";
+import store from "@/store/store";
 
 export class CkbHepler {
   private static _instance: CkbHepler;
@@ -117,49 +118,53 @@ export class CkbHepler {
     return this._instance;
   }
 
-  // async joyid_onConnect() {
-  //   const connection = await connect();
-  //
-  //   console.log("JoyId connect", connection);
-  //
-  //   DataManager.instance.joyIdConnectionType = connection.keyType;
-  //   return {
-  //     account: connection.address,
-  //     pubkey: connection.pubkey,
-  //     keyType: connection.keyType,
-  //   };
-  // }
+  async joyid_onConnect() {
+    const connection = await connect();
+
+    console.log("JoyId connect", connection);
+
+    DataManager.instance.joyIdConnectionType = connection.keyType;
+    return {
+      account: connection.address,
+      pubkey: connection.pubkey,
+      keyType: connection.keyType,
+    };
+  }
 
   // transfer ckb
-  // async transfer_ckb(options: ckb_TransferOptions) {
-  //   const curAccount = DataManager.instance.getCurAccount();
-  //   if (!curAccount) {
-  //     throw new Error("Please choose a wallet");
-  //   }
-  //
-  //   const wallet = accountStore.getWallet(curAccount);
-  //   if (!wallet) {
-  //     throw new Error("Please choose a wallet");
-  //   }
-  //
-  //   const unsigned = await this.buildTransfer(options);
-  //   const tx = helpers.createTransactionFromSkeleton(unsigned);
-  //
-  //   if (wallet.type == "joyid") {
-  //     const signed = await signRawTransaction(
-  //       tx as CKBTransaction,
-  //       options.from
-  //     );
-  //
-  //     console.log("sign raw tx", signed);
-  //
-  //     console.log("amount", options.amount.toString());
-  //
-  //     return this.sendTransaction(signed);
-  //   }
-  //
-  //   throw new Error("Please connect wallet");
-  // }
+  async transfer_ckb(options: ckb_TransferOptions) {
+    // const curAccount = DataManager.instance.getCurAccount();
+    const curAccount = store.getState().wallet.currentWalletAddress;
+    if (!curAccount) {
+      throw new Error("Please choose a wallet");
+    }
+
+    // const wallet = accountStore.getWallet(curAccount);
+    const wallets = store.getState().wallet.wallets;
+    const wallet = wallets.find((wallet) => wallet.address === curAccount);
+
+    if (!wallet) {
+      throw new Error("Please choose a wallet");
+    }
+
+    const unsigned = await this.buildTransfer(options);
+    const tx = helpers.createTransactionFromSkeleton(unsigned);
+
+    if (wallet.walletName.indexOf("joyid") > -1 ) {
+      const signed = await signRawTransaction(
+        tx as CKBTransaction,
+        options.from
+      );
+
+      console.log("sign raw tx", signed);
+
+      console.log("amount", options.amount.toString());
+
+      return this.sendTransaction(signed);
+    }
+
+    throw new Error("Please connect wallet");
+  }
 
   // transfer udt
   // async transfer_udt(options: ckb_TransferOptions) {
@@ -251,23 +256,24 @@ export class CkbHepler {
   //   const xudtScript = getXudtTypeScript(cfg.isMainnet);
   //   const sporeScript = getSporeTypeScript(cfg.isMainnet);
   //
-  //   if (
-  //     options.typeScript &&
-  //     (options.typeScript.codeHash == sudtScript.codeHash ||
-  //       options.typeScript.codeHash == xudtScript.codeHash)
-  //   ) {
-  //     // sudt
-  //     const txSkeleton = await this.sudt_xudt_buildTransfer(options);
-  //
-  //     return txSkeleton;
-  //   } else if (
-  //     options.typeScript &&
-  //     options.typeScript.codeHash == sporeScript.codeHash
-  //   ) {
-  //     // spore
-  //     const txSkeleton = await this.spore_buildTransfer(options);
-  //     return txSkeleton;
-  //   } else {
+  //   // if (
+  //   //   options.typeScript &&
+  //   //   (options.typeScript.codeHash == sudtScript.codeHash ||
+  //   //     options.typeScript.codeHash == xudtScript.codeHash)
+  //   // ) {
+  //   //   // sudt
+  //   //   const txSkeleton = await this.sudt_xudt_buildTransfer(options);
+  //   //
+  //   //   return txSkeleton;
+  //   // } else if (
+  //   //   options.typeScript &&
+  //   //   options.typeScript.codeHash == sporeScript.codeHash
+  //   // ) {
+  //   //   // spore
+  //   //   const txSkeleton = await this.spore_buildTransfer(options);
+  //   //   return txSkeleton;
+  //   // } else
+  //   {
   //     // ckb
   //     let txSkeleton = helpers.TransactionSkeleton({
   //       cellProvider: CkbHepler.instance.indexer,
