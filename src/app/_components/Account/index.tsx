@@ -28,8 +28,9 @@ const AccountSidebar: React.FC = () => {
   useEffect(() => {
     let walletData;
     
-    if (wallets) {
+    if (wallets.length) {
       walletData = wallets
+      console.log(walletData);
     } else {
       const walletsStr = localStorage ? localStorage.getItem('wallets') : ''
       try {

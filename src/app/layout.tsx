@@ -30,7 +30,7 @@ export default function RootLayout({
         }
     }
 };
-console.log('0.0.1');
+console.log('0.0.2');
 
 //@ts-ignore
 config.initializeConfig(forkConfig)
