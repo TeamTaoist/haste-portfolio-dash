@@ -26,19 +26,23 @@ const AccountSidebar: React.FC = () => {
   };
 
   useEffect(() => {
-    const walletsStr = localStorage ? localStorage.getItem('wallets') : '';
-
-    let wallets;
-    try {
-      wallets = JSON.parse(walletsStr!!);
-    } catch {
-      wallets = null;
+    let walletData;
+    
+    if (wallets) {
+      walletData = wallets
+    } else {
+      const walletsStr = localStorage ? localStorage.getItem('wallets') : ''
+      try {
+        walletData = JSON.parse(walletsStr!!);
+      } catch {
+        walletData = null
+      }
     }
 
-    if (!wallets || !wallets.length) {
+    if (!walletData || !walletData.length) {
       setIsOpenWalletModal(true);
     }
-  }, [setIsOpenWalletModal, wallets]);
+  }, [wallets]);
 
   return (
     <div className='h-full'>

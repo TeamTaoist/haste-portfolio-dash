@@ -32,11 +32,19 @@ export const walletSlice = createSlice({
       if (!state.currentWalletAddress) {
         state.currentWalletAddress = action.payload.address;
       }
+       localStorage.setItem('wallets', JSON.stringify(state.wallets));
+      if (!state.currentWalletAddress) {
+        state.currentWalletAddress = state.wallets[0].address
+      }
     },
     removeWalletItem: (state, action: PayloadAction<string>) => {
       state.wallets = state.wallets.filter(wallet => wallet.address !== action.payload);
       if (state.currentWalletAddress === action.payload) {
         state.currentWalletAddress = state.wallets.length > 0 ? state.wallets[0].address : undefined;
+      }
+      localStorage.setItem('wallets', JSON.stringify(state.wallets));
+      if (!state.currentWalletAddress) {
+        state.currentWalletAddress = state.wallets[0].address
       }
     },
     setCurrentWalletAddress: (state, action:PayloadAction<string>) => {
@@ -46,5 +54,6 @@ export const walletSlice = createSlice({
 });
 
 export const { initializeWallets, addWalletItem, removeWalletItem, setCurrentWalletAddress } = walletSlice.actions;
+
 
 export default walletSlice.reducer;
