@@ -87,7 +87,7 @@ export function TabUdt() {
         .getRgbppAssert(toAddress)
         .then((rs) => {
           rs.sort((a, b) => {
-            return a > b ? 1 : -1;
+            return a.value > b.value ? 1 : -1;
           });
 
           let findUtxo: RgbAssert | undefined = undefined;
@@ -348,9 +348,12 @@ export function TabUdt() {
                     </TabsList>
                     <TabsContent value="rgb++">
                       <DialogHeader>
-                        <DialogTitle>使用 RGB++ 协议发送到 BTC 链上</DialogTitle>
+                        <DialogTitle>
+                          使用 RGB++ 协议发送到 BTC 链上
+                        </DialogTitle>
                         <DialogDescription className="!text-white001">
-                          * 注意使用正确的 BTC 地址，目前只支持 Taproot 和 Segwit
+                          * 注意使用正确的 BTC 地址，目前只支持 Taproot 和
+                          Segwit
                         </DialogDescription>
                       </DialogHeader>
                     </TabsContent>
