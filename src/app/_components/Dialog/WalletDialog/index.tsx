@@ -62,9 +62,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
         balance: balance ? balance.toString() : '',
       }))
       setIsLoading(false);
-      
     }
-
   };
   const connectOKXWallet = async () => {
     setIsLoading(true);

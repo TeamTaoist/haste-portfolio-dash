@@ -68,7 +68,7 @@ const ResponsiveSidebar: React.FC = () => {
               }
             </div>
           </Link>
-          <Link  className={activeTab === '/transaction' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'} href="transaction">
+          <Link  className={activeTab === '/transaction' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'} href="/transaction">
             <div className='flex items-center px-4 gap-4 py-1 cursor-pointer'>
               <NotebookText className={activeTab === '/transaction' ? 'text-primary011': ''} />
               {
@@ -76,7 +76,7 @@ const ResponsiveSidebar: React.FC = () => {
               }
             </div>
           </Link>
-          <Link className={activeTab === '/send' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4' } href="send">
+          <Link className={activeTab === '/send' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4' } href="/send">
             <div className='flex items-center px-4 gap-4 py-1 cursor-pointer'>
               <SendToBack className={activeTab === '/send' ? 'text-primary011': ''} />
               {
