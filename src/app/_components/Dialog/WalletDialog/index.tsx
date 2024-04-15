@@ -67,50 +67,68 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
   };
   const connectOKXWallet = async () => {
     setIsLoading(true);
-    let rlt = await OKXConnect();
-
-    checkWalletByAddress({
-      address: rlt.address,
-      chain: 'btc',
-      walletName: 'okx',
-      pubKey: rlt.publicKey
-    })
+    try {
+      let rlt = await OKXConnect();
+      enqueueSnackbar("Connect OKX Wallet Successful", {variant: 'success'});
+      checkWalletByAddress({
+        address: rlt.address,
+        chain: 'btc',
+        walletName: 'okx',
+        pubKey: rlt.publicKey
+      })
+    } catch {
+      enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }
   }
 
   const connectUnisatWallet = async () => {
-    let rlt = await UnisatConnect();
-    checkWalletByAddress({
-      address: rlt.accounts[0],
-      chain: 'btc',
-      walletName: 'unisat',
-      pubKey: rlt.pubkey
-    })
+    setIsLoading(true);
+    try {
+      let rlt = await UnisatConnect();
+      enqueueSnackbar("Connect Unisat Wallet Successful", {variant: 'success'});
+      checkWalletByAddress({
+        address: rlt.accounts[0],
+        chain: 'btc',
+        walletName: 'unisat',
+        pubKey: rlt.pubkey
+      })
+    } catch {
+      enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }
   }
 
   const connectJoyIDBTCWallet = async () => {
-    let rlt = await JoyIDBTCconnect();
-    checkWalletByAddress({
-      address: rlt.address,
-      chain: 'btc',
-      walletName: 'joyidbtc',
-      pubKey: rlt.publicKey!!
-    })
+    setIsLoading(true);
+    try {
+      let rlt = await JoyIDBTCconnect();
+      enqueueSnackbar("Connect JoyID BTC Wallet Successful", {variant: 'success'});
+      checkWalletByAddress({
+        address: rlt.address,
+        chain: 'btc',
+        walletName: 'joyidbtc',
+        pubKey: rlt.publicKey!!
+      })
+    } catch {
+      enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }
   }
 
   const connectJoyIDCKBWallet = async () => {
-    let rlt = await JoyIDCKBConnect();
-    checkWalletByAddress({
-      address: rlt.address,
-      chain: 'ckb',
-      walletName: 'joyidckb',
-      pubKey: rlt.publickKey
-    })
+    setIsLoading(true);
+    try {
+      let rlt = await JoyIDCKBConnect();
+      checkWalletByAddress({
+        address: rlt.address,
+        chain: 'ckb',
+        walletName: 'joyidckb',
+        pubKey: rlt.publickKey
+      });
+      enqueueSnackbar("Connect JoyID BTC Wallet Successful", {variant: 'success'});
+    } catch {
+      enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }
   }
-
-
-
-  useEffect(() => {console.log(wallets)}, [wallets])
-
+  
   return (
     <>
       {

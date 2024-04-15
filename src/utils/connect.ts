@@ -1,3 +1,4 @@
+import { getEnv } from '@/settings/env';
 import { getPublicKey, initConfig as initBTCConfig, requestAccounts } from '@joyid/bitcoin' 
 import { connect, initConfig } from '@joyid/ckb';
 
@@ -5,7 +6,7 @@ export const OKXConnect = async () => {
 
   const okxwallet = (window as any)["okxwallet"];
     if (typeof okxwallet !== "undefined") {
-      if (process.env.NODE_ENV != 'development') {
+      if (getEnv()==='Mainnet') {
         const result = await okxwallet.bitcoin.connect();
         return result;
       } else {  

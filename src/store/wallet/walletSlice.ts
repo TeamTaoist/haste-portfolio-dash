@@ -29,18 +29,14 @@ export const walletSlice = createSlice({
     },
     addWalletItem: (state, action: PayloadAction<WalletItem>) => {
       state.wallets.push(action.payload);
-      if(typeof window !== 'undefined') {
-        if (!state.currentWalletAddress) {
-          state.currentWalletAddress = action.payload.address;
-        }
+      if (!state.currentWalletAddress) {
+        state.currentWalletAddress = action.payload.address;
       }
     },
     removeWalletItem: (state, action: PayloadAction<string>) => {
       state.wallets = state.wallets.filter(wallet => wallet.address !== action.payload);
-      if(typeof window !== 'undefined') {
-        if (state.currentWalletAddress === action.payload) {
-          state.currentWalletAddress = state.wallets.length > 0 ? state.wallets[0].address : undefined;
-        }
+      if (state.currentWalletAddress === action.payload) {
+        state.currentWalletAddress = state.wallets.length > 0 ? state.wallets[0].address : undefined;
       }
     },
     setCurrentWalletAddress: (state, action:PayloadAction<string>) => {
