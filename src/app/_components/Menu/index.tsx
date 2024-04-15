@@ -118,30 +118,40 @@ const ResponsiveSidebar: React.FC = () => {
             <div className={`fixed top-0 left-0 bg-white w-full text-black h-full z-40 transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300 ease-in-out`}>
                 <button onClick={toggleMobile} className="text-black p-4">Close</button>
                 <div>
-                  <Link className='flex flex-col' href="/">
+                  <div className='flex flex-col'
+                    onClick={() => {
+                      NaviTo("/")
+                    }}
+                  >
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
                       <LayoutDashboard className={` ${activeTab === '/' ? ' text-primary011': ''}`} />
                       {
                         isColleapse && <p className={` text-body1mb ${activeTab === '/' ? 'font-Montserrat text-primary011': ''}`}>Dashboard</p>
                       }
                     </div>
-                  </Link>
-                  <Link className='flex flex-col' href="transaction">
+                  </div>
+                  <div className='flex flex-col' onClick={() => {
+                    NaviTo("/transaction")
+                  }}>
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
                       <NotebookText className={` ${activeTab === '/transaction' ? ' text-primary011': ''}`} />
                       {
                         isColleapse && <p className={`text-body1mb ${activeTab === '/transaction' ? 'font-Montserrat text-primary011': ''}`}>Transaction</p>
                       }
                     </div>
-                  </Link>
-                  <Link className='flex flex-col' href="send">
+                  </div>
+                  <div className='flex flex-col'
+                    onClick={() => {
+                      NaviTo("/send")
+                    }}
+                  >
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
                       <SendToBack className={` ${activeTab === '/send' ? ' text-primary011': ''}`}  />
                       {
                         isColleapse && <p className={`text-body1mb ${activeTab === '/send' ? 'font-Montserrat text-primary011': ''}`}>Send & Receive</p>
                       }
                     </div>
-                  </Link>
+                  </div>
                 </div>
             </div>
           </>

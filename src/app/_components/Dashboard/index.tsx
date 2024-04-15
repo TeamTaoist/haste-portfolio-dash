@@ -48,9 +48,11 @@ export default function Dashboard() {
     <div className="flex-1 h-full min-h-0 overflow-auto p-4">
       <div className="flex sm:space-x-0 bg-inherit border-none z-1 static text-black gap-4">
         {tabs && tabs.map((tab) => (
-          <Link
+          <div
             key={tab.value}
-            href={`/?tab=${tab.value}`}
+            onClick={() => {
+              setCurrentTab(tab.value)
+            }}
             className={`${
               currentTab === tab.value
                 ? "activeTab font-Montserrat text-primary011"
@@ -58,11 +60,13 @@ export default function Dashboard() {
             } p-2 mx-2 font-medium relative text-default focus:outline-none focus:ring-0 w-auto py-0 pb-2 sm:w-[116px] px-0 sm:mx-0 cursor-pointer text-left`}
           >
             {tab.label}
-          </Link>
+          </div>
         ))}
       </div>
       <div className="mt-4">
-        {tabs && tabs.find((t) => t.value === currentTab)?.component}
+        {
+          currentTab === 'udt' ? <UDTList /> : <SporeList />
+        }
       </div>
     </div>
   );
