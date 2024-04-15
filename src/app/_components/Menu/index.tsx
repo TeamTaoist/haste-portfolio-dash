@@ -7,14 +7,16 @@ import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon, Component1Icon, FileTextI
 import { initializeWallets } from '@/store/wallet/walletSlice';
 import { AlignJustify, ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import DropdownSelect from '../MobileMenu';
+
 
 const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
   const deviceType = useSelector((state: RootState) => state.device.type);
   const activeTab = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   const toggleMobile = () => {
     setIsOpen(!isOpen)
@@ -23,6 +25,10 @@ const ResponsiveSidebar: React.FC = () => {
   const toggleSidebar = () => {
     setIsColleapse(!isColleapse);
   };
+
+  const NaviTo = (endpoint: string) => {
+    router.push(endpoint)
+  }
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -60,30 +66,45 @@ const ResponsiveSidebar: React.FC = () => {
             }
           </div>
           </div>
-          <Link className={activeTab === '/' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'} href="/">
+          <div 
+            className={activeTab === '/' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'}
+            onClick={() => {
+              NaviTo("/")
+            }}
+          >
             <div className='flex items-center px-4 gap-4 py-1 cursor-pointer'>
               <LayoutDashboard className={activeTab === '/' ? 'text-primary011': ''}/>
               {
                 isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/' ? 'font-semibold text-primary011': ''}`}>Dashboard</p>
               }
             </div>
-          </Link>
-          <Link  className={activeTab === '/transaction' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'} href="/transaction">
+          </div>
+          <div 
+            className={activeTab === '/transaction' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'} 
+            onClick={() => {
+              NaviTo("/transaction")
+            }}
+          >
             <div className='flex items-center px-4 gap-4 py-1 cursor-pointer'>
               <NotebookText className={activeTab === '/transaction' ? 'text-primary011': ''} />
               {
                 isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/transaction' ? 'font-semibold text-primary011': ''}`}>Transaction</p>
               }
             </div>
-          </Link>
-          <Link className={activeTab === '/send' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4' } href="/send">
+          </div>
+          <div 
+            className={activeTab === '/send' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4' }
+            onClick={() => {
+              NaviTo("/send")
+            }}
+          >
             <div className='flex items-center px-4 gap-4 py-1 cursor-pointer'>
               <SendToBack className={activeTab === '/send' ? 'text-primary011': ''} />
               {
                 isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/send' ? 'font-semibold text-primary011': ''}`}>Send & Receive</p>
               }
             </div>
-          </Link>
+          </div>
         </div>
       ) : (
         // 移动视图
