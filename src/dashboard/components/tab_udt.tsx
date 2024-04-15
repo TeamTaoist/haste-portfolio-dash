@@ -109,7 +109,7 @@ export function TabUdt() {
           if (!findUtxo) {
             for (let i = 0; i < rs.length; i++) {
               const utxo = rs[i];
-              if (!utxo.ckbCellInfo) {
+              if (!utxo.ckbCellInfo && utxo.value <= 1000) {
                 findUtxo = utxo;
                 break;
               }
