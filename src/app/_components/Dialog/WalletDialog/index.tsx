@@ -47,6 +47,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     } else {
       let balance;
       onClose();
+      console.log('here close')
       if(props.chain === 'btc') {
         let accountData = await _getBTCBalance(props.address);
         balance = formatUnit(accountData?.chain_stats.funded_txo_sum!!, 'ckb');
