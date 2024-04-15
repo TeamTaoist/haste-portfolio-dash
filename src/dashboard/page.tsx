@@ -13,6 +13,7 @@ import { TabRgb } from "./components/tab_rgb";
 import { observer } from "mobx-react";
 import { autorun } from "mobx";
 import { accountStore } from "@/store/AccountStore";
+import { TabCheckTx } from "./components/tab_checkTx";
 
 const Dashboard = observer(() => {
   const [hideTab, setHideTab] = useState(true);
@@ -84,7 +85,6 @@ const Dashboard = observer(() => {
 
   const getAssetData = async () => {
     if (accountStore.currentAddress) {
-
       const wallet = accountStore.getWallet(accountStore.currentAddress);
       if (wallet && wallet.chain == "BTC") {
         setChain("BTC");
@@ -137,11 +137,28 @@ const Dashboard = observer(() => {
                   RGB++资产
                 </TabsTrigger>
               )}
+              {!hideTab ? (
+                ""
+              ) : (
+                <TabsTrigger
+                  value="CheckTx"
+                  onClick={() => {
+                    setTabValue("CheckTx");
+                    EventManager.instance.publish(
+                      EventType.dashboard_checkRgb_reload,
+                      {}
+                    );
+                  }}
+                >
+                  获取RGB++资产交易状态
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
           <TabUdt></TabUdt>
           <TabSpore></TabSpore>
           <TabRgb></TabRgb>
+          <TabCheckTx></TabCheckTx>
         </Tabs>
       </div>
     </>

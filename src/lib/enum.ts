@@ -8,6 +8,8 @@ export enum EventType {
 
   dashboard_tokens_reload = "dashboard_tokens_reload",
 
+  dashboard_checkRgb_reload = "dashboard_checkRgb_reload",
+
   // transaction
   transaction_reload_page = "transaction_reload_page",
   transaction_item_show = "transaction_item_show",

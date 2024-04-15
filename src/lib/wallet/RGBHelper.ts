@@ -1,4 +1,4 @@
-import { BI, Cell, CellDep, Script, helpers, utils } from "@ckb-lumos/lumos";
+import { BI, CellDep, Script, helpers, utils } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -26,7 +26,8 @@ import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { AccountType, accountStore } from "@/store/AccountStore";
 import {
-  getCotaTypeScript,
+  getCotaCellDep,
+  // getCotaTypeScript,
   isTestNet,
   mainConfig,
   testConfig,
@@ -330,28 +331,24 @@ export class RGBHelper {
           outputType: "0x" + unlockEntry,
         };
 
-        const cotaType = getCotaTypeScript(isTestNet() ? false : true);
-        const cotaCollector = CkbHepler.instance.indexer.collector({
-          lock: lock,
-          type: cotaType,
-        });
+        // const cotaType = getCotaTypeScript(isTestNet() ? false : true);
+        // const cotaCollector = CkbHepler.instance.indexer.collector({
+        //   lock: lock,
+        //   type: cotaType,
+        // });
 
-        const cotaCells: Cell[] = [];
-        if (cotaCollector) {
-          for await (const cotaCell of cotaCollector.collect()) {
-            cotaCells.push(cotaCell);
-          }
-        }
+        // const cotaCells: Cell[] = [];
+        // if (cotaCollector) {
+        //   for await (const cotaCell of cotaCollector.collect()) {
+        //     cotaCells.push(cotaCell);
+        //   }
+        // }
 
-        if (!cotaCells || cotaCells.length === 0) {
-          throw new Error("Cota cell doesn't exist");
-        }
-        const cotaCell = cotaCells[0];
-        cotaCellDep = {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          outPoint: cotaCell.outPoint as any,
-          depType: "code",
-        };
+        // if (!cotaCells || cotaCells.length === 0) {
+        //   throw new Error("Cota cell doesn't exist");
+        // }
+        // const cotaCell = cotaCells[0];
+        cotaCellDep = getCotaCellDep(isTestNet() ? false : true);
 
         // note: COTA cell MUST put first
       }
@@ -600,21 +597,20 @@ export class RGBHelper {
   }
 
   async retryBtcTxId(txId: string) {
-    setTimeout(async () => {
-      const cfg = isTestNet() ? testConfig : mainConfig;
+    const cfg = isTestNet() ? testConfig : mainConfig;
 
-      const service = BtcAssetsApi.fromToken(
-        cfg.BTC_ASSETS_API_URL,
-        cfg.BTC_ASSETS_TOKEN,
-        cfg.BTC_ASSETS_ORGIN
-      );
+    const service = BtcAssetsApi.fromToken(
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
+    );
 
-      const rs = await service.retryRgbppCkbTransaction({
-        btc_txid: txId,
-      });
+    const rs = await service.retryRgbppCkbTransaction({
+      btc_txid: txId,
+    });
 
-      console.log("retry rs", rs);
-    }, 200);
+    console.log("retry rs", rs);
+    return rs;
   }
 
   async getRgbAssertByService(txId: string, address: string) {
