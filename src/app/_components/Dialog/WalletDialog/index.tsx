@@ -46,6 +46,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       enqueueSnackbar("Account Already Connected", {variant: "error"})
     } else {
       let balance;
+      onClose();
       if(props.chain === 'btc') {
         let accountData = await _getBTCBalance(props.address);
         balance = formatUnit(accountData?.chain_stats.funded_txo_sum!!, 'ckb');
@@ -61,7 +62,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
         balance: balance ? balance.toString() : '',
       }))
       setIsLoading(false);
-      onClose();
+      
     }
 
   };
@@ -128,7 +129,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       enqueueSnackbar("Connect Failed", {variant: 'error'});
     }
   }
-  
+
   return (
     <>
       {

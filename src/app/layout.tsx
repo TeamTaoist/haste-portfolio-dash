@@ -30,6 +30,8 @@ export default function RootLayout({
         }
     }
 };
+console.log('0.0.1');
+
 //@ts-ignore
 config.initializeConfig(forkConfig)
 setSporeConfig(sporeConfig);
