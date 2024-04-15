@@ -173,9 +173,6 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
 
   return (
     <main className="flex flex-col flex-1 h-full bg-gray-100 text-black">
-        {
-            isListLoading && <Loading />
-        }
       <div className="h-full w-full flex flex-col">
         <div className="sm:mt-20 flex text-black text-hd1mb border-b border-gray-300 w-full py-10 px-8 font-Montserrat font-bold">
           Transaction
@@ -184,7 +181,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
           <div className=" h-full bg-primary010">
             <AccountSidebar />
           </div>
-          <div className="flex-1 sm:pr-0 sm:border-none overflow-scroll no-scrollbar">
+          <div className="flex-1 sm:pr-0 sm:border-none overflow-scroll no-scrollbar relative">
             {
               (isListLoading || isEmptyList) &&
               <div className="w-full h-full flex flex-col items-center justify-center gap-8">
@@ -200,6 +197,9 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                 </div>
               </div>
             }
+            {
+            isListLoading && <Loading />
+        }
             {
                 (chain && chain === 'ckb' && !isEmptyList) &&
 

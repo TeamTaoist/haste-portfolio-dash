@@ -57,10 +57,7 @@ export default function UDTList() {
 
 
   return (
-    <div className="w-full">
-      {
-        loadingPage && <Loading />
-      }
+    <div className="w-full h-full relative">
       <table className="w-full">
         <thead>
           <tr className="font-SourceSanPro font-semibold text-black opacity-30 grid grid-cols-12 py-2 text-left">
@@ -73,6 +70,9 @@ export default function UDTList() {
           </tr>
         </thead>
         <tbody className="text-black">
+          {
+            loadingPage && <Loading />
+          }
           {isLoading ? (
             Array.from(new Array(5)).map((_, index) => (
               <tr key={index} className="hover:bg-gray-200 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-lg">
