@@ -15,6 +15,7 @@ const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
   const deviceType = useSelector((state: RootState) => state.device.type);
   const activeTab = usePathname();
+  console.log(activeTab);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -68,7 +69,8 @@ const ResponsiveSidebar: React.FC = () => {
           </div>
           <div 
             className={activeTab === '/' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'}
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
               NaviTo("/")
             }}
           >
@@ -81,27 +83,29 @@ const ResponsiveSidebar: React.FC = () => {
           </div>
           <div 
             className={activeTab === '/transaction' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'} 
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
               NaviTo("/transaction")
             }}
           >
             <div className='flex items-center px-4 gap-4 py-1 cursor-pointer'>
-              <NotebookText className={activeTab === '/transaction' ? 'text-primary011': ''} />
+              <NotebookText className={activeTab === '/transaction/' ? 'text-primary011': ''} />
               {
-                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/transaction' ? 'font-semibold text-primary011': ''}`}>Transaction</p>
+                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/transaction/' ? 'font-semibold text-primary011': ''}`}>Transaction</p>
               }
             </div>
           </div>
           <div 
-            className={activeTab === '/send' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4' }
-            onClick={() => {
+            className={activeTab === '/send/' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4' }
+            onClick={(e) => {
+              e.preventDefault()
               NaviTo("/send")
             }}
           >
             <div className='flex items-center px-4 gap-4 py-1 cursor-pointer'>
-              <SendToBack className={activeTab === '/send' ? 'text-primary011': ''} />
+              <SendToBack className={activeTab === '/send/' ? 'text-primary011': ''} />
               {
-                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/send' ? 'font-semibold text-primary011': ''}`}>Send & Receive</p>
+                isColleapse && <p className={`font-SourceSanPro text-body1mb ${activeTab === '/send/' ? 'font-semibold text-primary011': ''}`}>Send & Receive</p>
               }
             </div>
           </div>
@@ -119,7 +123,8 @@ const ResponsiveSidebar: React.FC = () => {
                 <button onClick={toggleMobile} className="text-black p-4">Close</button>
                 <div>
                   <div className='flex flex-col'
-                    onClick={() => {
+                    onClick={(e) => {
+                       e.preventDefault()
                       NaviTo("/")
                     }}
                   >
@@ -130,25 +135,27 @@ const ResponsiveSidebar: React.FC = () => {
                       }
                     </div>
                   </div>
-                  <div className='flex flex-col' onClick={() => {
+                  <div className='flex flex-col' onClick={(e) => {
+                    e.preventDefault()
                     NaviTo("/transaction")
                   }}>
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
-                      <NotebookText className={` ${activeTab === '/transaction' ? ' text-primary011': ''}`} />
+                      <NotebookText className={` ${activeTab === '/transaction/' ? ' text-primary011': ''}`} />
                       {
-                        isColleapse && <p className={`text-body1mb ${activeTab === '/transaction' ? 'font-Montserrat text-primary011': ''}`}>Transaction</p>
+                        isColleapse && <p className={`text-body1mb ${activeTab === '/transaction/' ? 'font-Montserrat text-primary011': ''}`}>Transaction</p>
                       }
                     </div>
                   </div>
                   <div className='flex flex-col'
-                    onClick={() => {
+                    onClick={(e) => { 
+                      e.preventDefault()
                       NaviTo("/send")
                     }}
                   >
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
-                      <SendToBack className={` ${activeTab === '/send' ? ' text-primary011': ''}`}  />
+                      <SendToBack className={` ${activeTab === '/send/' ? ' text-primary011': ''}`}  />
                       {
-                        isColleapse && <p className={`text-body1mb ${activeTab === '/send' ? 'font-Montserrat text-primary011': ''}`}>Send & Receive</p>
+                        isColleapse && <p className={`text-body1mb ${activeTab === '/send/' ? 'font-Montserrat text-primary011': ''}`}>Send & Receive</p>
                       }
                     </div>
                   </div>
