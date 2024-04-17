@@ -324,13 +324,6 @@ export class CkbHepler {
       throw new Error("No spore type script");
     }
 
-    const spore_cellDeps = getSporeDep(cfg.isMainnet);
-    if (spore_cellDeps == null) {
-      throw new Error("No spore cell deps");
-    }
-
-    txSkeleton = addCellDep(txSkeleton, spore_cellDeps);
-
     const fromScript = helpers.parseAddress(options.from, {
       config: cfg.CONFIG,
     });
@@ -442,6 +435,14 @@ export class CkbHepler {
     txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
       witnesses.push(sporeCoBuild)
     );
+
+    const spore_cellDeps = getSporeDep(cfg.isMainnet);
+    if (spore_cellDeps == null) {
+      throw new Error("No spore cell deps");
+    }
+
+    txSkeleton = addCellDep(txSkeleton, spore_cellDeps);
+
     return txSkeleton;
   }
 
@@ -480,17 +481,6 @@ export class CkbHepler {
     const toAddress = helpers.encodeToAddress(toScript, { config: cfg.CONFIG });
 
     console.log(toAddress);
-
-    let sudt_cellDeps = helpers.locateCellDep(sudtToken);
-    if (sudt_cellDeps == null) {
-      if (isXUDT) {
-        sudt_cellDeps = getXudtDep(cfg.isMainnet);
-      } else {
-        throw new Error("No sudt cell deps");
-      }
-    }
-
-    txSkeleton = addCellDep(txSkeleton, sudt_cellDeps);
 
     // find sudt
     // <<
@@ -716,6 +706,17 @@ export class CkbHepler {
         );
       }
     }
+
+    let sudt_cellDeps = helpers.locateCellDep(sudtToken);
+    if (sudt_cellDeps == null) {
+      if (isXUDT) {
+        sudt_cellDeps = getXudtDep(cfg.isMainnet);
+      } else {
+        throw new Error("No sudt cell deps");
+      }
+    }
+
+    txSkeleton = addCellDep(txSkeleton, sudt_cellDeps);
 
     return txSkeleton;
   }
