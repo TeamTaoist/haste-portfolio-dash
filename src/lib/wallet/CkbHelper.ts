@@ -1,3 +1,4 @@
+import { formatUnit } from "@ckb-lumos/bi";
 import {
   BI,
   Cell,
@@ -588,7 +589,22 @@ export class CkbHepler {
     }
 
     let needCapacity = outputCapacity.add(MAX_FEE); // fee
-    if (needCapacity.lt(sudt_sumCapacity)) {
+    const minFromCKBCell = BI.from(
+      helpers.minimalCellCapacity({
+        cellOutput: {
+          lock: fromScript,
+          capacity: BI.from(0).toHexString(),
+        },
+        data: "0x",
+      })
+    );
+
+    console.log("minFromCKBCell", minFromCKBCell.toBigInt());
+
+    if (
+      needCapacity.lt(sudt_sumCapacity) &&
+      sudt_sumCapacity.sub(needCapacity).gt(minFromCKBCell)
+    ) {
       const ckb_change = sudt_sumCapacity.sub(needCapacity);
       if (ckb_change.gt(0)) {
         const output_ckb_change: Cell = {
@@ -598,12 +614,18 @@ export class CkbHepler {
           },
           data: "0x",
         };
+
         txSkeleton = txSkeleton.update("outputs", (outputs) =>
           outputs.push(output_ckb_change)
         );
       }
     } else {
-      needCapacity = needCapacity.sub(sudt_sumCapacity);
+      needCapacity = needCapacity.lt(sudt_sumCapacity)
+        ? needCapacity.add(minFromCKBCell).sub(sudt_sumCapacity)
+        : needCapacity.sub(sudt_sumCapacity);
+
+      console.log("needCapacity", needCapacity.toBigInt());
+
       // find ckb
       // <<
       const collect_ckb = CkbHepler.instance.indexer.collector({
@@ -618,13 +640,23 @@ export class CkbHepler {
       for await (const collect of collect_ckb.collect()) {
         inputs_ckb.push(collect);
         ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
-        if (ckb_sum.gte(needCapacity)) {
+        if (
+          ckb_sum.gte(needCapacity) &&
+          ckb_sum.sub(needCapacity).gte(minFromCKBCell)
+        ) {
           break;
         }
       }
       // >>
-      if (ckb_sum.lt(needCapacity)) {
-        throw new Error("No enough capacity");
+      if (
+        ckb_sum.lt(needCapacity) ||
+        ckb_sum.sub(needCapacity).lt(minFromCKBCell)
+      ) {
+        throw new Error(
+          "No enough capacity must remain gt " +
+            formatUnit(minFromCKBCell, "ckb") +
+            " CKB"
+        );
       }
       for (let i = 0; i < inputs_ckb.length; i++) {
         const element = inputs_ckb[i];
