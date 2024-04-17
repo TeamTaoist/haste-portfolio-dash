@@ -25,6 +25,8 @@ import {MainnetInfo, TestnetInfo} from "@/settings/variable";
 import {getSymbol} from "@/lib/utils";
 import {RGBHelper} from "@/lib/wallet/RGBHelper";
 import {BtcHepler} from "@/lib/wallet/BtcHelper";
+import {RgbAssert} from "@/lib/interface";
+import Loading from "@/app/_components/loading";
 export default function SendContent() {
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const [selectWallet, setSelectWallet] = useState<WalletItem>(wallets[0]);
@@ -33,6 +35,7 @@ export default function SendContent() {
   const [assetModalVisible, setAssetModalVisible] = useState(false);
   const [selectAsset, setSelectAsset] = useState<SelectAssetType>();
   const [isNative,setIsNative] = useState(true)
+    const [loading,setLoading] = useState(false);
 
   const [amount, setAmount] = useState<number|string>('');
     const dispatch = useDispatch();
@@ -42,7 +45,7 @@ export default function SendContent() {
   }
 
   const onSend = () => {
-
+      setLoading(true)
     if(isNative){
         if(isToCKB(selectWallet.address) !== isToCKB(to)) {
             enqueueSnackbar("Address Error", {variant: "error"})
@@ -60,6 +63,8 @@ export default function SendContent() {
             }).catch((err) => {
                 console.error(err);
                 enqueueSnackbar("Transfer Error", {variant: "error"})
+            }).finally(()=>{
+                setLoading(false)
             });
         }else{
             RGBHelper.instance.transferBTC(
@@ -72,6 +77,8 @@ export default function SendContent() {
             }).catch((err) => {
                 console.error(err);
                 enqueueSnackbar("Transfer Error", {variant: "error"})
+            }).finally(()=>{
+                setLoading(false)
             });
         }
 
@@ -99,7 +106,6 @@ export default function SendContent() {
   }
 
   const send_Spore = () =>{
-    console.log(isToCKB(to));
       switch (true) {
           case selectWallet.chain === "ckb" && isToCKB(to):
               send_ckb2ckb_Spore()
@@ -152,6 +158,8 @@ export default function SendContent() {
         enqueueSnackbar("Transfer Successful", {variant: "success"})
       } catch {
         enqueueSnackbar("Transfer Error", {variant: "error"})
+      }finally {
+          setLoading(false)
       }
     }
     const send_ckb2ckb_UDT = () =>{
@@ -171,7 +179,9 @@ export default function SendContent() {
                 console.error(err);
                 enqueueSnackbar("Transfer Error", {variant: "error"})
 
-            });
+            }).finally(()=>{
+                setLoading(false)
+        });
     }
 
 
@@ -194,7 +204,9 @@ export default function SendContent() {
             .catch((err) => {
                 console.error(err);
                 enqueueSnackbar("Transfer Error", {variant: "error"})
-            });
+            }).finally(()=>{
+                setLoading(false)
+        });
     }
     const send_btc2btc_UDT = () =>{
         console.log("===send_btc2btc_UDT====",selectWallet,to,selectAsset,amount)
@@ -214,14 +226,58 @@ export default function SendContent() {
             .catch((err) => {
                 console.error(err);
                 enqueueSnackbar("Transfer Error", {variant: "error"})
-            });
+            }).finally(()=>{
+            setLoading(false)
+        });
 
 
     }
 
-    const send_ckb2btc_UDT = () =>{
+    const send_ckb2btc_UDT = async() =>{
 
-        const {txHash,idx,type_script} = selectAsset?.data;
+        const {type_script} = selectAsset?.data;
+
+        let rs = await RGBHelper.instance.getRgbppAssert(to);
+        console.log(rs,selectAsset)
+
+        let findUtxo: RgbAssert | undefined = undefined;
+        // find same utxo
+        for (let i = 0; i < rs.length; i++) {
+            const utxo = rs[i];
+            if (
+                utxo.ckbCellInfo &&
+                utxo.ckbCellInfo.type_script.args == selectAsset?.data.type_script.args &&
+                utxo.ckbCellInfo.type_script.codeHash ==
+                selectAsset?.data.type_script.codeHash &&
+                utxo.ckbCellInfo.type_script.hashType == selectAsset?.data.type_script.hashType
+            ) {
+                findUtxo = utxo;
+                break;
+            }
+        }
+        // find empty utxo
+        if (!findUtxo) {
+            for (let i = 0; i < rs.length; i++) {
+                const utxo = rs[i];
+                if (!utxo.ckbCellInfo) {
+                    findUtxo = utxo;
+                    break;
+                }
+            }
+        }
+
+        if (!findUtxo) {
+           // console.error({
+           //      title: "Warning",
+           //      description: "No can use utxo",
+           //      variant: "destructive",
+           //  });
+            enqueueSnackbar("No can use utxo ", {variant: "error"})
+            return;
+        }
+
+
+        const {idx,txHash} = findUtxo;
         RGBHelper.instance
             .transfer_ckb_to_btc(
                 txHash,
@@ -236,7 +292,9 @@ export default function SendContent() {
             .catch((err) => {
                 console.error(err);
                 enqueueSnackbar("Transfer Error", {variant: "error"})
-            });
+            }).finally(()=>{
+            setLoading(false)
+        });
     }
     //@ts-ignore
     const handleSelect = (w) =>{
@@ -246,6 +304,9 @@ export default function SendContent() {
 
   return (
       <>
+          {
+              loading && <Loading />
+          }
           <div className="flex flex-col gap-2">
               <p className="font-semibold ">Send from</p>
               <WalletSelect

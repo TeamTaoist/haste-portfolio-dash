@@ -11,7 +11,7 @@ import {
   utils,
 } from "@ckb-lumos/lumos";
 import {
-  CellOutPutData,
+  CellOutPutData, ckb_SporeInfo,
   ckb_TransferOptions,
   ckb_TxInfo_new,
   ckb_UDTInfo,
@@ -218,11 +218,11 @@ export class CkbHepler {
   // build ckb transfer
   async buildTransfer(options: ckb_TransferOptions) {
     const cfg =  getEnv() === 'Testnet' ? testConfig : mainConfig;
-  
+
     const sudtScript = getSudtTypeScript(cfg.isMainnet);
     const xudtScript = getXudtTypeScript(cfg.isMainnet);
     const sporeScript = getSporeTypeScript(cfg.isMainnet);
-  
+
     // if (
     //   options.typeScript &&
     //   (options.typeScript.codeHash == sudtScript.codeHash ||
@@ -245,23 +245,23 @@ export class CkbHepler {
       let txSkeleton = helpers.TransactionSkeleton({
         cellProvider: CkbHepler.instance.indexer,
       });
-  
+
       const fromScript = helpers.parseAddress(options.from, {
         config: cfg.CONFIG,
       });
       const fromAddress = helpers.encodeToAddress(fromScript, {
         config: cfg.CONFIG,
       });
-  
+
       console.log(fromAddress);
-  
+
       const toScript = helpers.parseAddress(options.to, {
         config: cfg.CONFIG,
       });
       const toAddress = helpers.encodeToAddress(toScript, {
         config: cfg.CONFIG,
       });
-  
+
       console.log(toAddress);
       txSkeleton = await commons.common.transfer(
         txSkeleton,
@@ -273,7 +273,7 @@ export class CkbHepler {
         undefined,
         { config: cfg.CONFIG }
       );
-  
+
       txSkeleton = await commons.common.payFee(
         txSkeleton,
         [fromAddress],
@@ -941,92 +941,92 @@ export class CkbHepler {
     return result;
   }
 
-  // async getXudtAndSpore(address: string) {
-  //   const cfg = isTestNet() ? testConfig : mainConfig;
-  //
-  //   const xudtTypeScript = getXudtTypeScript(cfg.isMainnet);
-  //   const sporeTypeScript = getSporeTypeScript(cfg.isMainnet);
-  //
-  //   const xudt_collector = CkbHepler.instance.indexer.collector({
-  //     lock: helpers.parseAddress(address, {
-  //       config: cfg.CONFIG,
-  //     }),
-  //     type: {
-  //       script: {
-  //         codeHash: xudtTypeScript.codeHash,
-  //         hashType: xudtTypeScript.hashType,
-  //         args: "0x",
-  //       },
-  //       searchMode: "prefix",
-  //     },
-  //   });
-  //
-  //   const spore_collector = CkbHepler.instance.indexer.collector({
-  //     lock: helpers.parseAddress(address, {
-  //       config: cfg.CONFIG,
-  //     }),
-  //     type: {
-  //       script: {
-  //         codeHash: sporeTypeScript.codeHash,
-  //         hashType: sporeTypeScript.hashType,
-  //         args: "0x",
-  //       },
-  //       searchMode: "prefix",
-  //     },
-  //   });
-  //
-  //   const xudtList: ckb_UDTInfo[] = [];
-  //   const sporeList: ckb_SporeInfo[] = [];
-  //
-  //   const xudtMap: { [key: string]: ckb_UDTInfo } = {};
-  //
-  //   for await (const xudtCell of xudt_collector.collect()) {
-  //     if (xudtCell.cellOutput.type) {
-  //       const typeHash = utils.computeScriptHash(xudtCell.cellOutput.type);
-  //       if (!xudtMap[typeHash]) {
-  //         const ckbUDTInfo: ckb_UDTInfo = {
-  //           symbol: "UNKNOWN",
-  //           amount: BI.from(0).toString(),
-  //           type_hash: typeHash,
-  //           udt_type: "xUDT",
-  //           type_script: xudtCell.cellOutput.type,
-  //         };
-  //
-  //         xudtMap[typeHash] = ckbUDTInfo;
-  //         xudtList.push(ckbUDTInfo);
-  //       }
-  //
-  //       let addNum: BI | undefined = undefined;
-  //       try {
-  //         addNum = number.Uint128LE.unpack(xudtCell.data);
-  //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //       } catch (error: any) {
-  //         console.warn(error.message);
-  //       }
-  //
-  //       if (addNum)
-  //         xudtMap[typeHash].amount = BI.from(xudtMap[typeHash].amount)
-  //           .add(addNum)
-  //           .toString();
-  //     }
-  //   }
-  //
-  //   for await (const sporeCell of spore_collector.collect()) {
-  //     if (sporeCell.cellOutput.type) {
-  //       const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
-  //
-  //       sporeList.push({
-  //         symbol: "DOBs",
-  //         amount: sporeCell.cellOutput.type.args,
-  //         type_hash: typeHash,
-  //         udt_type: "spore_cell",
-  //         type_script: sporeCell.cellOutput.type,
-  //       });
-  //     }
-  //   }
-  //
-  //   return { xudtList, sporeList };
-  // }
+  async getXudtAndSpore(address: string) {
+    const cfg = getEnv() ? testConfig : mainConfig;
+
+    const xudtTypeScript = getXudtTypeScript(cfg.isMainnet);
+    const sporeTypeScript = getSporeTypeScript(cfg.isMainnet);
+
+    const xudt_collector = CkbHepler.instance.indexer.collector({
+      lock: helpers.parseAddress(address, {
+        config: cfg.CONFIG,
+      }),
+      type: {
+        script: {
+          codeHash: xudtTypeScript.codeHash,
+          hashType: xudtTypeScript.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    const spore_collector = CkbHepler.instance.indexer.collector({
+      lock: helpers.parseAddress(address, {
+        config: cfg.CONFIG,
+      }),
+      type: {
+        script: {
+          codeHash: sporeTypeScript.codeHash,
+          hashType: sporeTypeScript.hashType,
+          args: "0x",
+        },
+        searchMode: "prefix",
+      },
+    });
+
+    const xudtList: ckb_UDTInfo[] = [];
+    const sporeList: ckb_SporeInfo[] = [];
+
+    const xudtMap: { [key: string]: ckb_UDTInfo } = {};
+
+    for await (const xudtCell of xudt_collector.collect()) {
+      if (xudtCell.cellOutput.type) {
+        const typeHash = utils.computeScriptHash(xudtCell.cellOutput.type);
+        if (!xudtMap[typeHash]) {
+          const ckbUDTInfo: ckb_UDTInfo = {
+            symbol: "UNKNOWN",
+            amount: BI.from(0).toString(),
+            type_hash: typeHash,
+            udt_type: "xUDT",
+            type_script: xudtCell.cellOutput.type,
+          };
+
+          xudtMap[typeHash] = ckbUDTInfo;
+          xudtList.push(ckbUDTInfo);
+        }
+
+        let addNum: BI | undefined = undefined;
+        try {
+          addNum = number.Uint128LE.unpack(xudtCell.data);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+          console.warn(error.message);
+        }
+
+        if (addNum)
+          xudtMap[typeHash].amount = BI.from(xudtMap[typeHash].amount)
+            .add(addNum)
+            .toString();
+      }
+    }
+
+    for await (const sporeCell of spore_collector.collect()) {
+      if (sporeCell.cellOutput.type) {
+        const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
+
+        sporeList.push({
+          symbol: "DOBs",
+          amount: sporeCell.cellOutput.type.args,
+          type_hash: typeHash,
+          udt_type: "spore_cell",
+          type_script: sporeCell.cellOutput.type,
+        });
+      }
+    }
+
+    return { xudtList, sporeList };
+  }
 
   // async withDrawXUDT(sudtToken: Script) {
   //   const cfg = isTestNet() ? testConfig : mainConfig;
@@ -1245,27 +1245,27 @@ export class CkbHepler {
 
   async getRgbppPendingAssert(address: string) {
     const cfg =  getEnv() === 'Testnet' ? testConfig : mainConfig;
-  
+
     const btcTimeLock = getBtcTimeLockScript(cfg.isMainnet);
-  
+
     const xudtTS = getXudtTypeScript(cfg.isMainnet);
-  
+
     const lock = helpers.parseAddress(address, {
       config: cfg.CONFIG,
     });
-  
+
     const btcLockArgs = genBtcTimeLockArgs(
       lock,
       "0000000000000000000000000000000000000000000000000000000000000000",
       0
     );
-  
+
     const addressHexString = bytes.hexify(btcLockArgs);
     const prefixArgs = addressHexString.split(
       "000000000000000000000000000000000000000000000000000000000000000000000000"
     )[0];
     console.log(prefixArgs);
-  
+
     const collect = CkbHepler.instance.indexer.collector({
       lock: {
         script: {
@@ -1285,14 +1285,14 @@ export class CkbHepler {
       },
       scriptSearchMode: "prefix",
     });
-  
+
     const xudtList: ckb_UDTInfo[] = [];
-  
+
     const xudtMap: { [key: string]: ckb_UDTInfo } = {};
-  
+
     for await (const xudtCell of collect.collect()) {
       console.log(xudtCell);
-  
+
       if (xudtCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(xudtCell.cellOutput.type);
         if (!xudtMap[typeHash]) {
@@ -1304,11 +1304,11 @@ export class CkbHepler {
             type_script: xudtCell.cellOutput.type,
             isPending: true,
           };
-  
+
           xudtMap[typeHash] = ckbUDTInfo;
           xudtList.push(ckbUDTInfo);
         }
-  
+
         let addNum: BI | undefined = undefined;
         try {
           //@ts-ignore
@@ -1316,14 +1316,14 @@ export class CkbHepler {
         } catch (error: any) {
           console.warn(error.message);
         }
-  
+
         if (addNum)
           xudtMap[typeHash].amount = BI.from(xudtMap[typeHash].amount)
             .add(addNum)
             .toString();
       }
     }
-  
+
     return xudtList;
   }
 
