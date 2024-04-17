@@ -1,33 +1,22 @@
 import { bytes } from "@ckb-lumos/codec";
 import * as blockchain from "@ckb-lumos/base/lib/blockchain";
-import {
-  WitnessArgs,
-  commons,
-  helpers,
-  Script,
-  Cell,
-  // CellDep,
-  utils,
-  CellDep,
-} from "@ckb-lumos/lumos";
+import { commons, helpers, Script, Cell, CellDep } from "@ckb-lumos/lumos";
 import type * as api from "@ckb-lumos/base";
 import {
   getJoyIDLockScript,
   getJoyIDCellDep,
   getConfig,
   Aggregator,
-  // connect,
 } from "@joyid/ckb";
-import {
-  getCotaCellDep,
-  // getCotaTypeScript,
-  // getCotaTypeScript,
-  isTestNet,
-  mainConfig,
-  testConfig,
-} from "./constants";
+import { getCotaCellDep, isTestNet, mainConfig, testConfig } from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 import { accountStore } from "@/store/AccountStore";
+import { append0x } from "@rgbpp-sdk/ckb";
+import {
+  blake160,
+  serializeScript,
+  serializeWitnessArgs,
+} from "@nervosnetwork/ckb-sdk-utils";
 
 const cfg = isTestNet() ? testConfig : mainConfig;
 const isMainnet = cfg.isMainnet;
@@ -164,48 +153,28 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
           });
 
           // will change if the connection.keyType is a sub_key
-          let newWitnessArgs: WitnessArgs = {
-            lock: "0x",
-          };
+          let newWitnessArgs = { lock: "", inputType: "", outputType: "" };
 
           if (wallet.keyType === "sub_key") {
             const aggregator = new Aggregator(cfg.aggregatorUrl);
 
-            const pubkeyHash = bytes
-              .bytify(utils.ckbHash("0x" + wallet.pubkey))
-              .slice(0, 20);
-
-            const { unlock_entry: unlockEntry } =
-              await aggregator.generateSubkeyUnlockSmt({
-                // TODO TBD
-                alg_index: 1,
-                pubkey_hash: bytes.hexify(pubkeyHash),
-                lock_script: bytes.hexify(blockchain.Script.pack(lock)),
-              });
+            const pubkeyHash = append0x(
+              blake160(append0x(wallet.pubkey), "hex")
+            );
+            const req = {
+              lock_script: serializeScript(lock),
+              pubkey_hash: pubkeyHash,
+              alg_index: 1, // secp256r1
+            };
+            const { unlock_entry } = await aggregator.generateSubkeyUnlockSmt(
+              req
+            );
             newWitnessArgs = {
-              lock: "0x",
-              inputType: "0x",
-              outputType: "0x" + unlockEntry,
+              lock: "",
+              inputType: "",
+              outputType: append0x(unlock_entry),
             };
 
-            // const cotaType = getCotaTypeScript(
-            //   getConfig().network === "mainnet"
-            // );
-            // const cotaCollector = txSkeleton
-            //   .get("cellProvider")
-            //   ?.collector({ lock: lock, type: cotaType });
-
-            // const cotaCells: Cell[] = [];
-            // if (cotaCollector) {
-            //   for await (const cotaCell of cotaCollector.collect()) {
-            //     cotaCells.push(cotaCell);
-            //   }
-            // }
-
-            // if (!cotaCells || cotaCells.length === 0) {
-            //   throw new Error("Cota cell doesn't exist");
-            // }
-            // const cotaCell = cotaCells[0];
             const cotaCellDep: CellDep = getCotaCellDep(
               isTestNet() ? false : true
             );
@@ -216,9 +185,7 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
 
           txSkeleton = addCellDep(txSkeleton, getJoyIDCellDep(isMainnet));
 
-          const witness = bytes.hexify(
-            blockchain.WitnessArgs.pack(newWitnessArgs)
-          );
+          const witness = serializeWitnessArgs(newWitnessArgs);
           txSkeleton = txSkeleton.update("witnesses", (witnesses) =>
             witnesses.set(firstIndex, witness)
           );
