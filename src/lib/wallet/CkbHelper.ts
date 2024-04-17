@@ -601,12 +601,9 @@ export class CkbHepler {
 
     console.log("minFromCKBCell", minFromCKBCell.toBigInt());
 
-    if (
-      needCapacity.lt(sudt_sumCapacity) &&
-      sudt_sumCapacity.sub(needCapacity).gt(minFromCKBCell)
-    ) {
+    if (needCapacity.lt(sudt_sumCapacity)) {
       const ckb_change = sudt_sumCapacity.sub(needCapacity);
-      if (ckb_change.gt(0)) {
+      if (ckb_change.gt(minFromCKBCell)) {
         const output_ckb_change: Cell = {
           cellOutput: {
             lock: fromScript,
@@ -618,11 +615,48 @@ export class CkbHepler {
         txSkeleton = txSkeleton.update("outputs", (outputs) =>
           outputs.push(output_ckb_change)
         );
+      } else {
+        // find ckb
+        // <<
+        const collect_ckb = CkbHepler.instance.indexer.collector({
+          lock: {
+            script: fromScript,
+            searchMode: "exact",
+          },
+          type: "empty",
+        });
+        const inputs_ckb: Cell[] = [];
+        let ckb_sum = BI.from(0);
+        for await (const collect of collect_ckb.collect()) {
+          inputs_ckb.push(collect);
+          ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
+          break;
+        }
+        if (inputs_ckb.length <= 0) {
+          throw new Error("Cannot find empty cell");
+        }
+        for (let i = 0; i < inputs_ckb.length; i++) {
+          const element = inputs_ckb[i];
+          element.cellOutput.capacity = "0x0";
+          txSkeleton = await commons.common.setupInputCell(txSkeleton, element);
+        }
+        const new_ckb_change = ckb_sum.add(ckb_change);
+        if (new_ckb_change.gt(0)) {
+          const output_ckb_change: Cell = {
+            cellOutput: {
+              lock: fromScript,
+              capacity: new_ckb_change.toHexString(),
+            },
+            data: "0x",
+          };
+          txSkeleton = txSkeleton.update("outputs", (outputs) =>
+            outputs.push(output_ckb_change)
+          );
+        }
+        // >>
       }
     } else {
-      needCapacity = needCapacity.lt(sudt_sumCapacity)
-        ? needCapacity.add(minFromCKBCell).sub(sudt_sumCapacity)
-        : needCapacity.sub(sudt_sumCapacity);
+      needCapacity = needCapacity.sub(sudt_sumCapacity);
 
       console.log("needCapacity", needCapacity.toBigInt());
 
@@ -648,6 +682,11 @@ export class CkbHepler {
         }
       }
       // >>
+      console.log(
+        ckb_sum.toBigInt(),
+        needCapacity.toBigInt(),
+        minFromCKBCell.toBigInt()
+      );
       if (
         ckb_sum.lt(needCapacity) ||
         ckb_sum.sub(needCapacity).lt(minFromCKBCell)
