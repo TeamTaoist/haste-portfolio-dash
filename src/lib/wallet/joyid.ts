@@ -207,7 +207,7 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
             // }
             // const cotaCell = cotaCells[0];
             const cotaCellDep: CellDep = getCotaCellDep(
-              getConfig().network === "mainnet"
+              isTestNet() ? false : true
             );
 
             // note: COTA cell MUST put first
