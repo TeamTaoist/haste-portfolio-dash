@@ -1,4 +1,4 @@
-import { BI, CellDep, Script, helpers, utils } from "@ckb-lumos/lumos";
+import { BI, CellDep, Script, helpers } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -9,8 +9,13 @@ import {
   isBtcTimeCellsSpent,
   genRgbppLockScript,
   genBtcTransferCkbVirtualTx,
+  append0x,
 } from "@rgbpp-sdk/ckb";
-import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
+import {
+  blake160,
+  serializeScript,
+  serializeWitnessArgs,
+} from "@nervosnetwork/ckb-sdk-utils";
 import {
   Aggregator,
   CKBTransaction,
@@ -20,8 +25,6 @@ import {
 } from "@joyid/ckb";
 import { CkbHepler } from "./CkbHelper";
 import { DataManager } from "../manager/DataManager";
-import { bytes } from "@ckb-lumos/codec";
-import { blockchain } from "@ckb-lumos/base";
 import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { AccountType, accountStore } from "@/store/AccountStore";
@@ -304,56 +307,31 @@ export class RGBHelper {
     });
     const joyidScropt = getJoyIDLockScript(cfg.isMainnet);
     if (lock.codeHash == joyidScropt.codeHash) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let newWitnessArgs: any = {
-        lock: "0x",
-      };
+      let newWitnessArgs = { lock: "", inputType: "", outputType: "" };
 
       let cotaCellDep: CellDep | undefined = undefined;
       if (ckb_wallet.keyType == "sub_key") {
         const aggregator = new Aggregator(cfg.aggregatorUrl);
-        const pubkeyHash = bytes
-          .bytify(utils.ckbHash("0x" + ckb_wallet.pubkey))
-          .slice(0, 20);
 
-        console.log(ckb_wallet.pubkey);
-
-        const { unlock_entry: unlockEntry } =
-          await aggregator.generateSubkeyUnlockSmt({
-            // TODO TBD
-            alg_index: 1,
-            pubkey_hash: bytes.hexify(pubkeyHash),
-            lock_script: bytes.hexify(blockchain.Script.pack(lock)),
-          });
+        const pubkeyHash = append0x(
+          blake160(append0x(ckb_wallet.pubkey), "hex")
+        );
+        const req = {
+          lock_script: serializeScript(lock),
+          pubkey_hash: pubkeyHash,
+          alg_index: 1, // secp256r1
+        };
+        const { unlock_entry } = await aggregator.generateSubkeyUnlockSmt(req);
         newWitnessArgs = {
-          lock: "0x",
-          inputType: "0x",
-          outputType: "0x" + unlockEntry,
+          lock: "",
+          inputType: "",
+          outputType: append0x(unlock_entry),
         };
 
-        // const cotaType = getCotaTypeScript(isTestNet() ? false : true);
-        // const cotaCollector = CkbHepler.instance.indexer.collector({
-        //   lock: lock,
-        //   type: cotaType,
-        // });
-
-        // const cotaCells: Cell[] = [];
-        // if (cotaCollector) {
-        //   for await (const cotaCell of cotaCollector.collect()) {
-        //     cotaCells.push(cotaCell);
-        //   }
-        // }
-
-        // if (!cotaCells || cotaCells.length === 0) {
-        //   throw new Error("Cota cell doesn't exist");
-        // }
-        // const cotaCell = cotaCells[0];
         cotaCellDep = getCotaCellDep(isTestNet() ? false : true);
-
-        // note: COTA cell MUST put first
       }
 
-      const witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
+      const witness = serializeWitnessArgs(newWitnessArgs);
       const unsignedTx = {
         ...ckbRawTx,
         cellDeps: [
