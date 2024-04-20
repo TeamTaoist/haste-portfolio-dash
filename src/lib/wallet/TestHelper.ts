@@ -98,6 +98,14 @@ export class TestHelper {
       value: params.price,
     });
 
+    // dex fee
+    // <<
+    psbt.addOutput({
+      address: "tb1p6pak2svxsj8ay85enpv62h6ryamkynhr6s33sxc92mhzchll94psaharfw",
+      value: Math.ceil(params.price * 0.01),
+    });
+    // >>
+
     console.log("======", psbt);
 
     return psbt;
@@ -332,23 +340,16 @@ export class TestHelper {
       merged.push(...btcOutputs);
 
       // Add paymaster if provided
-      if (salePsbt.txOutputs[0]) {
-        merged.push({
-          ...salePsbt.txOutputs[0],
-          fixed: true,
-          minUtxoSatoshi: salePsbt.txOutputs[0].value,
-        });
+      for (let i = 0; i < salePsbt.txOutputs.length; i++) {
+        const output = salePsbt.txOutputs[i];
+        if (output) {
+          merged.push({
+            ...output,
+            fixed: true,
+            minUtxoSatoshi: output.value,
+          });
+        }
       }
-      // dex fee
-      // <<
-      merged.push({
-        address:
-          "tb1pnprtrusgvq9tsf7dsm7yfwxf7qsazpdguw6xkducu020pc0wlw4s4f6w3n",
-        value: 3000,
-        fixed: true,
-        minUtxoSatoshi: 3000,
-      });
-      // >>
 
       return merged;
     })();
@@ -420,7 +421,7 @@ export const testBuyPsbt = async () => {
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
       psbtHex:
-        "70736274ff01005e02000000018bcc0dc1d662fc9643f540f85a364b4a440eee46e599c4e5d7f22721d362aae00000000000ffffffff016400000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32000000000001012b6e03000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32010842014051d93691800d18f57a0cb407473a4aed2bfacf189e6647042d82380563f00d69957f4115a0123085fddf0973ca598c91e415e94645c9ee36de18a558f6f2ebaa0000",
+        "70736274ff01008902000000018bcc0dc1d662fc9643f540f85a364b4a440eee46e599c4e5d7f22721d362aae00000000000ffffffff026400000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b3201000000000000002251209846b1f208600ab827cd86fc44b8c9f021d105a8e3b46b3798e3d4f0e1eefbab000000000001012b6e03000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b3201084201403e111dac5718e810dbc78430c6a2434f1b3a093795dfcb5ffa81ea0b3d01adf94dbcfd8d6c0f889275aab3e4e5778b17c920ef7479f4e85e471349731b7d2dda000000",
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
       xudtTS: {
