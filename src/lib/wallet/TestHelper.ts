@@ -339,6 +339,16 @@ export class TestHelper {
           minUtxoSatoshi: salePsbt.txOutputs[0].value,
         });
       }
+      // dex fee
+      // <<
+      merged.push({
+        address:
+          "tb1pnprtrusgvq9tsf7dsm7yfwxf7qsazpdguw6xkducu020pc0wlw4s4f6w3n",
+        value: 3000,
+        fixed: true,
+        minUtxoSatoshi: 3000,
+      });
+      // >>
 
       return merged;
     })();
