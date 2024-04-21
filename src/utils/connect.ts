@@ -1,6 +1,8 @@
 import { getEnv } from '@/settings/env';
 import { getPublicKey, initConfig as initBTCConfig, requestAccounts } from '@joyid/bitcoin' 
 import { connect, initConfig } from '@joyid/ckb';
+import { mainConfig, testConfig } from '@/lib/wallet/constants';
+import test from 'node:test';
 
 export const OKXConnect = async () => {
 
@@ -38,11 +40,12 @@ export const UnisatConnect = async () => {
 export const JoyIDBTCconnect = async () => {
    initBTCConfig({
       // your app name
-      name: "JoyID demo",
+      name: "Haste Pro",
       // your app logo
       logo: "https://fav.farm/🆔",
       // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: "https://testnet.joyid.dev",
+      // joyidAppURL: "https://testnet.joyid.dev",
+      joyidAppURL: process.env.NODE_ENV === 'development' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
     });
 
     const [address] = await requestAccounts();
@@ -52,11 +55,12 @@ export const JoyIDBTCconnect = async () => {
 
 export const JoyIDCKBConnect = async () => {
   initConfig({
-    name: "JoyID demo",
+      name: "Haste Pro",
       // your app logo
       logo: "https://fav.farm/🆔",
       // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
-      joyidAppURL: "https://testnet.joyid.dev",
+      // joyidAppURL: "https://testnet.joyid.dev",
+      joyidAppURL: process.env.NODE_ENV === 'development' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
   })
   const JoyIDCkbWallet = await connect();
   return {
