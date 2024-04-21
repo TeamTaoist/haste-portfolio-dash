@@ -1,7 +1,7 @@
 import superagent from "superagent";
 
 import { WalletType, btc_AddressInfo, btc_TxInfo } from "../interface";
-import { initConfig, sendPsbt } from "@joyid/bitcoin";
+import { initConfig, sendPsbt, signPsbt } from "@joyid/bitcoin";
 import {
   requestAccounts,
   getPublicKey,
@@ -97,7 +97,8 @@ export class BtcHepler {
     }
   }
 
-  async signPsdt(hex: string, walletType: WalletType) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async signPsdt(hex: string, walletType: WalletType, options?: any) {
     if (walletType == "unisat") {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const unisat = (window as any)["unisat"];
@@ -109,7 +110,7 @@ export class BtcHepler {
           await unisat.switchNetwork(this._network);
         }
 
-        const newHex = await unisat.signPsbt(hex);
+        const newHex = await unisat.signPsbt(hex, options);
         return newHex;
       } else {
         throw new Error("UniSat Wallet is no installed!");
@@ -123,10 +124,10 @@ export class BtcHepler {
         // {address publicKey}
         const cfg = isTestNet() ? testConfig : mainConfig;
         if (cfg.isMainnet) {
-          const result = await okxwallet.bitcoin.signPsbt(hex);
+          const result = await okxwallet.bitcoin.signPsbt(hex, options);
           return result;
         } else {
-          const result = await okxwallet.bitcoinTestnet.signPsbt(hex);
+          const result = await okxwallet.bitcoinTestnet.signPsbt(hex, options);
           return result;
         }
       } else {
@@ -134,7 +135,53 @@ export class BtcHepler {
       }
     } else if (walletType == "joyid") {
       // const result = await joyID_signPsbt(hex);
-      return hex;
+      const result = await signPsbt(hex, options);
+      return result;
+    }
+
+    throw new Error("Please connect btc wallet");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async halfSignPsbt(hex: string, walletType: WalletType, options: any) {
+    if (walletType == "unisat") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const unisat = (window as any)["unisat"];
+      if (typeof unisat !== "undefined") {
+        console.log("UniSat Wallet is installed!");
+
+        const curNetwork = await unisat.getNetwork();
+        if (curNetwork != this._network) {
+          await unisat.switchNetwork(this._network);
+        }
+
+        const newHex = await unisat.signPsbt(hex, options);
+        return newHex;
+      } else {
+        throw new Error("UniSat Wallet is no installed!");
+      }
+    } else if (walletType == "okx") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const okxwallet = (window as any)["okxwallet"];
+      if (typeof okxwallet !== "undefined") {
+        console.log("OKX is installed!");
+
+        // {address publicKey}
+        const cfg = isTestNet() ? testConfig : mainConfig;
+        if (cfg.isMainnet) {
+          const result = await okxwallet.bitcoin.signPsbt(hex, options);
+          return result;
+        } else {
+          const result = await okxwallet.bitcoinTestnet.signPsbt(hex, options);
+          return result;
+        }
+      } else {
+        throw new Error("OKX Wallet is no installed!");
+      }
+    } else if (walletType == "joyid") {
+      // const result = await joyID_signPsbt(hex);
+      const result = await signPsbt(hex, options);
+      return result;
     }
 
     throw new Error("Please connect btc wallet");
@@ -221,6 +268,50 @@ export class BtcHepler {
     } else if (walletType == "joyid") {
       const result = await sendPsbt(psbtHex);
       return result;
+    }
+
+    throw new Error("Please connect btc wallet");
+  }
+
+  async pushTx(rawTx: string, walletType: WalletType) {
+    if (walletType == "unisat") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const unisat = (window as any)["unisat"];
+      if (typeof unisat !== "undefined") {
+        console.log("UniSat Wallet is installed!");
+
+        const curNetwork = await unisat.getNetwork();
+        if (curNetwork != this._network) {
+          await unisat.switchNetwork(this._network);
+        }
+
+        return unisat.pushTx({
+          rawtx: rawTx,
+        });
+      } else {
+        throw new Error("UniSat Wallet is no installed!");
+      }
+    } else if (walletType == "okx") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const okxwallet = (window as any)["okxwallet"];
+      if (typeof okxwallet !== "undefined") {
+        console.log("OKX is installed!");
+
+        console.log(okxwallet.bitcoinTestnet);
+
+        // {address publicKey}
+        const cfg = isTestNet() ? testConfig : mainConfig;
+        if (cfg.isMainnet) {
+          const result = await okxwallet.bitcoin.pushTx(rawTx);
+          return result;
+        } else {
+          throw new Error("OKX Wallet is no testnet push psbt");
+        }
+      } else {
+        throw new Error("OKX Wallet is no installed!");
+      }
+    } else if (walletType == "joyid") {
+      throw new Error("need a send rawTx api");
     }
 
     throw new Error("Please connect btc wallet");

@@ -55,7 +55,10 @@
     "superagent": "^8.1.2",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@noble/secp256k1": "^2.1.0",
+    "@scure/base": "^1.1.6",
+    "@scure/btc-signer": "^1.2.2"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

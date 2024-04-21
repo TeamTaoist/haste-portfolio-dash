@@ -25,7 +25,9 @@ import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { unpackRgbppLockArgs } from "@rgbpp-sdk/btc/lib/ckb/molecule";
 import { accountStore } from "@/store/AccountStore";
 import { BtcHepler } from "./BtcHelper";
-import { WalletType } from "../interface";
+import * as btcSigner from "@scure/btc-signer";
+import superagent from "superagent";
+import { Address, OutScript } from "@scure/btc-signer";
 
 export class TestHelper {
   private static _instance: TestHelper;
@@ -91,6 +93,24 @@ export class TestHelper {
         value: utxo.value,
       },
       tapInternalKey: toXOnly(Buffer.from(remove0x(params.fromPubkey), "hex")),
+      sighashType: btcSigner.SigHash.SINGLE_ANYONECANPAY,
+    });
+
+    psbt.data.addOutput({
+      script: Buffer.from("0000000000000000000000000000000000"),
+      value: 0,
+    });
+
+    psbt.data.addOutput({
+      script: OutScript.encode(
+        Address(btcSigner.TEST_NETWORK).decode(params.fromAddress)
+      ),
+      value: 0,
+    });
+
+    psbt.data.addOutput({
+      address: params.fromAddress,
+      value: 0,
     });
 
     psbt.addOutput({
@@ -101,7 +121,7 @@ export class TestHelper {
     // dex fee
     // <<
     psbt.addOutput({
-      address: "tb1p6pak2svxsj8ay85enpv62h6ryamkynhr6s33sxc92mhzchll94psaharfw",
+      address: "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
       value: Math.ceil(params.price * 0.01),
     });
     // >>
@@ -172,7 +192,7 @@ export class TestHelper {
       collector,
       rgbppLockArgsList: [sporeRgbppLockArgs],
       xudtTypeBytes: sporeTypeBytes,
-      transferAmount: BigInt(1_0000_0000),
+      transferAmount: BigInt(10000),
       isMainnet,
     });
 
@@ -192,7 +212,6 @@ export class TestHelper {
       buyerAddr: params.buyAddress,
       buyerPubkey: params.buyPubKey,
     });
-
     // >>
 
     return { psbt, ckbVirtualTxResult };
@@ -218,7 +237,7 @@ export class TestHelper {
     });
     console.log("========== sale psbt", salePsbt);
 
-    const saleAddress = salePsbt.txOutputs[0].address;
+    const saleAddress = salePsbt.txOutputs[1].address;
 
     const btcInputs: Utxo[] = [];
     const btcOutputs: TxAddressOutput[] = [];
@@ -267,6 +286,7 @@ export class TestHelper {
 
         btcInputs.push({
           ...utxo,
+          pubkey: props.buyerPubkey, // for pass build tx
         });
       }
     }
@@ -339,16 +359,15 @@ export class TestHelper {
       // Add outputs
       merged.push(...btcOutputs);
 
-      // Add paymaster if provided
-      for (let i = 0; i < salePsbt.txOutputs.length; i++) {
+      for (let i = 3; i < salePsbt.txOutputs.length; i++) {
         const output = salePsbt.txOutputs[i];
-        if (output) {
-          merged.push({
-            ...output,
-            fixed: true,
-            minUtxoSatoshi: output.value,
-          });
-        }
+        merged.push({
+          address: output.address,
+          script: output.script,
+          fixed: true,
+          value: output.value,
+          minUtxoSatoshi: output.value,
+        });
       }
 
       return merged;
@@ -357,7 +376,7 @@ export class TestHelper {
     console.log("======== mergedBtcOutputs", mergedBtcOutputs);
 
     const { builder } = await createSendUtxosBuilder({
-      inputs: [],
+      inputs: btcInputs,
       outputs: mergedBtcOutputs,
       from: props.buyerAddr,
       source: props.source,
@@ -366,10 +385,44 @@ export class TestHelper {
     });
 
     const psbt = builder.toPsbt();
-    psbt.addInput(salePsbt.txInputs[0]);
-    psbt.data.updateInput(psbt.data.inputs.length - 1, salePsbt.data.inputs[0]);
-    console.log("======== buy psbt", psbt);
-    return psbt;
+    // console.log("======== buy psbt", psbt);
+    // psbt.data.updateInput(0, salePsbt.data.inputs[0]);
+    console.log("======== before psbt", psbt, salePsbt);
+
+    for (let i = 1; i < psbt.txInputs.length; i++) {
+      const input = psbt.txInputs[i];
+      salePsbt.data.addInput({
+        hash: input.hash,
+        index: input.index,
+        witnessUtxo: psbt.data.inputs[i].witnessUtxo,
+        tapInternalKey: psbt.data.inputs[i].tapInternalKey,
+      });
+    }
+
+    salePsbt.data.globalMap.unsignedTx["tx"]["outs"][0] =
+      psbt.data.globalMap.unsignedTx["tx"]["outs"][0];
+    salePsbt.data.outputs[0] = psbt.data.outputs[0];
+
+    salePsbt.data.globalMap.unsignedTx["tx"]["outs"][1] =
+      psbt.data.globalMap.unsignedTx["tx"]["outs"][1];
+    salePsbt.data.outputs[1] = psbt.data.outputs[1];
+
+    salePsbt.data.globalMap.unsignedTx["tx"]["outs"][2] =
+      psbt.data.globalMap.unsignedTx["tx"]["outs"][2];
+    salePsbt.data.outputs[2] = psbt.data.outputs[2];
+
+    for (let i = 5; i < psbt.txOutputs.length; i++) {
+      const output = psbt.txOutputs[i];
+      salePsbt.data.addOutput({
+        address: output.address as string,
+        script: output.script,
+        value: output.value,
+      });
+    }
+
+    // salePsbt.finalizeInput(0);
+    console.log("======== after psbt", salePsbt);
+    return salePsbt;
   }
 }
 
@@ -382,22 +435,33 @@ export const testListPsbt = async () => {
     throw new Error("Please choose a wallet");
   }
 
-  console.log("======", curAccount);
+  console.log("======", curAccount, "pubkey", wallet.pubkey);
 
   const listPsbt = await TestHelper.instance.createListPsbt({
     isTestnet: true,
     rgbpp_txHash:
-      "e0aa62d32127f2d7e5c499e546ee0e444a4b365af840f54396fc62d6c10dcc8b",
-    rgbpp_txIdx: 0,
+      "012051cf08ec7701a9ecbdebbceef49af3662d10c898471b42562475a6d85bac",
+    rgbpp_txIdx: 1,
     price: 100,
     fromAddress: curAccount as string,
     fromPubkey: wallet.pubkey,
   });
 
-  const psbtHex = await BtcHepler.instance.signPsdt(
+  const psbtHex = await BtcHepler.instance.halfSignPsbt(
     listPsbt.toHex(),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    wallet.type as any
+    wallet.type as any,
+    {
+      autoFinalized: false,
+      toSignInputs: [
+        {
+          index: 0,
+          address: curAccount,
+          publicKey: wallet.pubkey,
+          sighashTypes: [btcSigner.SigHash.SINGLE_ANYONECANPAY],
+        },
+      ],
+    }
   );
 
   const cfg = networkTypeToConfig(NetworkType.TESTNET);
@@ -421,34 +485,83 @@ export const testBuyPsbt = async () => {
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
       psbtHex:
-        "70736274ff01008902000000018bcc0dc1d662fc9643f540f85a364b4a440eee46e599c4e5d7f22721d362aae00000000000ffffffff026400000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b3201000000000000002251209846b1f208600ab827cd86fc44b8c9f021d105a8e3b46b3798e3d4f0e1eefbab000000000001012b6e03000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b3201084201403e111dac5718e810dbc78430c6a2434f1b3a093795dfcb5ffa81ea0b3d01adf94dbcfd8d6c0f889275aab3e4e5778b17c920ef7479f4e85e471349731b7d2dda000000",
+        "70736274ff0100fd0a010200000001ac5bd8a6752456421b4798c8102d66f39af4eebcebbdeca90177ec08cf5120010100000000ffffffff05000000000000000022303030303030303030303030303030303030303030303030303030303030303030300000000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430000000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d436400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430100000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32000000000001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d4301030483000000011341e0fde5100a5c90c56244b582412409ce80a26e3db9dfadbc8b3dea4a9af31aaa51c6bd3981d7d587c88b158b0abbe5ccb012be5ef75eadfbd70bd9766e42f15683011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000000000",
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
       xudtTS: {
         codeHash:
           "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb",
         hashType: "type",
-        args: "0x6a5a8762fc76d5854e69d8a13611acfede063e77d15e964e3a88660e86cff1af",
+        args: "0x30452490e0f5bc2b2c832ed04a349be90cab3f25aaece06612195642f61fa114",
       },
     });
+
+  const signInputList: { index: number; address: string; publicKey: string }[] =
+    [];
+
+  for (let i = 0; i < buyPsbt.txInputs.length; i++) {
+    if (!buyPsbt.data.inputs[i].tapKeySig) {
+      signInputList.push({
+        index: i,
+        address: curAccount as string,
+        publicKey: wallet.pubkey,
+      });
+    }
+  }
 
   const psbtHex = await BtcHepler.instance.signPsdt(
     buyPsbt.toHex(),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    wallet.type as any
+    wallet.type as any,
+    {
+      autoFinalized: false,
+      toSignInputs: signInputList,
+    }
   );
 
   const cfg = networkTypeToConfig(NetworkType.TESTNET);
-  console.log(
-    "====== psbtHex",
-    psbtHex,
-    bitcoin.Psbt.fromHex(psbtHex, { network: cfg.network })
-  );
+  const newPsbt = bitcoin.Psbt.fromHex(psbtHex, { network: cfg.network });
 
-  const btcTxId = await BtcHepler.instance.pushPsbt(
-    psbtHex,
-    wallet.type as WalletType
-  );
+  console.log("====== psbtHex", psbtHex, newPsbt);
+  newPsbt.finalizeAllInputs();
+  console.log("====== after finalize newPsbt", newPsbt, newPsbt.toHex());
+
+  const btcTx = newPsbt.extractTransaction();
+
+  console.log("======= btc tx is ", btcTx.toHex());
+
+  // const btcTxId = await BtcHepler.instance.pushPsbt(
+  //   newPsbt.toHex(),
+  //   wallet.type as WalletType
+  // );
+  // console.log("======= btcTxId", btcTxId);
+
+  // const {
+  //   bitcoin: { transactions },
+  // } = mempoolJS({
+  //   hostname: "mempool.space",
+  //   network: "testnet",
+  // });
+
+  // const txid = await transactions.postTx({ txhex: btcTx.toHex() });
+  // console.log(txid);
+
+  const result = await superagent
+    .post(
+      // eslint-disable-next-line no-constant-condition
+      `https://mempool.space${false ? "" : "/testnet"}/api/tx`
+    )
+    .send(btcTx.toHex())
+    .catch((err) => {
+      console.error(err);
+    });
+
+  console.log(result);
+
+  let txHash = "";
+  if (result && result.status == 200) {
+    txHash = result.text;
+  }
 
   //需要替换成自己的配置
   // <<
@@ -462,7 +575,7 @@ export const testBuyPsbt = async () => {
   );
   // >>
   const rgbppState = await service.sendRgbppCkbTransaction({
-    btc_txid: btcTxId,
+    btc_txid: txHash as string,
     ckb_virtual_result: ckbVirtualTxResult,
   });
   console.log("rgbppState", rgbppState);
