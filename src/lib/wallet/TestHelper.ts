@@ -240,11 +240,11 @@ export class TestHelper {
         isMainnet,
       });
     } else if (params.itemType === "xudt") {
-      const sporeTypeBytes = serializeScript(params.script);
+      const xudtTypeBytes = serializeScript(params.script);
       ckbVirtualTxResult = await this.dex_genBtcTransferCkbVirtualTx({
         collector,
         rgbppLockArgsList: [sporeRgbppLockArgs],
-        xudtTypeBytes: sporeTypeBytes,
+        xudtTypeBytes,
         transferAmount: BigInt(10000), // [TODO] why 10000 ????
         isMainnet,
       });
