@@ -1,4 +1,4 @@
-import { BI, CellDep, Script, helpers } from "@ckb-lumos/lumos";
+import { BI, CellDep, Script, helpers, utils } from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -7,9 +7,9 @@ import {
   Collector,
   genBtcJumpCkbVirtualTx,
   isBtcTimeCellsSpent,
-  genRgbppLockScript,
   genBtcTransferCkbVirtualTx,
   append0x,
+  getXudtTypeScript,
 } from "@rgbpp-sdk/ckb";
 import {
   blake160,
@@ -35,6 +35,8 @@ import {
   mainConfig,
   testConfig,
 } from "./constants";
+import { unpackRgbppLockArgs } from "@rgbpp-sdk/btc/lib/ckb/molecule";
+import { number } from "@ckb-lumos/codec";
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -473,78 +475,65 @@ export class RGBHelper {
   async getRgbppAssert(address: string) {
     const cfg = isTestNet() ? testConfig : mainConfig;
 
-    const result: btc_utxo[] | undefined = await BtcHepler.instance.getUtxo(
-      address
+    const service = BtcAssetsApi.fromToken(
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
     );
 
     const rgbAssertList: RgbAssert[] = [];
 
-    if (result) {
-      const rgbppLockArgsList: {
-        args: string;
-        txHash: string;
-        idx: number;
-        value: number;
-      }[] = [];
-      for (let i = 0; i < result.length; i++) {
-        const element = result[i];
-        const rgbArgs = buildRgbppLockArgs(element.vout, element.txid);
-        rgbppLockArgsList.push({
-          args: rgbArgs,
-          txHash: element.txid,
-          idx: element.vout,
-          value: element.value,
-        });
-      }
-      const rgbppLocks = rgbppLockArgsList.map((item) => {
-        const lock = genRgbppLockScript(item.args, cfg.isMainnet);
+    const rgbAsserts = await service.getRgbppAssetsByBtcAddress(address);
 
-        return {
-          lock,
-          txHash: item.txHash,
-          idx: item.idx,
-          value: item.value,
-        };
+    const xudtCodeHash = getXudtTypeScript(cfg.isMainnet);
+
+    for (let i = 0; i < rgbAsserts.length; i++) {
+      const rgbAssert = rgbAsserts[i];
+
+      const btcInfo = unpackRgbppLockArgs(rgbAssert.cellOutput.lock.args);
+
+      const isXUDT =
+        rgbAssert.cellOutput.type &&
+        rgbAssert.cellOutput.type.codeHash == xudtCodeHash.codeHash
+          ? true
+          : false;
+
+      const typeHash = utils.computeScriptHash(
+        rgbAssert.cellOutput.type as Script
+      );
+      rgbAssertList.push({
+        ckbCellInfo: {
+          type_hash: typeHash,
+          symbol: "UNKOWN",
+          amount: isXUDT
+            ? number.Uint128LE.unpack(rgbAssert.data).toString()
+            : rgbAssert.cellOutput.type!.args,
+          type_script: rgbAssert.cellOutput.type as Script,
+          udt_type: isXUDT ? "xUDT" : "spore_cell",
+        },
+        txHash: btcInfo.btcTxid,
+        idx: btcInfo.outIndex,
+        value: 0,
       });
-      // const xudtTypeScript = getXudtTypeScript(isMainnet);
-      for await (const rgbppLock of rgbppLocks) {
-        const address = helpers.encodeToAddress(rgbppLock.lock, {
-          config: cfg.CONFIG,
-        });
-        const { xudtList, sporeList } =
-          await CkbHepler.instance.getXudtAndSpore(address);
+    }
 
-        if (xudtList.length > 0) {
-          for (let i = 0; i < xudtList.length; i++) {
-            const xudt = xudtList[i];
-            rgbAssertList.push({
-              txHash: rgbppLock.txHash,
-              idx: rgbppLock.idx,
-              ckbCellInfo: xudt,
-              value: rgbppLock.value,
-            });
-          }
-        } else if (sporeList.length > 0) {
-          for (let i = 0; i < sporeList.length; i++) {
-            const spore = sporeList[i];
-            rgbAssertList.push({
-              txHash: rgbppLock.txHash,
-              idx: rgbppLock.idx,
-              ckbCellInfo: spore,
-              value: rgbppLock.value,
-            });
-          }
-        } else {
-          rgbAssertList.push({
-            txHash: rgbppLock.txHash,
-            idx: rgbppLock.idx,
-            value: rgbppLock.value,
-          });
-        }
+    const utxo = await service.getBtcUtxos(address);
+
+    for (let i = 0; i < utxo.length; i++) {
+      const item = utxo[i];
+      const find = rgbAssertList.find(
+        (v) => v.txHash == item.txid && v.idx == item.vout
+      );
+      if (!find) {
+        rgbAssertList.push({
+          txHash: item.txid,
+          idx: item.vout,
+          value: item.value,
+        });
       }
     }
 
-    console.log(rgbAssertList);
+    console.log(rgbAssertList, rgbAsserts);
 
     return rgbAssertList;
   }

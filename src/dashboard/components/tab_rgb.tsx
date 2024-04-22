@@ -180,7 +180,7 @@ export function TabRgb() {
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {rgbs.map((rgb) =>
-          !rgb.ckbCellInfo ? (
+          !rgb.ckbCellInfo || rgb.ckbCellInfo.udt_type == "spore_cell" ? (
             ""
           ) : (
             <Card key={rgb.ckbCellInfo.type_hash + rgb.txHash}>
@@ -227,20 +227,23 @@ export function TabRgb() {
                           className="w-[50%]"
                           onClick={() => setIsRgb(true)}
                         >
-                          发送 {getSymbol(chooseRgb?.ckbCellInfo?.type_script)} 到 CKB
+                          发送 {getSymbol(chooseRgb?.ckbCellInfo?.type_script)}{" "}
+                          到 CKB
                         </TabsTrigger>
                         <TabsTrigger
                           value={getSymbol(chooseRgb?.ckbCellInfo?.type_script)}
                           className="w-[50%]"
                           onClick={() => setIsRgb(false)}
                         >
-                          发送 {" "}
-                          {getSymbol(chooseRgb?.ckbCellInfo?.type_script)} 到 BTC
+                          发送 {getSymbol(chooseRgb?.ckbCellInfo?.type_script)}{" "}
+                          到 BTC
                         </TabsTrigger>
                       </TabsList>
                       <TabsContent value="rgb++">
                         <DialogHeader>
-                          <DialogTitle>使用 RGB++ 协议发送到 CKB 地址</DialogTitle>
+                          <DialogTitle>
+                            使用 RGB++ 协议发送到 CKB 地址
+                          </DialogTitle>
                           <DialogDescription className="!text-white001">
                             * 注意请使用正确的 CKB 地址
                           </DialogDescription>
@@ -251,11 +254,12 @@ export function TabRgb() {
                       >
                         <DialogHeader>
                           <DialogTitle>
-                            发送 {" "}
+                            发送{" "}
                             {getSymbol(chooseRgb?.ckbCellInfo?.type_script)}
                           </DialogTitle>
                           <DialogDescription className="!text-white001">
-                            * 注意请使用正确的 BTC 地址，当前支持 Taproot 和 Segwit
+                            * 注意请使用正确的 BTC 地址，当前支持 Taproot 和
+                            Segwit
                           </DialogDescription>
                         </DialogHeader>
                       </TabsContent>
