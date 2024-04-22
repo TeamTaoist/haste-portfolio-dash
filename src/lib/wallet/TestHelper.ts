@@ -37,6 +37,12 @@ import {
   isBtcTimeLockCell,
   isRgbppLockCell,
   compareInputs,
+  getSporeTypeDep,
+  RGBPP_TX_WITNESS_MAX_SIZE,
+  TransferSporeCkbVirtualTxParams,
+  SporeTransferVirtualTxResult,
+  getRgbppLockScript,
+  RgbppUtxoBindMultiSporesError,
 } from "@rgbpp-sdk/ckb";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { unpackRgbppLockArgs } from "@rgbpp-sdk/btc/lib/ckb/molecule";
@@ -49,6 +55,7 @@ import {
   calculateRgbppCellCapacity,
   estimateWitnessSize,
   genRgbppLockScript,
+  generateSporeTransferCoBuild,
   isTypeAssetSupported,
   throwErrorWhenTxInputsExceeded,
   u128ToLe,
@@ -167,8 +174,8 @@ export class TestHelper {
     psbtHex: string;
     buyAddress: string;
     buyPubKey: string;
-    //   sporeTS: CKBComponents.Script;
-    xudtTS: CKBComponents.Script;
+    sporeTS: CKBComponents.Script;
+    // xudtTS: CKBComponents.Script;
   }) {
     //需要替换成自己的配置
     // <<
@@ -217,13 +224,21 @@ export class TestHelper {
 
     // TODO: 需要替换成spore的，目前使用xudt测试
     //<<
-    const sporeTypeBytes = serializeScript(params.xudtTS);
+    // const sporeTypeBytes = serializeScript(params.xudtTS);
 
-    const ckbVirtualTxResult = await this.dex_genBtcTransferCkbVirtualTx({
+    // const ckbVirtualTxResult = await this.dex_genBtcTransferCkbVirtualTx({
+    //   collector,
+    //   rgbppLockArgsList: [sporeRgbppLockArgs],
+    //   xudtTypeBytes: sporeTypeBytes,
+    //   transferAmount: BigInt(10000),
+    //   isMainnet,
+    // });
+
+    const sporeTypeBytes = serializeScript(params.sporeTS);
+    const ckbVirtualTxResult = await this.dex_genTransferSporeCkbVirtualTx({
       collector,
-      rgbppLockArgsList: [sporeRgbppLockArgs],
-      xudtTypeBytes: sporeTypeBytes,
-      transferAmount: BigInt(10000),
+      sporeRgbppLockArgs,
+      sporeTypeBytes,
       isMainnet,
     });
 
@@ -247,6 +262,107 @@ export class TestHelper {
 
     return { psbt, ckbVirtualTxResult };
   }
+
+  dex_genTransferSporeCkbVirtualTx = async ({
+    collector,
+    sporeRgbppLockArgs,
+    sporeTypeBytes,
+    isMainnet,
+    witnessLockPlaceholderSize,
+    ckbFeeRate,
+  }: TransferSporeCkbVirtualTxParams): Promise<SporeTransferVirtualTxResult> => {
+    const sporeRgbppLock = {
+      ...getRgbppLockScript(isMainnet),
+      args: append0x(sporeRgbppLockArgs),
+    };
+    const sporeCells = await collector.getCells({
+      lock: sporeRgbppLock,
+      isDataEmpty: false,
+    });
+    if (!sporeCells || sporeCells.length === 0) {
+      throw new NoRgbppLiveCellError(
+        "No spore rgbpp cells found with the spore rgbpp lock args"
+      );
+    }
+    if (sporeCells.length > 1) {
+      throw new RgbppUtxoBindMultiSporesError(
+        "The UTXO is bound to multiple spores"
+      );
+    }
+    const sporeCell = sporeCells[0];
+
+    if (!sporeCell.output.type) {
+      throw new RgbppUtxoBindMultiSporesError(
+        "The cell with the rgbpp lock args has no spore asset"
+      );
+    }
+
+    if (
+      append0x(serializeScript(sporeCell.output.type)) !==
+      append0x(sporeTypeBytes)
+    ) {
+      throw new RgbppUtxoBindMultiSporesError(
+        "The cell type with the rgbpp lock args does not match"
+      );
+    }
+
+    const inputs: CKBComponents.CellInput[] = [
+      {
+        previousOutput: sporeCell.outPoint,
+        since: "0x0",
+      },
+    ];
+
+    const outputs: CKBComponents.CellOutput[] = [
+      {
+        ...sporeCell.output,
+        // The BTC transaction Vouts[0] for OP_RETURN, Vouts[1] for spore
+        lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
+      },
+    ];
+    const outputsData: Hex[] = [sporeCell.outputData];
+    const cellDeps = [
+      getRgbppLockDep(isMainnet),
+      getRgbppLockConfigDep(isMainnet),
+      getSporeTypeDep(isMainnet),
+    ];
+    const sporeCoBuild = generateSporeTransferCoBuild(sporeCell, outputs[0]);
+    const witnesses = [RGBPP_WITNESS_PLACEHOLDER, sporeCoBuild];
+
+    const ckbRawTx: CKBComponents.RawTransaction = {
+      version: "0x0",
+      cellDeps,
+      headerDeps: [],
+      inputs,
+      outputs,
+      outputsData,
+      witnesses,
+    };
+
+    let changeCapacity = BigInt(sporeCell.output.capacity);
+    const txSize =
+      getTransactionSize(ckbRawTx) +
+      (witnessLockPlaceholderSize ?? RGBPP_TX_WITNESS_MAX_SIZE);
+    const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
+    changeCapacity -= estimatedTxFee;
+
+    ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(
+      changeCapacity.toString(16)
+    );
+
+    const virtualTx: RgbppCkbVirtualTx = {
+      ...ckbRawTx,
+    };
+    const commitment = calculateCommitment(virtualTx);
+
+    return {
+      ckbRawTx,
+      commitment,
+      sporeCell,
+      needPaymasterCell: false,
+      sumInputsCapacity: sporeCell.output.capacity,
+    };
+  };
 
   dex_genBtcTransferCkbVirtualTx = async ({
     collector,
@@ -723,16 +839,21 @@ export const testBuyPsbt = async () => {
   const { psbt: buyPsbt, ckbVirtualTxResult } =
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
-      psbtHex:
-        "70736274ff010092020000000201000000000000000000000000000000000000000000000000000000000000000000000000fffffffff8d43ca98c58f19e233e017f857fe4a3b46b361ac08e0591b3249bcf9724a89c0100000000ffffffff020000000000000000026a006400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43000000000001012b0000000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43011720c56d5c3cdc4c28aa383271d56a6ac3e06cc2ebe7a626ef3c5c54dd66cfe45c1a0001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d4301030483000000011341ee1442895f306cd2add3b66b22c2d118c53f997f34a1a53f3c0e39bd256ad3aad51b96a25cb333d293fe8a520655d980ed27b97100b3894172d1d879285d1d1e83011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000",
+      psbtHex: "change to list hex", // !!!! 替换上架的spore
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
-      xudtTS: {
-        codeHash:
-          "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb",
-        hashType: "type",
-        args: "0x6a5a8762fc76d5854e69d8a13611acfede063e77d15e964e3a88660e86cff1af",
+      sporeTS: {
+        // !!!! 替换上架的spore
+        args: "",
+        codeHash: "",
+        hashType: "data1",
       },
+      // xudtTS: {
+      //   codeHash:
+      //     "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb",
+      //   hashType: "type",
+      //   args: "0x6a5a8762fc76d5854e69d8a13611acfede063e77d15e964e3a88660e86cff1af",
+      // },
     });
 
   const signInputList: { index: number; address: string; publicKey: string }[] =
