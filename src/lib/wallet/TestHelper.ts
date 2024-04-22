@@ -62,6 +62,10 @@ import {
 } from "@rgbpp-sdk/ckb/lib/utils";
 import { blockchain } from "@ckb-lumos/base";
 
+
+const DEFAULT_WITNESS_ADDR = 'tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m'; // The address of the witness, which is used to receive service fee.
+const DEFAULT_WITNESS_PUBKEY = 'c56d5c3cdc4c28aa383271d56a6ac3e06cc2ebe7a626ef3c5c54dd66cfe45c1a'; // The pubkey of the witness.
+
 export class TestHelper {
   private static _instance: TestHelper;
   private constructor() {}
@@ -174,8 +178,8 @@ export class TestHelper {
     psbtHex: string;
     buyAddress: string;
     buyPubKey: string;
-    sporeTS: CKBComponents.Script;
-    // xudtTS: CKBComponents.Script;
+    itemType:string; // spore or xudt
+    script: CKBComponents.Script;
   }) {
     //需要替换成自己的配置
     // <<
@@ -224,23 +228,30 @@ export class TestHelper {
 
     // TODO: 需要替换成spore的，目前使用xudt测试
     //<<
-    // const sporeTypeBytes = serializeScript(params.xudtTS);
 
-    // const ckbVirtualTxResult = await this.dex_genBtcTransferCkbVirtualTx({
-    //   collector,
-    //   rgbppLockArgsList: [sporeRgbppLockArgs],
-    //   xudtTypeBytes: sporeTypeBytes,
-    //   transferAmount: BigInt(10000),
-    //   isMainnet,
-    // });
+    let ckbVirtualTxResult:BtcTransferVirtualTxResult;
 
-    const sporeTypeBytes = serializeScript(params.sporeTS);
-    const ckbVirtualTxResult = await this.dex_genTransferSporeCkbVirtualTx({
-      collector,
-      sporeRgbppLockArgs,
-      sporeTypeBytes,
-      isMainnet,
-    });
+    if (params.itemType === "spore") {
+      const sporeTypeBytes = serializeScript(params.script);
+      ckbVirtualTxResult = await this.dex_genTransferSporeCkbVirtualTx({
+        collector,
+        sporeRgbppLockArgs,
+        sporeTypeBytes,
+        isMainnet,
+      });
+    } else if (params.itemType === "xudt") {
+      const sporeTypeBytes = serializeScript(params.script);
+      ckbVirtualTxResult = await this.dex_genBtcTransferCkbVirtualTx({
+        collector,
+        rgbppLockArgsList: [sporeRgbppLockArgs],
+        xudtTypeBytes: sporeTypeBytes,
+        transferAmount: BigInt(10000), // [TODO] why 10000 ????
+        isMainnet,
+      });
+    } else {
+      throw new Error("Unknown item type");
+    }
+    
 
     const { commitment, ckbRawTx } = ckbVirtualTxResult;
 
@@ -670,8 +681,7 @@ export class TestHelper {
       merged.push(...btcOutputs);
 
       merged.push({
-        address:
-          "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
+        address: DEFAULT_WITNESS_ADDR,
         value: Math.ceil(salePsbt.txOutputs[1].value * 0.01),
         fixed: true,
         minUtxoSatoshi: Math.ceil(salePsbt.txOutputs[1].value * 0.01),
@@ -788,18 +798,19 @@ export const testListPsbt = async () => {
 
   console.log("======", curAccount, "pubkey", wallet.pubkey);
 
+  const rgbpp_txHash = "9ca82497cf9b24b391058ec01a366bb4a3e47f857f013e239ef1588ca93cd4f8";
+  const rgbpp_txIdx = 1;
+  const sell_price = 100; // 100 sats
+
   const listPsbt = await TestHelper.instance.createListPsbt({
     isTestnet: true,
-    rgbpp_txHash:
-      "9ca82497cf9b24b391058ec01a366bb4a3e47f857f013e239ef1588ca93cd4f8",
-    rgbpp_txIdx: 1,
-    price: 100,
+    rgbpp_txHash: rgbpp_txHash,
+    rgbpp_txIdx: rgbpp_txIdx,
+    price: sell_price,
     fromAddress: curAccount as string,
     fromPubkey: wallet.pubkey,
-    witnessAddr:
-      "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
-    witnessPubkey:
-      "c56d5c3cdc4c28aa383271d56a6ac3e06cc2ebe7a626ef3c5c54dd66cfe45c1a",
+    witnessAddr: DEFAULT_WITNESS_ADDR,
+    witnessPubkey: DEFAULT_WITNESS_PUBKEY,
   });
 
   const psbtHex = await BtcHepler.instance.halfSignPsbt(
@@ -836,24 +847,30 @@ export const testBuyPsbt = async () => {
     throw new Error("Please choose a wallet");
   }
 
+
+  // !!!! 替换上架的xudt
+  const xudtTS: CKBComponents.Script =  {
+    codeHash:
+      "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb",
+    hashType: "type",
+    args: "0x6a5a8762fc76d5854e69d8a13611acfede063e77d15e964e3a88660e86cff1af",
+  };
+
+  // !!!! 替换上架的spore
+  const sporeTS: CKBComponents.Script= {
+    args: "",
+    codeHash: "",
+    hashType: "data1",
+  };
+
   const { psbt: buyPsbt, ckbVirtualTxResult } =
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
       psbtHex: "change to list hex", // !!!! 替换上架的spore
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
-      sporeTS: {
-        // !!!! 替换上架的spore
-        args: "",
-        codeHash: "",
-        hashType: "data1",
-      },
-      // xudtTS: {
-      //   codeHash:
-      //     "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb",
-      //   hashType: "type",
-      //   args: "0x6a5a8762fc76d5854e69d8a13611acfede063e77d15e964e3a88660e86cff1af",
-      // },
+      itemType: "xudt", // !!!! 替换上架的spore
+      script: xudtTS, // !!!! 替换上架的spore
     });
 
   const signInputList: { index: number; address: string; publicKey: string }[] =
