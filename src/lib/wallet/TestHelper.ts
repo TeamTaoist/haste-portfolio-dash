@@ -4,14 +4,14 @@ import {
   ErrorCodes,
   InitOutput,
   NetworkType,
+  SendUtxosProps,
   TxAddressOutput,
   TxBuildError,
+  TxBuilder,
   Utxo,
   bitcoin,
   createSendUtxosBuilder,
   networkTypeToConfig,
-  remove0x,
-  toXOnly,
 } from "@rgbpp-sdk/btc";
 import {
   Collector,
@@ -27,7 +27,6 @@ import { accountStore } from "@/store/AccountStore";
 import { BtcHepler } from "./BtcHelper";
 import * as btcSigner from "@scure/btc-signer";
 import superagent from "superagent";
-import { Address, OutScript } from "@scure/btc-signer";
 
 export class TestHelper {
   private static _instance: TestHelper;
@@ -83,48 +82,103 @@ export class TestHelper {
       );
     }
 
-    const psbt = new bitcoin.Psbt({ network: cfg.network });
+    const config = networkTypeToConfig(source.networkType);
+    const minUtxoSatoshi = config.rgbppUtxoDustLimit;
 
-    psbt.addInput({
-      hash: params.rgbpp_txHash,
-      index: params.rgbpp_txIdx,
-      witnessUtxo: {
-        script: Buffer.from(remove0x(utxo.scriptPk), "hex"),
-        value: utxo.value,
+    const { builder } = await this.dex_createSendUtxosBuilder(
+      {
+        inputs: [
+          {
+            ...utxo,
+            pubkey: params.fromPubkey,
+          },
+        ],
+        outputs: [
+          {
+            data: Buffer.from("0x" + "00".repeat(32), "hex"), // any data <= 80 bytes
+            value: 0, // normally the value is 0
+            fixed: true,
+          },
+          {
+            address: params.fromAddress,
+            value: minUtxoSatoshi,
+            fixed: true,
+            minUtxoSatoshi: minUtxoSatoshi,
+          },
+          {
+            address: params.fromAddress,
+            value: minUtxoSatoshi,
+            fixed: true,
+            minUtxoSatoshi: minUtxoSatoshi,
+          },
+          {
+            address: params.fromAddress,
+            value: params.price,
+            fixed: true,
+            minUtxoSatoshi: params.price,
+          },
+          {
+            address:
+              "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
+            value: Math.ceil(params.price * 0.01),
+            fixed: true,
+            minUtxoSatoshi: Math.ceil(params.price * 0.01),
+          },
+        ],
+        from: params.fromAddress,
+        fromPubkey: params.fromPubkey,
+        changeAddress: params.fromAddress,
+        feeRate: 1,
+        source,
+        minUtxoSatoshi: 0,
       },
-      tapInternalKey: toXOnly(Buffer.from(remove0x(params.fromPubkey), "hex")),
+      false
+    );
+    const psbt = builder.toPsbt();
+    psbt.updateInput(0, {
       sighashType: btcSigner.SigHash.SINGLE_ANYONECANPAY,
     });
 
-    psbt.data.addOutput({
-      script: Buffer.from("0000000000000000000000000000000000"),
-      value: 0,
-    });
+    // const psbt = new bitcoin.Psbt({ network: cfg.network });
 
-    psbt.data.addOutput({
-      script: OutScript.encode(
-        Address(btcSigner.TEST_NETWORK).decode(params.fromAddress)
-      ),
-      value: 0,
-    });
+    // psbt.addInput({
+    //   hash: params.rgbpp_txHash,
+    //   index: params.rgbpp_txIdx,
+    //   witnessUtxo: {
+    //     script: Buffer.from(remove0x(utxo.scriptPk), "hex"),
+    //     value: utxo.value,
+    //   },
+    //   tapInternalKey: toXOnly(Buffer.from(remove0x(params.fromPubkey), "hex")),
+    //   sighashType: btcSigner.SigHash.SINGLE_ANYONECANPAY,
+    // });
 
-    psbt.data.addOutput({
-      address: params.fromAddress,
-      value: 0,
-    });
+    // psbt.data.addOutput({
+    //   script: Buffer.from("0000000000000000000000000000000000"),
+    //   value: 0,
+    // });
 
-    psbt.addOutput({
-      address: params.fromAddress,
-      value: params.price,
-    });
+    // psbt.data.addOutput({
+    //   script: Buffer.from("0000000000000000000000000000000001"),
+    //   value: 0,
+    // });
 
-    // dex fee
-    // <<
-    psbt.addOutput({
-      address: "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
-      value: Math.ceil(params.price * 0.01),
-    });
-    // >>
+    // psbt.addOutput({
+    //   address: params.fromAddress,
+    //   value: 0,
+    // });
+
+    // psbt.addOutput({
+    //   address: params.fromAddress,
+    //   value: params.price,
+    // });
+
+    // // dex fee
+    // // <<
+    // psbt.addOutput({
+    //   address: "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
+    //   value: Math.ceil(params.price * 0.01),
+    // });
+    // // >>
 
     console.log("======", psbt);
 
@@ -237,7 +291,7 @@ export class TestHelper {
     });
     console.log("========== sale psbt", salePsbt);
 
-    const saleAddress = salePsbt.txOutputs[1].address;
+    const saleAddress = salePsbt.txOutputs[2].address;
 
     const btcInputs: Utxo[] = [];
     const btcOutputs: TxAddressOutput[] = [];
@@ -424,6 +478,49 @@ export class TestHelper {
     console.log("======== after psbt", salePsbt);
     return salePsbt;
   }
+
+  async dex_createSendUtxosBuilder(
+    props: SendUtxosProps,
+    isPayFee: boolean
+  ): Promise<{
+    builder: TxBuilder;
+    feeRate: number;
+    fee: number;
+  }> {
+    const tx = new TxBuilder({
+      source: props.source,
+      feeRate: props.feeRate,
+      minUtxoSatoshi: props.minUtxoSatoshi,
+      onlyConfirmedUtxos: props.onlyConfirmedUtxos,
+    });
+
+    tx.addInputs(props.inputs);
+    tx.addOutputs(props.outputs);
+
+    if (props.onlyConfirmedUtxos) {
+      await tx.validateInputs();
+    }
+
+    if (isPayFee) {
+      const paid = await tx.payFee({
+        address: props.from,
+        publicKey: props.fromPubkey,
+        changeAddress: props.changeAddress,
+      });
+
+      return {
+        builder: tx,
+        fee: paid.fee,
+        feeRate: paid.feeRate,
+      };
+    } else {
+      return {
+        builder: tx,
+        fee: 0,
+        feeRate: 0,
+      };
+    }
+  }
 }
 
 export const testListPsbt = async () => {
@@ -485,7 +582,7 @@ export const testBuyPsbt = async () => {
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
       psbtHex:
-        "70736274ff0100fd0a010200000001ac5bd8a6752456421b4798c8102d66f39af4eebcebbdeca90177ec08cf5120010100000000ffffffff05000000000000000022303030303030303030303030303030303030303030303030303030303030303030300000000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430000000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d436400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430100000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32000000000001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d4301030483000000011341e0fde5100a5c90c56244b582412409ce80a26e3db9dfadbc8b3dea4a9af31aaa51c6bd3981d7d587c88b158b0abbe5ccb012be5ef75eadfbd70bd9766e42f15683011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000000000",
+        "70736274ff0100ea0200000001ac5bd8a6752456421b4798c8102d66f39af4eebcebbdeca90177ec08cf5120010100000000ffffffff050000000000000000026a002202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d432202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d436400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430100000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32000000000001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43010304830000000113413274804aabc9fc107c3067bdb8d3a34e6aafa3d90ed7ddabf658cd96c84b7938b5acdd48f39e4bdd90950cb0d80930488518c295732a13b33dcd971ba5685b0d83011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000000000",
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
       xudtTS: {
