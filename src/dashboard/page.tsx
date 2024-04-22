@@ -88,6 +88,8 @@ const Dashboard = observer(() => {
       const wallet = accountStore.getWallet(accountStore.currentAddress);
       if (wallet && wallet.chain == "BTC") {
         setChain("BTC");
+      } else if (wallet && wallet.chain == "CKB") {
+        setChain("CKB");
       }
 
       await HttpManager.instance.getAsset(accountStore.currentAddress);

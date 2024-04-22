@@ -179,11 +179,11 @@ export function TabRgb() {
     <TabsContent value="RGB++" className="space-y-4">
       <div hidden={true}>{reload ? "1" : "2"}</div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {rgbs.map((rgb) =>
+        {rgbs.map((rgb, index) =>
           !rgb.ckbCellInfo || rgb.ckbCellInfo.udt_type == "spore_cell" ? (
             ""
           ) : (
-            <Card key={rgb.ckbCellInfo.type_hash + rgb.txHash}>
+            <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   {rgb.ckbCellInfo.udt_type}
