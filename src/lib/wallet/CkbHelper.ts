@@ -1260,7 +1260,9 @@ export class CkbHepler {
       emptyCells,
       uniqueCellCapacity + minXudtCapacity,
       txFee,
-      MIN_CAPACITY
+      {
+        minCapacity: MIN_CAPACITY,
+      }
     );
 
     const uniqueTypeScript = getUniqueCellTypeScript(cfg.isMainnet);
@@ -1547,7 +1549,9 @@ export class CkbHepler {
     }
     const needCapacity = totalReceiverXudtCapacity;
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } =
-      collector.collectInputs(emptyCells, needCapacity, txFee, MIN_CAPACITY);
+      collector.collectInputs(emptyCells, needCapacity, txFee, {
+        minCapacity: MIN_CAPACITY,
+      });
 
     inputs.push(...emptyInputs);
 
@@ -1712,7 +1716,9 @@ export class CkbHepler {
     }
     const needCapacity = totalReceiverXudtCapacity;
     const { inputs: emptyInputs, sumInputsCapacity: sumEmptyCapacity } =
-      collector.collectInputs(emptyCells, needCapacity, txFee, MIN_CAPACITY);
+      collector.collectInputs(emptyCells, needCapacity, txFee, {
+        minCapacity: MIN_CAPACITY,
+      });
 
     inputs.push(...emptyInputs);
 

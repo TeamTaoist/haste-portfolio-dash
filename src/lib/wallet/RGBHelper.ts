@@ -25,7 +25,7 @@ import {
 } from "@joyid/ckb";
 import { CkbHepler } from "./CkbHelper";
 import { DataManager } from "../manager/DataManager";
-import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
+import { DataSource, remove0x, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { AccountType, accountStore } from "@/store/AccountStore";
 import {
@@ -511,7 +511,7 @@ export class RGBHelper {
           type_script: rgbAssert.cellOutput.type as Script,
           udt_type: isXUDT ? "xUDT" : "spore_cell",
         },
-        txHash: btcInfo.btcTxid,
+        txHash: remove0x(btcInfo.btcTxid),
         idx: btcInfo.outIndex,
         value: 0,
       });
@@ -533,7 +533,7 @@ export class RGBHelper {
       }
     }
 
-    console.log(rgbAssertList, rgbAsserts);
+    console.log(rgbAssertList);
 
     return rgbAssertList;
   }

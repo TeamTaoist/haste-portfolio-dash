@@ -1,4 +1,7 @@
-import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
+import {
+  getTransactionSize,
+  serializeScript,
+} from "@nervosnetwork/ckb-sdk-utils";
 import {
   DataSource,
   ErrorCodes,
@@ -14,12 +17,26 @@ import {
   networkTypeToConfig,
 } from "@rgbpp-sdk/btc";
 import {
+  BtcTransferVirtualTxParams,
+  BtcTransferVirtualTxResult,
   Collector,
+  Hex,
+  IndexerCell,
+  NoRgbppLiveCellError,
+  RGBPP_WITNESS_PLACEHOLDER,
+  RgbppCkbVirtualTx,
+  TypeAssetNotSupportedError,
+  append0x,
   buildRgbppLockArgs,
   calculateCommitment,
-  genBtcTransferCkbVirtualTx,
+  calculateTransactionFee,
+  getRgbppLockConfigDep,
+  getRgbppLockDep,
+  getSecp256k1CellDep,
+  getXudtDep,
   isBtcTimeLockCell,
   isRgbppLockCell,
+  compareInputs,
 } from "@rgbpp-sdk/ckb";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 import { unpackRgbppLockArgs } from "@rgbpp-sdk/btc/lib/ckb/molecule";
@@ -27,6 +44,16 @@ import { accountStore } from "@/store/AccountStore";
 import { BtcHepler } from "./BtcHelper";
 import * as btcSigner from "@scure/btc-signer";
 import superagent from "superagent";
+import {
+  buildPreLockArgs,
+  calculateRgbppCellCapacity,
+  estimateWitnessSize,
+  genRgbppLockScript,
+  isTypeAssetSupported,
+  throwErrorWhenTxInputsExceeded,
+  u128ToLe,
+} from "@rgbpp-sdk/ckb/lib/utils";
+import { blockchain } from "@ckb-lumos/base";
 
 export class TestHelper {
   private static _instance: TestHelper;
@@ -84,12 +111,20 @@ export class TestHelper {
       );
     }
 
-    const config = networkTypeToConfig(source.networkType);
-    const minUtxoSatoshi = config.rgbppUtxoDustLimit;
+    // const config = networkTypeToConfig(source.networkType);
+    // const minUtxoSatoshi = config.rgbppUtxoDustLimit;
 
     const { builder } = await this.dex_createSendUtxosBuilder(
       {
         inputs: [
+          {
+            ...utxo,
+            txid: "0000000000000000000000000000000000000000000000000000000000000001",
+            vout: 0,
+            value: 0,
+            address: params.witnessAddr,
+            pubkey: params.witnessPubkey,
+          },
           {
             ...utxo,
             pubkey: params.fromPubkey,
@@ -97,34 +132,15 @@ export class TestHelper {
         ],
         outputs: [
           {
-            data: Buffer.from("0x" + "00".repeat(32), "hex"), // any data <= 80 bytes
-            value: 0, // normally the value is 0
-            fixed: true,
-          },
-          {
-            address: params.witnessAddr,
-            value: minUtxoSatoshi,
-            fixed: true,
-            minUtxoSatoshi: minUtxoSatoshi,
-          },
-          {
-            address: params.witnessAddr,
-            value: minUtxoSatoshi,
-            fixed: true,
-            minUtxoSatoshi: minUtxoSatoshi,
+            data: Buffer.from("0x" + "00".repeat(32), "hex"), // RGBPP commitment
+            value: 0,
+            fixed: true, // mark as fixed, so the output.value will not be changed
           },
           {
             address: params.fromAddress,
             value: params.price,
             fixed: true,
             minUtxoSatoshi: params.price,
-          },
-          {
-            address:
-              "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
-            value: Math.ceil(params.price * 0.01),
-            fixed: true,
-            minUtxoSatoshi: Math.ceil(params.price * 0.01),
           },
         ],
         from: params.fromAddress,
@@ -137,50 +153,9 @@ export class TestHelper {
       false
     );
     const psbt = builder.toPsbt();
-    psbt.updateInput(0, {
+    psbt.updateInput(1, {
       sighashType: btcSigner.SigHash.SINGLE_ANYONECANPAY,
     });
-
-    // const psbt = new bitcoin.Psbt({ network: cfg.network });
-
-    // psbt.addInput({
-    //   hash: params.rgbpp_txHash,
-    //   index: params.rgbpp_txIdx,
-    //   witnessUtxo: {
-    //     script: Buffer.from(remove0x(utxo.scriptPk), "hex"),
-    //     value: utxo.value,
-    //   },
-    //   tapInternalKey: toXOnly(Buffer.from(remove0x(params.fromPubkey), "hex")),
-    //   sighashType: btcSigner.SigHash.SINGLE_ANYONECANPAY,
-    // });
-
-    // psbt.data.addOutput({
-    //   script: Buffer.from("0000000000000000000000000000000000"),
-    //   value: 0,
-    // });
-
-    // psbt.data.addOutput({
-    //   script: Buffer.from("0000000000000000000000000000000001"),
-    //   value: 0,
-    // });
-
-    // psbt.addOutput({
-    //   address: params.fromAddress,
-    //   value: 0,
-    // });
-
-    // psbt.addOutput({
-    //   address: params.fromAddress,
-    //   value: params.price,
-    // });
-
-    // // dex fee
-    // // <<
-    // psbt.addOutput({
-    //   address: "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
-    //   value: Math.ceil(params.price * 0.01),
-    // });
-    // // >>
 
     console.log("======", psbt);
 
@@ -216,15 +191,15 @@ export class TestHelper {
       network: cfg.network,
     });
 
-    const txHash = Buffer.from(salePsbt.txInputs[0].hash.reverse()).toString(
+    const txHash = Buffer.from(salePsbt.txInputs[1].hash.reverse()).toString(
       "hex"
     );
     const sporeRgbppLockArgs = buildRgbppLockArgs(
-      salePsbt.txInputs[0].index,
+      salePsbt.txInputs[1].index,
       txHash
     );
 
-    console.log("=====", salePsbt.txInputs[0].index, txHash, salePsbt);
+    console.log("=====", salePsbt.txInputs[1].index, txHash, salePsbt);
 
     const networkType = isMainnet ? NetworkType.MAINNET : NetworkType.TESTNET;
     //需要替换成自己的配置
@@ -244,7 +219,7 @@ export class TestHelper {
     //<<
     const sporeTypeBytes = serializeScript(params.xudtTS);
 
-    const ckbVirtualTxResult = await genBtcTransferCkbVirtualTx({
+    const ckbVirtualTxResult = await this.dex_genBtcTransferCkbVirtualTx({
       collector,
       rgbppLockArgsList: [sporeRgbppLockArgs],
       xudtTypeBytes: sporeTypeBytes,
@@ -273,6 +248,158 @@ export class TestHelper {
     return { psbt, ckbVirtualTxResult };
   }
 
+  dex_genBtcTransferCkbVirtualTx = async ({
+    collector,
+    xudtTypeBytes,
+    rgbppLockArgsList,
+    transferAmount,
+    isMainnet,
+    noMergeOutputCells,
+    witnessLockPlaceholderSize,
+    ckbFeeRate,
+  }: BtcTransferVirtualTxParams): Promise<BtcTransferVirtualTxResult> => {
+    const xudtType = blockchain.Script.unpack(
+      xudtTypeBytes
+    ) as CKBComponents.Script;
+
+    if (!isTypeAssetSupported(xudtType, isMainnet)) {
+      throw new TypeAssetNotSupportedError(
+        "The type script asset is not supported now"
+      );
+    }
+
+    const rgbppLocks = rgbppLockArgsList.map((args) =>
+      genRgbppLockScript(args, isMainnet)
+    );
+    let rgbppCells: IndexerCell[] = [];
+    for await (const rgbppLock of rgbppLocks) {
+      const cells = await collector.getCells({
+        lock: rgbppLock,
+        type: xudtType,
+      });
+      if (!cells || cells.length === 0) {
+        throw new NoRgbppLiveCellError(
+          "No rgbpp cells found with the xudt type script and the rgbpp lock args"
+        );
+      }
+      rgbppCells = [...rgbppCells, ...cells];
+    }
+    rgbppCells = rgbppCells.sort(compareInputs);
+
+    let inputs: CKBComponents.CellInput[] = [];
+    let sumInputsCapacity = BigInt(0);
+    const outputs: CKBComponents.CellOutput[] = [];
+    const outputsData: Hex[] = [];
+    let changeCapacity = BigInt(0);
+
+    if (noMergeOutputCells) {
+      for (const [index, rgbppCell] of rgbppCells.entries()) {
+        inputs.push({
+          previousOutput: rgbppCell.outPoint,
+          since: "0x0",
+        });
+        sumInputsCapacity += BigInt(rgbppCell.output.capacity);
+        outputs.push({
+          ...rgbppCell.output,
+          // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+          lock: genRgbppLockScript(buildPreLockArgs(index + 1), isMainnet),
+        });
+        outputsData.push(rgbppCell.outputData);
+      }
+      changeCapacity = BigInt(
+        rgbppCells[rgbppCells.length - 1].output.capacity
+      );
+    } else {
+      const collectResult = collector.collectUdtInputs({
+        liveCells: rgbppCells,
+        needAmount: transferAmount,
+      });
+      inputs = collectResult.inputs;
+
+      throwErrorWhenTxInputsExceeded(inputs.length);
+
+      sumInputsCapacity = collectResult.sumInputsCapacity;
+
+      rgbppCells = rgbppCells.slice(0, inputs.length);
+
+      const rpbppCellCapacity = calculateRgbppCellCapacity(xudtType);
+      outputsData.push(append0x(u128ToLe(transferAmount)));
+
+      changeCapacity = sumInputsCapacity;
+      // The Vouts[0] for OP_RETURN and Vouts[1], Vouts[2], ... for RGBPP assets
+      outputs.push({
+        lock: genRgbppLockScript(buildPreLockArgs(2), isMainnet),
+        type: xudtType,
+        capacity: append0x(rpbppCellCapacity.toString(16)),
+      });
+      if (collectResult.sumAmount > transferAmount) {
+        outputs.push({
+          lock: genRgbppLockScript(buildPreLockArgs(3), isMainnet),
+          type: xudtType,
+          capacity: append0x(rpbppCellCapacity.toString(16)),
+        });
+        outputsData.push(
+          append0x(u128ToLe(collectResult.sumAmount - transferAmount))
+        );
+        changeCapacity -= rpbppCellCapacity;
+      }
+    }
+
+    const cellDeps = [
+      getRgbppLockDep(isMainnet),
+      getXudtDep(isMainnet),
+      getRgbppLockConfigDep(isMainnet),
+    ];
+    const needPaymasterCell = inputs.length < outputs.length;
+    if (needPaymasterCell) {
+      cellDeps.push(getSecp256k1CellDep(isMainnet));
+    }
+    const witnesses: Hex[] = [];
+    const lockArgsSet: Set<string> = new Set();
+    for (const cell of rgbppCells) {
+      if (lockArgsSet.has(cell.output.lock.args)) {
+        witnesses.push("0x");
+      } else {
+        lockArgsSet.add(cell.output.lock.args);
+        witnesses.push(RGBPP_WITNESS_PLACEHOLDER);
+      }
+    }
+
+    const ckbRawTx: CKBComponents.RawTransaction = {
+      version: "0x0",
+      cellDeps,
+      headerDeps: [],
+      inputs,
+      outputs,
+      outputsData,
+      witnesses,
+    };
+
+    if (!needPaymasterCell) {
+      const txSize =
+        getTransactionSize(ckbRawTx) +
+        (witnessLockPlaceholderSize ?? estimateWitnessSize(rgbppLockArgsList));
+      const estimatedTxFee = calculateTransactionFee(txSize, ckbFeeRate);
+
+      changeCapacity -= estimatedTxFee;
+      ckbRawTx.outputs[ckbRawTx.outputs.length - 1].capacity = append0x(
+        changeCapacity.toString(16)
+      );
+    }
+
+    const virtualTx: RgbppCkbVirtualTx = {
+      ...ckbRawTx,
+    };
+    const commitment = calculateCommitment(virtualTx);
+
+    return {
+      ckbRawTx,
+      commitment,
+      needPaymasterCell,
+      sumInputsCapacity: append0x(sumInputsCapacity.toString(16)),
+    };
+  };
+
   async dex_sendRgbppUtxosBuilder(props: {
     isTestnet: boolean;
     ckbVirtualTx: CKBComponents.RawTransaction;
@@ -293,7 +420,7 @@ export class TestHelper {
     });
     console.log("========== sale psbt", salePsbt);
 
-    const saleAddress = salePsbt.txOutputs[3].address;
+    const saleAddress = salePsbt.txOutputs[1].address;
 
     const btcInputs: Utxo[] = [];
     const btcOutputs: TxAddressOutput[] = [];
@@ -412,10 +539,7 @@ export class TestHelper {
         value: 0,
       });
 
-      // Add outputs
-      merged.push(...btcOutputs);
-
-      for (let i = 3; i < salePsbt.txOutputs.length; i++) {
+      for (let i = 1; i < salePsbt.txOutputs.length; i++) {
         const output = salePsbt.txOutputs[i];
         merged.push({
           address: output.address,
@@ -425,6 +549,17 @@ export class TestHelper {
           minUtxoSatoshi: output.value,
         });
       }
+
+      // Add outputs
+      merged.push(...btcOutputs);
+
+      merged.push({
+        address:
+          "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
+        value: Math.ceil(salePsbt.txOutputs[1].value * 0.01),
+        fixed: true,
+        minUtxoSatoshi: Math.ceil(salePsbt.txOutputs[1].value * 0.01),
+      });
 
       return merged;
     })();
@@ -441,13 +576,18 @@ export class TestHelper {
     });
 
     const psbt = builder.toPsbt();
-    // console.log("======== buy psbt", psbt);
-    // psbt.data.updateInput(0, salePsbt.data.inputs[0]);
+
     console.log("======== before psbt", psbt, salePsbt);
 
-    for (let i = 1; i < psbt.txInputs.length; i++) {
+    // inputs
+    salePsbt.data.globalMap.unsignedTx["tx"]["ins"][0] =
+      psbt.data.globalMap.unsignedTx["tx"]["ins"][1];
+    salePsbt.data.inputs[0] = psbt.data.inputs[1];
+
+    for (let i = 2; i < psbt.txInputs.length; i++) {
       const input = psbt.txInputs[i];
-      salePsbt.data.addInput({
+
+      salePsbt.addInput({
         hash: input.hash,
         index: input.index,
         witnessUtxo: psbt.data.inputs[i].witnessUtxo,
@@ -455,6 +595,7 @@ export class TestHelper {
       });
     }
 
+    // outputs
     salePsbt.data.globalMap.unsignedTx["tx"]["outs"][0] =
       psbt.data.globalMap.unsignedTx["tx"]["outs"][0];
     salePsbt.data.outputs[0] = psbt.data.outputs[0];
@@ -463,11 +604,7 @@ export class TestHelper {
       psbt.data.globalMap.unsignedTx["tx"]["outs"][1];
     salePsbt.data.outputs[1] = psbt.data.outputs[1];
 
-    salePsbt.data.globalMap.unsignedTx["tx"]["outs"][2] =
-      psbt.data.globalMap.unsignedTx["tx"]["outs"][2];
-    salePsbt.data.outputs[2] = psbt.data.outputs[2];
-
-    for (let i = 5; i < psbt.txOutputs.length; i++) {
+    for (let i = 2; i < psbt.txOutputs.length; i++) {
       const output = psbt.txOutputs[i];
       salePsbt.data.addOutput({
         address: output.address as string,
@@ -476,7 +613,6 @@ export class TestHelper {
       });
     }
 
-    // salePsbt.finalizeInput(0);
     console.log("======== after psbt", salePsbt);
     return salePsbt;
   }
@@ -539,7 +675,7 @@ export const testListPsbt = async () => {
   const listPsbt = await TestHelper.instance.createListPsbt({
     isTestnet: true,
     rgbpp_txHash:
-      "012051cf08ec7701a9ecbdebbceef49af3662d10c898471b42562475a6d85bac",
+      "9ca82497cf9b24b391058ec01a366bb4a3e47f857f013e239ef1588ca93cd4f8",
     rgbpp_txIdx: 1,
     price: 100,
     fromAddress: curAccount as string,
@@ -558,7 +694,7 @@ export const testListPsbt = async () => {
       autoFinalized: false,
       toSignInputs: [
         {
-          index: 0,
+          index: 1,
           address: curAccount,
           publicKey: wallet.pubkey,
           sighashTypes: [btcSigner.SigHash.SINGLE_ANYONECANPAY],
@@ -588,14 +724,14 @@ export const testBuyPsbt = async () => {
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
       psbtHex:
-        "70736274ff0100ea0200000001ac5bd8a6752456421b4798c8102d66f39af4eebcebbdeca90177ec08cf5120010100000000ffffffff050000000000000000026a002202000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b322202000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b326400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430100000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32000000000001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43010304830000000113413274804aabc9fc107c3067bdb8d3a34e6aafa3d90ed7ddabf658cd96c84b7938b5acdd48f39e4bdd90950cb0d80930488518c295732a13b33dcd971ba5685b0d83011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000000000",
+        "70736274ff010092020000000201000000000000000000000000000000000000000000000000000000000000000000000000fffffffff8d43ca98c58f19e233e017f857fe4a3b46b361ac08e0591b3249bcf9724a89c0100000000ffffffff020000000000000000026a006400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43000000000001012b0000000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43011720c56d5c3cdc4c28aa383271d56a6ac3e06cc2ebe7a626ef3c5c54dd66cfe45c1a0001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d4301030483000000011341ee1442895f306cd2add3b66b22c2d118c53f997f34a1a53f3c0e39bd256ad3aad51b96a25cb333d293fe8a520655d980ed27b97100b3894172d1d879285d1d1e83011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000",
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
       xudtTS: {
         codeHash:
           "0x25c29dc317811a6f6f3985a7a9ebc4838bd388d19d0feeecf0bcd60f6c0975bb",
         hashType: "type",
-        args: "0x30452490e0f5bc2b2c832ed04a349be90cab3f25aaece06612195642f61fa114",
+        args: "0x6a5a8762fc76d5854e69d8a13611acfede063e77d15e964e3a88660e86cff1af",
       },
     });
 
