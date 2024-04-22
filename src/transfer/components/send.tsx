@@ -20,6 +20,9 @@ import { useEffect, useState } from "react";
 import { accountStore } from "@/store/AccountStore";
 import { RGBHelper } from "@/lib/wallet/RGBHelper";
 
+import { testListPsbt, testBuyPsbt } from "@/lib/wallet/TestHelper";
+import test from "node:test";
+
 export const Send = observer(() => {
   const [receiveAddress, setReceiverAddress] = useState("");
   const [amount, setAmount] = useState<number>(0);
@@ -27,6 +30,11 @@ export const Send = observer(() => {
   const handlerCancel = () => {
     setReceiverAddress("");
     setAmount(0);
+
+    // FIXME: test psbt!!! remove it later
+    testListPsbt();
+    // testBuyPsbt();
+
   };
 
   const handleSend = () => {

@@ -798,8 +798,12 @@ export const testListPsbt = async () => {
 
   console.log("======", curAccount, "pubkey", wallet.pubkey);
 
-  const rgbpp_txHash = "9ca82497cf9b24b391058ec01a366bb4a3e47f857f013e239ef1588ca93cd4f8";
-  const rgbpp_txIdx = 1;
+  // const rgbpp_txHash = "9ca82497cf9b24b391058ec01a366bb4a3e47f857f013e239ef1588ca93cd4f8";
+  // const rgbpp_txIdx = 1;
+  // const sell_price = 100; // 100 sats
+
+  const rgbpp_txHash = "5d4663987b52288f329245400391de89ca0c663802497a90a3ecadae85457adb";
+  const rgbpp_txIdx = 41;
   const sell_price = 100; // 100 sats
 
   const listPsbt = await TestHelper.instance.createListPsbt({
@@ -847,7 +851,7 @@ export const testBuyPsbt = async () => {
     throw new Error("Please choose a wallet");
   }
 
-
+  //<<<<
   // !!!! 替换上架的xudt
   const xudtTS: CKBComponents.Script =  {
     codeHash:
@@ -863,14 +867,21 @@ export const testBuyPsbt = async () => {
     hashType: "data1",
   };
 
+  const listItemType = 'xudt'; // !!!! 替换上架的spore
+  const listItemScript = xudtTS; // !!!! 替换上架的spore
+
+  // !!!! 替换上架的spore
+  const listPsbtHex = '70736274ff010092020000000201000000000000000000000000000000000000000000000000000000000000000000000000ffffffffdb7a4585aeadeca3907a490238660cca89de9103404592328f28527b9863465d2900000000ffffffff020000000000000000026a0064000000000000002251202df68c87d6fcc7a3beace9e367f925e94684a13d4328b4482236a57df5cecdd4000000000001012b00000000000000002251202df68c87d6fcc7a3beace9e367f925e94684a13d4328b4482236a57df5cecdd4011720c56d5c3cdc4c28aa383271d56a6ac3e06cc2ebe7a626ef3c5c54dd66cfe45c1a0001012b22020000000000002251202df68c87d6fcc7a3beace9e367f925e94684a13d4328b4482236a57df5cecdd401030483000000011341083036ea25d8498624bd3e600e48a58e811f324631731e820b91a60b5a3002206083b5633dd9bf6e358aa460f36b6c6fa3ba6f12cfdf40e09e1157ab38bc4f608301172042c287b65e8713512127229ed1bf221dde31b73d0109458f792399e432fb6314000000';
+  //>>>>
+
   const { psbt: buyPsbt, ckbVirtualTxResult } =
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
-      psbtHex: "change to list hex", // !!!! 替换上架的spore
+      psbtHex: listPsbtHex, 
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
-      itemType: "xudt", // !!!! 替换上架的spore
-      script: xudtTS, // !!!! 替换上架的spore
+      itemType: listItemType, 
+      script: listItemScript, 
     });
 
   const signInputList: { index: number; address: string; publicKey: string }[] =
