@@ -798,6 +798,7 @@ export const testListPsbt = async () => {
 
   console.log("======", curAccount, "pubkey", wallet.pubkey);
 
+  //<<<< 替换成对应资产的 RGB++ 的 Tx Hash 和 Index
   // const rgbpp_txHash = "9ca82497cf9b24b391058ec01a366bb4a3e47f857f013e239ef1588ca93cd4f8";
   // const rgbpp_txIdx = 1;
   // const sell_price = 100; // 100 sats
@@ -805,6 +806,7 @@ export const testListPsbt = async () => {
   const rgbpp_txHash = "5d4663987b52288f329245400391de89ca0c663802497a90a3ecadae85457adb";
   const rgbpp_txIdx = 41;
   const sell_price = 100; // 100 sats
+  //>>>>
 
   const listPsbt = await TestHelper.instance.createListPsbt({
     isTestnet: true,
