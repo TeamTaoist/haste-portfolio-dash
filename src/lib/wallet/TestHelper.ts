@@ -46,6 +46,8 @@ export class TestHelper {
     price: number; // sat
     fromAddress: string;
     fromPubkey: string;
+    witnessAddr: string;
+    witnessPubkey: string;
   }) {
     const cfg = networkTypeToConfig(
       params.isTestnet ? NetworkType.TESTNET : NetworkType.MAINNET
@@ -100,13 +102,13 @@ export class TestHelper {
             fixed: true,
           },
           {
-            address: params.fromAddress,
+            address: params.witnessAddr,
             value: minUtxoSatoshi,
             fixed: true,
             minUtxoSatoshi: minUtxoSatoshi,
           },
           {
-            address: params.fromAddress,
+            address: params.witnessAddr,
             value: minUtxoSatoshi,
             fixed: true,
             minUtxoSatoshi: minUtxoSatoshi,
@@ -291,7 +293,7 @@ export class TestHelper {
     });
     console.log("========== sale psbt", salePsbt);
 
-    const saleAddress = salePsbt.txOutputs[2].address;
+    const saleAddress = salePsbt.txOutputs[3].address;
 
     const btcInputs: Utxo[] = [];
     const btcOutputs: TxAddressOutput[] = [];
@@ -542,6 +544,10 @@ export const testListPsbt = async () => {
     price: 100,
     fromAddress: curAccount as string,
     fromPubkey: wallet.pubkey,
+    witnessAddr:
+      "tb1pq2x0qvl0qejrxdxnlmm43zdt8cvda4dcwcespdwcw96v6xnd3veqzgdm0m",
+    witnessPubkey:
+      "c56d5c3cdc4c28aa383271d56a6ac3e06cc2ebe7a626ef3c5c54dd66cfe45c1a",
   });
 
   const psbtHex = await BtcHepler.instance.halfSignPsbt(
@@ -582,7 +588,7 @@ export const testBuyPsbt = async () => {
     await TestHelper.instance.createBuyPsbt({
       isTestnet: true,
       psbtHex:
-        "70736274ff0100ea0200000001ac5bd8a6752456421b4798c8102d66f39af4eebcebbdeca90177ec08cf5120010100000000ffffffff050000000000000000026a002202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d432202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d436400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430100000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32000000000001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43010304830000000113413274804aabc9fc107c3067bdb8d3a34e6aafa3d90ed7ddabf658cd96c84b7938b5acdd48f39e4bdd90950cb0d80930488518c295732a13b33dcd971ba5685b0d83011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000000000",
+        "70736274ff0100ea0200000001ac5bd8a6752456421b4798c8102d66f39af4eebcebbdeca90177ec08cf5120010100000000ffffffff050000000000000000026a002202000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b322202000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b326400000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d430100000000000000225120028cf033ef06643334d3fef75889ab3e18ded5b8763300b5d87174cd1a6d8b32000000000001012b2202000000000000225120d07b654186848fd21e999859a55f432777624ee3d423181b0556ee2c5fff2d43010304830000000113413274804aabc9fc107c3067bdb8d3a34e6aafa3d90ed7ddabf658cd96c84b7938b5acdd48f39e4bdd90950cb0d80930488518c295732a13b33dcd971ba5685b0d83011720f93f0462a182c05eedfcb26eebcf5fa6bcb9cfc32f10e157e97fcd5f8df0bf8a000000000000",
       buyAddress: wallet.address,
       buyPubKey: wallet.pubkey,
       xudtTS: {
