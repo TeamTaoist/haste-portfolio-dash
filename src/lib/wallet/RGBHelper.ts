@@ -10,6 +10,7 @@ import {
   genBtcTransferCkbVirtualTx,
   append0x,
   getXudtTypeScript,
+  genTransferSporeCkbVirtualTx,
 } from "@rgbpp-sdk/ckb";
 import {
   blake160,
@@ -598,5 +599,69 @@ export class RGBHelper {
 
     const jobStat = await service.getRgbppTransactionState(txId);
     console.log("jobStat", jobStat);
+  }
+
+  async transferRgbSpore(
+    toAddress: string,
+    rgbTxHash: string,
+    rgbTxIdx: number,
+    sporeTS: Script,
+    wallet: WalletInfo
+  ) {
+    const cfg = isTestNet() ? testConfig : mainConfig;
+
+    const collector = new Collector({
+      ckbNodeUrl: cfg.CKB_RPC_URL,
+      ckbIndexerUrl: cfg.CKB_INDEX_URL,
+    });
+
+    const networkType = cfg.rgb_networkType;
+    const service = BtcAssetsApi.fromToken(
+      cfg.BTC_ASSETS_API_URL,
+      cfg.BTC_ASSETS_TOKEN,
+      cfg.BTC_ASSETS_ORGIN
+    );
+    const source = new DataSource(service, networkType);
+
+    const sporeRgbppLockArgs = buildRgbppLockArgs(rgbTxIdx, rgbTxHash);
+
+    const sporeTypeBytes = serializeScript(sporeTS);
+
+    const ckbVirtualTxResult = await genTransferSporeCkbVirtualTx({
+      collector,
+      sporeRgbppLockArgs,
+      sporeTypeBytes,
+      isMainnet: cfg.isMainnet,
+    });
+
+    const { commitment, ckbRawTx } = ckbVirtualTxResult;
+
+    // Send BTC tx
+    const psbt = await sendRgbppUtxos({
+      ckbVirtualTx: ckbRawTx,
+      commitment,
+      tos: [toAddress],
+      ckbCollector: collector,
+      from: wallet.address!,
+      fromPubkey: wallet.pubkey,
+      source,
+    });
+
+    const psbtHex = await BtcHepler.instance.signPsdt(
+      psbt.toHex(),
+      wallet.type
+    );
+
+    const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex, wallet.type);
+
+    const rgbppState = await service.sendRgbppCkbTransaction({
+      btc_txid: btcTxId,
+      ckb_virtual_result: ckbVirtualTxResult,
+    });
+    console.log("rgbppState", rgbppState);
+
+    await this.retryBtcTxId(btcTxId);
+
+    return btcTxId;
   }
 }

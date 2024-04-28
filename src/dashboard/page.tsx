@@ -1,4 +1,3 @@
-// import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Assets } from "./components/assets";
 import { useEffect, useState } from "react";
@@ -6,14 +5,13 @@ import { EventManager } from "@/lib/manager/EventManager";
 import { EventType } from "@/lib/enum";
 import { TabUdt } from "./components/tab_udt";
 import { TabSpore } from "./components/tab_spore";
-// import { useLocation } from "react-router-dom";
-// import { DataManager } from "@/lib/manager/DataManager";
 import { HttpManager } from "@/lib/api/HttpManager";
 import { TabRgb } from "./components/tab_rgb";
 import { observer } from "mobx-react";
 import { autorun } from "mobx";
 import { accountStore } from "@/store/AccountStore";
 import { TabCheckTx } from "./components/tab_checkTx";
+import { TabRgbSpore } from "./components/tab_rgb_spore";
 
 const Dashboard = observer(() => {
   const [hideTab, setHideTab] = useState(true);
@@ -143,6 +141,16 @@ const Dashboard = observer(() => {
                 ""
               ) : (
                 <TabsTrigger
+                  value="RGB++DOBs"
+                  onClick={() => setTabValue("RGB++DOBs")}
+                >
+                  RGB++资产DOBs
+                </TabsTrigger>
+              )}
+              {!hideTab ? (
+                ""
+              ) : (
+                <TabsTrigger
                   value="CheckTx"
                   onClick={() => {
                     setTabValue("CheckTx");
@@ -160,6 +168,7 @@ const Dashboard = observer(() => {
           <TabUdt></TabUdt>
           <TabSpore></TabSpore>
           <TabRgb></TabRgb>
+          <TabRgbSpore></TabRgbSpore>
           <TabCheckTx></TabCheckTx>
         </Tabs>
       </div>
