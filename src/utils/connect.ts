@@ -1,5 +1,5 @@
 import { getEnv } from '@/settings/env';
-import { getPublicKey, initConfig as initBTCConfig, requestAccounts } from '@joyid/bitcoin' 
+import { getPublicKey, initConfig as initBTCConfig, requestAccounts } from '@joyid/bitcoin'
 import { connect, initConfig } from '@joyid/ckb';
 import { mainConfig, testConfig } from '@/lib/wallet/constants';
 import test from 'node:test';
@@ -11,7 +11,7 @@ export const OKXConnect = async () => {
       if (getEnv()==='Mainnet') {
         const result = await okxwallet.bitcoin.connect();
         return result;
-      } else {  
+      } else {
         const result = await okxwallet.bitcoinTestnet.connect();
         return result;
       }
@@ -24,9 +24,13 @@ export const UnisatConnect = async () => {
   const unisat = (window as any)["unisat"];
     if (typeof unisat !== "undefined") {
       const curNetwork = await unisat.getNetwork();
-      if (process.env.NODE_ENV === 'development') {
+        console.log("==process.env.NODE_ENV==",getEnv())
+
+      if (getEnv() === 'Testnet') {
         //@ts-ignore
         await unisat.switchNetwork('testnet');
+      }else{
+          await unisat.switchNetwork('livenet');
       }
 
       const accounts: string[] = await unisat.requestAccounts();
@@ -45,7 +49,8 @@ export const JoyIDBTCconnect = async () => {
       logo: "https://fav.farm/🆔",
       // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
       // joyidAppURL: "https://testnet.joyid.dev",
-      joyidAppURL: process.env.NODE_ENV === 'development' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
+      // joyidAppURL: process.env.NODE_ENV === 'development' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
+      joyidAppURL: getEnv() === 'Testnet' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
     });
 
     const [address] = await requestAccounts();
@@ -60,7 +65,8 @@ export const JoyIDCKBConnect = async () => {
       logo: "https://fav.farm/🆔",
       // JoyID app URL, this is for testnet, for mainnet, use "https://app.joy.id"
       // joyidAppURL: "https://testnet.joyid.dev",
-      joyidAppURL: process.env.NODE_ENV === 'development' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
+      // joyidAppURL: process.env.NODE_ENV === 'development' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
+      joyidAppURL: getEnv() === 'Testnet' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
   })
   const JoyIDCkbWallet = await connect();
   return {

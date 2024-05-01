@@ -1,7 +1,8 @@
-const stage = 'prepare'
+// const stage = 'prepare'
+const stage:string = ''
 
 export const getEnv = (): string => {
-  const sysEnv = process.env.NODE_ENV
+  const sysEnv = process.env.NEXT_PUBLIC_ENV_PARAM
   if (stage === 'prepare') {
     return 'Testnet'
   } else {

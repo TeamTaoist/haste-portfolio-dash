@@ -996,10 +996,10 @@ export class CkbHepler {
           xudtList.push(ckbUDTInfo);
         }
 
-        let addNum: BI | undefined = undefined;
+        let addNum: any = undefined;
         try {
           addNum = number.Uint128LE.unpack(xudtCell.data);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         } catch (error: any) {
           console.warn(error.message);
         }
