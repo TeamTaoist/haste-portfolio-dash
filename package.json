@@ -27,6 +27,7 @@
     "@rgbpp-sdk/service": "^0.0.0-snap-20240403090049",
     "@spore-sdk/core": "0.2.0-beta.2",
     "@types/react-redux": "^7.1.33",
+    "bignumber.js": "^9.1.2",
     "bitcoin-units": "^1.0.0",
     "lucide-react": "^0.365.0",
     "net": "^1.0.2",

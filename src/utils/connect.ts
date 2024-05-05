@@ -2,7 +2,6 @@ import { getEnv } from '@/settings/env';
 import { getPublicKey, initConfig as initBTCConfig, requestAccounts } from '@joyid/bitcoin'
 import { connect, initConfig } from '@joyid/ckb';
 import { mainConfig, testConfig } from '@/lib/wallet/constants';
-import test from 'node:test';
 
 export const OKXConnect = async () => {
 
@@ -24,7 +23,6 @@ export const UnisatConnect = async () => {
   const unisat = (window as any)["unisat"];
     if (typeof unisat !== "undefined") {
       const curNetwork = await unisat.getNetwork();
-        console.log("==process.env.NODE_ENV==",getEnv())
 
       if (getEnv() === 'Testnet') {
         //@ts-ignore

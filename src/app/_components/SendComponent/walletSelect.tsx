@@ -76,7 +76,7 @@ export default function WalletSelect({
           {wallets.map((w) => (
             <li
               key={w.address}
-              className="text-gray-900 relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-slate-100"
+              className="text-gray-900 relative cursor-default select-none py-2 pl-3 pr-9 hover:bg-slate-100 "
               onClick={() => onSelectWallet(w)}
             >
               <div className="flex items-center">

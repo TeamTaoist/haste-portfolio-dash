@@ -34,7 +34,7 @@ export default function SendContent() {
 
   const [assetModalVisible, setAssetModalVisible] = useState(false);
   const [selectAsset, setSelectAsset] = useState<SelectAssetType>();
-  const [isNative,setIsNative] = useState(true)
+  const [isNative,setIsNative] = useState(false)
     const [loading,setLoading] = useState(false);
 
   const [amount, setAmount] = useState<number|string>('');

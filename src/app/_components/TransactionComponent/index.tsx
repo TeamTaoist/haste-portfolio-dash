@@ -34,11 +34,11 @@ const TokenBlock = ({
         alt="USDT"
         className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
       />
-      <div className="">
+      <div className="sm:flex sm:gap-2">
         {type === TRANSACTION_TYPE.RECEIVE ? (
           <div className="text-lime-600">+{amount}</div>
         ) : (
-          <div className="text-red-600">-{amount}</div>
+          <div className="text-red-600">{amount}</div>
         )}
         <div className="text-slate-600 uppercase">{token}</div>
       </div>
@@ -86,6 +86,18 @@ const SendBlock = ({ amount, token, address,type }: { amount: number | string, t
       <AccountBlock token={token} address={address}  type={type} />
     </div>
   );
+};
+
+const BalanceBlock = ({ amount, token, address,type }: { amount: number | string, token: string, address: string ,type:TRANSACTION_TYPE }) => {
+    return (
+        <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
+            <TokenBlock amount={amount} type={type} token={token} />
+            {/*<div className="mx-1 sm:mx-2 text-sm">*/}
+            {/*    <ChevronRight />*/}
+            {/*</div>*/}
+            {/*<AccountBlock token={token} address={address}  type={type} />*/}
+        </div>
+    );
 };
 
 interface ITransactionItemProps {
@@ -144,11 +156,12 @@ export default function TransactionItem({
             </div>
           </div>
           <div className="col-span-7 2xl:col-span-5 sm:flex-1 hidden lg:flex truncate">
-            {type === TRANSACTION_TYPE.SEND ? (
-              <SendBlock amount={amount} token={token} address={formatString(to, 5)} type={type} />
-            ) : (
-              <ReceiveBlock amount={amount} token={token} address={formatString(from, 5)} type={type} />
-            )}
+              <BalanceBlock amount={amount} token={token} address={formatString(to, 5)} type={type} />
+            {/*{type === TRANSACTION_TYPE.SEND ? (*/}
+            {/*  <SendBlock amount={amount} token={token} address={formatString(to, 5)} type={type} />*/}
+            {/*) : (*/}
+            {/*  <ReceiveBlock amount={amount} token={token} address={formatString(from, 5)} type={type} />*/}
+            {/*)}*/}
           </div>
           <div className="flex items-center justify-end space-x-2 col-span-1 2xl:col-span-2">
             <a
@@ -163,11 +176,12 @@ export default function TransactionItem({
         </div>
       </div>
       <div className="lg:hidden col-span-7 2xl:col-span-5 sm:flex-1 mt-4 visible bg-gray-100 rounded-lg p-2">
-        {type === TRANSACTION_TYPE.SEND ? (
-          <SendBlock amount={amount} token={token} address={formatString(to, 5)} type={type} />
-        ) : (
-          <ReceiveBlock amount={amount} token={token} address={formatString(from, 5)} type={type} />
-        )}
+          <BalanceBlock amount={amount} token={token} address={formatString(to, 5)} type={type} />
+        {/*{type === TRANSACTION_TYPE.SEND ? (*/}
+        {/*  <SendBlock amount={amount} token={token} address={formatString(to, 5)} type={type} />*/}
+        {/*) : (*/}
+        {/*  <ReceiveBlock amount={amount} token={token} address={formatString(from, 5)} type={type} />*/}
+        {/*)}*/}
       </div>
     </div>
   );

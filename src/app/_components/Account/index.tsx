@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store'; 
+import { RootState } from '@/store/store';
 import { ArrowLeftIcon, CaretLeftIcon, CaretRightIcon, Component1Icon, FileTextIcon, GearIcon, GridIcon, PaperPlaneIcon, PlusIcon, ThickArrowLeftIcon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 import { formatString } from '@/utils/common';
@@ -21,16 +21,27 @@ const AccountSidebar: React.FC = () => {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if(!(window as any).unisat || !wallets?.length) return;
+
+    const {unisat} = window as any;
+    const walletArr = wallets.filter(w=>w.walletName === "unisat")
+    unisat.on('accountsChanged',()=>{
+      if(walletArr.length){
+        dispatch(removeWalletItem(walletArr[0].address));
+      }
+    });
+  }, [wallets]);
+
   const toggleSidebar = () => {
     setIsColleapse(!isColleapse);
   };
 
   useEffect(() => {
     let walletData;
-    
+
     if (wallets.length) {
       walletData = wallets
-      console.log(walletData);
     } else {
       const walletsStr = localStorage ? localStorage.getItem('wallets') : ''
       try {
