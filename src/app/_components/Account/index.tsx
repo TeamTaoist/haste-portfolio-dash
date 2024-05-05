@@ -9,8 +9,12 @@ import { formatString } from '@/utils/common';
 import CustomModal from '../Dialog';
 import WalletModalContent from '../Dialog/WalletDialog';
 import { useDispatch } from 'react-redux';
-import { removeWalletItem, setCurrentWalletAddress } from '@/store/wallet/walletSlice';
+import {removeWalletItem, setCurrentWalletAddress, WalletItem} from '@/store/wallet/walletSlice';
 import { ChevronsLeft, ChevronsRight, Unplug } from 'lucide-react';
+import {getBTCAsset} from "@/query/btc/tools";
+import {getCKBCapacity} from "@/query/ckb/tools";
+import BigNumber from "bignumber.js";
+import {BitcoinUnit} from "bitcoin-units";
 
 const AccountSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
@@ -18,6 +22,8 @@ const AccountSidebar: React.FC = () => {
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const currentWallet: string | undefined = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const deviceType = useSelector((state: RootState) => state.device.type);
+  const [list,setList] = useState<WalletItem[]>([])
+
 
   const dispatch = useDispatch();
 
@@ -55,6 +61,66 @@ const AccountSidebar: React.FC = () => {
       setIsOpenWalletModal(true);
     }
   }, [wallets]);
+
+
+  useEffect(() => {
+
+    if(!wallets?.length)return;
+    setList(wallets)
+
+    getListBalance()
+
+  }, [wallets]);
+
+  const getListBalance = async() =>{
+
+    let arr:WalletItem[] =[];
+
+    for (let key in  wallets){
+      let wallet = wallets[key]
+      let balance = await getBalance(wallet)  ?? 0
+      arr.push({
+        ...wallet,
+        balance:balance.toString()
+      })
+    }
+
+    setList([...arr])
+  }
+
+
+  const _getBTCBalance = async (address: string) => {
+    const rlt = await getBTCAsset(address);
+
+    return rlt
+  }
+
+  const _getCKBCapacity = async (address: string) => {
+    const rlt = await getCKBCapacity(address);
+    return rlt
+  }
+
+  const getBalance = async(wallet:any) =>{
+    let balance;
+    if(wallet.chain === 'btc') {
+      let accountData = await _getBTCBalance(wallet.address);
+      // balance = formatUnit(accountData?.chain_stats.funded_txo_sum!!, 'ckb');
+
+      const { chain_stats, mempool_stats } = accountData as any;
+      const inputSum = new BigNumber(chain_stats.funded_txo_sum).plus(mempool_stats.funded_txo_sum)
+      const outputSum = new BigNumber(chain_stats.spent_txo_sum).plus(mempool_stats.spent_txo_sum)
+      const result = inputSum.minus(outputSum);
+      let rt = result.toNumber();
+
+      balance =   new BitcoinUnit(rt, 'sats').to('BTC').getValue();
+
+    } else if (wallet.chain === 'ckb') {
+      balance = await _getCKBCapacity(wallet.address);
+      balance = (balance.toNumber() / (10 ** 8)).toFixed(2);
+    }
+
+    return balance;
+  }
 
   return (
     <div className='h-full'>
@@ -102,7 +168,7 @@ const AccountSidebar: React.FC = () => {
           </div>
           </div>
           <div className='flex flex-col mt-8 border-t border-gray-200'>
-            {wallets.map(wallet => (
+            {list.map(wallet => (
               <div key={wallet.address} className={` 
                 flex items-center py-2 border-b border-gray-200 ba cursor-pointer firstLi
                 ${wallet.address === currentWallet ? 'bg-white': 'bg-gray-100'}

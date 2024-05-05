@@ -52,29 +52,29 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       let balance;
       onClose();
       console.log('here close')
-      if(props.chain === 'btc') {
-        let accountData = await _getBTCBalance(props.address);
-        // balance = formatUnit(accountData?.chain_stats.funded_txo_sum!!, 'ckb');
-
-        const { chain_stats, mempool_stats } = accountData as any;
-        const inputSum = new BigNumber(chain_stats.funded_txo_sum).plus(mempool_stats.funded_txo_sum)
-        const outputSum = new BigNumber(chain_stats.spent_txo_sum).plus(mempool_stats.spent_txo_sum)
-        const result = inputSum.minus(outputSum);
-        let rt = result.toNumber();
-
-        balance =   new BitcoinUnit(rt, 'sats').to('BTC').getValue();
-
-      } else if (props.chain === 'ckb') {
-        balance = await _getCKBCapacity(props.address);
-        balance = (balance.toNumber() / (10 ** 8)).toFixed(2);
-      }
+      // if(props.chain === 'btc') {
+      //   let accountData = await _getBTCBalance(props.address);
+      //   // balance = formatUnit(accountData?.chain_stats.funded_txo_sum!!, 'ckb');
+      //
+      //   const { chain_stats, mempool_stats } = accountData as any;
+      //   const inputSum = new BigNumber(chain_stats.funded_txo_sum).plus(mempool_stats.funded_txo_sum)
+      //   const outputSum = new BigNumber(chain_stats.spent_txo_sum).plus(mempool_stats.spent_txo_sum)
+      //   const result = inputSum.minus(outputSum);
+      //   let rt = result.toNumber();
+      //
+      //   balance =   new BitcoinUnit(rt, 'sats').to('BTC').getValue();
+      //
+      // } else if (props.chain === 'ckb') {
+      //   balance = await _getCKBCapacity(props.address);
+      //   balance = (balance.toNumber() / (10 ** 8)).toFixed(2);
+      // }
 
       dispatch(addWalletItem({
         address: props.address,
         chain: props.chain,
         walletName: props.walletName,
         pubKey: props.pubKey,
-        balance: balance ? balance.toString() : '',
+        // balance: balance ? balance.toString() : '',
       }))
       setIsLoading(false);
     }
