@@ -11,7 +11,7 @@ const Send: React.FC = () => {
   return (
     <main className="flex flex-col flex-1 min-h-screen bg-gray-100 text-black h-full">
       <div className="pb-10 md:mx-4 my-4 lg:mx-8 lg:my-0 h-full flex flex-col">
-        <div className=" text-hd1mb w-full py-4 px-4 font-Montserrat my-4">
+        <div className=" text-hd1mb w-full py-4 px-4 font-Montserrat my-4 pt-9">
           Send & Receive
         </div>
         <div className="flex items-center justify-center w-full flex-1 flex-grow">
