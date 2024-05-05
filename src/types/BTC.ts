@@ -170,6 +170,7 @@ export interface ckb_SporeInfo {
     txHash:string;
     index:string;
   };
+  sum?: any;
   type_script: Script;
   ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
 }
@@ -181,6 +182,7 @@ export interface ckb_UDTInfo {
   udt_icon_file?: string;
   udt_type: "xUDT";
   type_script: Script;
+  sum?: any;
   ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
 }
 
@@ -291,6 +293,7 @@ export interface RgbAssert {
   idx: number;
   ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
   value: number;
+
 }
 
 export interface ckb_LiveCell {

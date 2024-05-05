@@ -11,6 +11,7 @@ import { getRgbppAssert } from "@/query/rgbpp/tools";
 import { getSymbol } from "@/lib/utils";
 import { formatUnit } from "@ckb-lumos/bi";
 import Loading from "@/app/_components/loading";
+import {BI} from "@ckb-lumos/lumos";
 
 export default function UDTList() {
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
@@ -28,8 +29,24 @@ export default function UDTList() {
   const _getRgbAsset = async(address: string) => {
     const assetsList = await getRgbppAssert(address);
     const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
+
+
+    const groupedData = rgbAssetList.reduce((acc:any, obj) => {
+      const key= obj?.ckbCellInfo?.type_script?.args! ;
+      if (!acc[key]) {
+        acc[key] = { category: key, sum: BI.from(0),...obj };
+      }
+      acc[key].sum = acc[key].sum.add((obj?.ckbCellInfo?.amount));
+
+      return acc;
+    }, {});
+
+    const result = Object.values(groupedData);
+
+    console.error("==rgbAssetList==",rgbAssetList)
     //@ts-ignore
-    setXudtList(rgbAssetList)
+    // setXudtList(rgbAssetList)
+    setXudtList(result)
     setIsLoading(false);
   }
 
@@ -121,7 +138,8 @@ export default function UDTList() {
 
                 <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
                   <p className="text-sm sm:text-base text-default font-semibold truncate text-base font-din">
-                    {formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}
+                    {/*{formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}*/}
+                    {formatUnit(((xudt?.sum?.toString()) ?? 0), 'ckb')}
                   </p>
                   {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--
