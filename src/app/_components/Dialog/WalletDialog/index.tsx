@@ -18,6 +18,7 @@ import { formatUnit } from '@ckb-lumos/bi';
 
 import BigNumber from "bignumber.js";
 import {BitcoinUnit} from "bitcoin-units";
+import Loading from "@/app/_components/loading";
 
 interface walletModalProps {
   onClose: () => void
@@ -92,6 +93,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       })
     } catch {
       enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }finally {
+      setIsLoading(false);
     }
   }
 
@@ -108,6 +111,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       })
     } catch {
       enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }finally {
+      setIsLoading(false);
     }
   }
 
@@ -124,6 +129,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       })
     } catch {
       enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }finally {
+      setIsLoading(false);
     }
   }
 
@@ -140,6 +147,8 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
       enqueueSnackbar("Connect JoyID BTC Wallet Successful", {variant: 'success'});
     } catch {
       enqueueSnackbar("Connect Failed", {variant: 'error'});
+    }finally {
+      setIsLoading(false);
     }
   }
 
@@ -147,18 +156,20 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     <>
       {
         isLoading &&
-        <div className='absolute w-full h-full z-10  bg-opacity-80 rounded-lg bg-black flex flex-col justify-center items-center gap-4 pb-5'>
-          <Image
-            src={'/img/joker.png'}
-            width={128}
-            height={128}
-            alt='joker loading'
-          />
-          <p className='text-black font-Montserrat'>Your Wallet is Connecting……</p>
-        </div>
+          <div
+              className='absolute w-full h-full z-10  bg-opacity-80 rounded-lg bg-white flex flex-col justify-center items-center gap-4 pb-5'>
+            {/*<Image*/}
+            {/*  src={'/img/joker.png'}*/}
+            {/*  width={128}*/}
+            {/*  height={128}*/}
+            {/*  alt='joker loading'*/}
+            {/*/>*/}
+            <div className="loader"></div>
+            <p className='text-gray-400 font-Montserrat'>Your Wallet is Connecting……</p>
+          </div>
       }
       <div
-      className="w-96 p-4  flex flex-col gap-4 relative"
+          className="w-96 p-4  flex flex-col gap-4 relative"
     >
       <div className="font-Montserrat text-black">Connect a Wallet</div>
       <div className="flex items-center justify-center">
