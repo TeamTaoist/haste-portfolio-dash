@@ -67,7 +67,7 @@ const ResponsiveSidebar: React.FC = () => {
             }
           </div>
           </div>
-          <div 
+          <div
             className={activeTab === '/' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'}
             onClick={(e) => {
               e.preventDefault()
@@ -81,8 +81,8 @@ const ResponsiveSidebar: React.FC = () => {
               }
             </div>
           </div>
-          <div 
-            className={activeTab === '/transaction' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'} 
+          <div
+            className={activeTab === '/transaction' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4'}
             onClick={(e) => {
               e.preventDefault()
               NaviTo("/transaction")
@@ -95,7 +95,7 @@ const ResponsiveSidebar: React.FC = () => {
               }
             </div>
           </div>
-          <div 
+          <div
             className={activeTab === '/send/' ? 'flex flex-col mt-8 border-l-primary011 border-l-4 rounded-l': 'flex flex-col mt-8 border-l-white border-l-4' }
             onClick={(e) => {
               e.preventDefault()
@@ -125,6 +125,7 @@ const ResponsiveSidebar: React.FC = () => {
                   <div className='flex flex-col'
                     onClick={(e) => {
                        e.preventDefault()
+                      setIsOpen(false)
                       NaviTo("/")
                     }}
                   >
@@ -137,6 +138,7 @@ const ResponsiveSidebar: React.FC = () => {
                   </div>
                   <div className='flex flex-col' onClick={(e) => {
                     e.preventDefault()
+                    setIsOpen(false)
                     NaviTo("/transaction")
                   }}>
                     <div className='flex items-center px-4 gap-4 py-4 cursor-pointer'>
@@ -147,8 +149,9 @@ const ResponsiveSidebar: React.FC = () => {
                     </div>
                   </div>
                   <div className='flex flex-col'
-                    onClick={(e) => { 
+                    onClick={(e) => {
                       e.preventDefault()
+                      setIsOpen(false)
                       NaviTo("/send")
                     }}
                   >
