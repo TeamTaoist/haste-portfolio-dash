@@ -12,6 +12,9 @@ import { getSymbol } from "@/lib/utils";
 import { formatUnit } from "@ckb-lumos/bi";
 import Loading from "@/app/_components/loading";
 import {BI} from "@ckb-lumos/lumos";
+import {
+  BookDashed
+} from "lucide-react";
 
 export default function UDTList() {
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
@@ -108,47 +111,60 @@ export default function UDTList() {
                 </td>
               </tr>
             ))
-          ) : (
-            xudtList.map((xudt, index) => (
-              <tr key={index} className="hover:bg-gray-200 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-l ">
-                <td className="col-span-7 lg:col-span-5 px-8">
-                  <div className="flex gap-3 items-center">
-                    <div>
-                      <Image
-                        width={32}
-                        height={32}
-                        src="/img/btc.png"
-                        alt="USDT"
-                        className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
-                      />
-                    </div>
-                    <div>
+          ) :
+              (
+                  <>{
+                    !!xudtList.length && xudtList.map((xudt, index) => (
+                    <tr key={index} className="hover:bg-gray-200 grid grid-cols-12 group py-6 border-0 bg-white mb-4 rounded-l ">
+                      <td className="col-span-7 lg:col-span-5 px-8">
+                        <div className="flex gap-3 items-center">
+                          <div>
+                            <Image
+                                width={32}
+                                height={32}
+                                src="/img/btc.png"
+                                alt="USDT"
+                                className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+                            />
+                          </div>
+                          <div>
 
-                      <p className="font-semibold">{xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}</p>
+                            <p className="font-semibold">{xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}</p>
 
-                      {/*<p className="font-bold">{xudt && xudt.symbol}</p>*/}
+                            {/*<p className="font-bold">{xudt && xudt.symbol}</p>*/}
 
-                      <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
-                        {xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}
-                      </p>
-                    </div>
-                  </div>
-                </td>
+                            <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
+                              {xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
 
-                <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
-                  <p className="text-sm sm:text-base text-default font-semibold truncate text-base font-din">
-                    {/*{formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}*/}
-                    {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
-                  </p>
-                  {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
+                      <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
+                        <p className="text-sm sm:text-base text-default font-semibold truncate text-base font-din">
+                          {/*{formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}*/}
+                          {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
+                        </p>
+                        {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--
                   </p> */}
-                </td>
-              </tr>
-            ))
-          )}
+                      </td>
+                    </tr>
+                ))}
+
+
+              </>
+
+             )
+
+
+          }
         </tbody>
       </table>
+      {          !xudtList.length &&
+
+          <div className="w-full flex justify-center gap-5 opacity-20 py-20 bg-gray-300 mt-10"><BookDashed />No data</div>
+      }
     </div>
   );
 }
