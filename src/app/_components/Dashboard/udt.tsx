@@ -41,9 +41,8 @@ export default function UDTList() {
       return acc;
     }, {});
 
-    const result = Object.values(groupedData);
 
-    console.error("==rgbAssetList==",rgbAssetList)
+    const result = Object.values(groupedData);
     //@ts-ignore
     // setXudtList(rgbAssetList)
     setXudtList(result)
@@ -139,7 +138,7 @@ export default function UDTList() {
                 <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
                   <p className="text-sm sm:text-base text-default font-semibold truncate text-base font-din">
                     {/*{formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}*/}
-                    {formatUnit(((xudt?.sum?.toString()) ?? 0), 'ckb')}
+                    {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
                   </p>
                   {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--
