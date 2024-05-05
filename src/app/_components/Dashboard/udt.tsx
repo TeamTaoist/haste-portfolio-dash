@@ -163,7 +163,7 @@ export default function UDTList() {
       </table>
       {          !xudtList.length &&
 
-          <div className="w-full flex justify-center gap-5 opacity-20 py-20 bg-gray-300 mt-10"><BookDashed />No data</div>
+          <div className="w-full flex justify-center gap-5 opacity-20 py-20  mt-10"><BookDashed />No data</div>
       }
     </div>
   );

@@ -13,6 +13,7 @@ import { formatUnit } from "@ckb-lumos/bi";
 import Image from 'next/image';
 import { getEnv } from "@/settings/env";
 import Loading from "@/app/_components/loading";
+import {BookDashed} from "lucide-react";
 
 const Transaction = () => {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
@@ -185,15 +186,16 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
             {
               (isListLoading || isEmptyList) &&
               <div className="w-full h-full flex flex-col items-center justify-center gap-8">
-                <Image
-                  src={'/img/joker.png'}
-                  width={256}
-                  height={256}
-                  alt="is empty"
-                />
+                {/*<Image*/}
+                {/*  src={'/img/joker.png'}*/}
+                {/*  width={256}*/}
+                {/*  height={256}*/}
+                {/*  alt="is empty"*/}
+                {/*/>*/}
                 <div className="text-black opacity-30 uppercase">
-                  {isListLoading && 'Your data is on the way from Gottam'}
-                  {(!isListLoading && isEmptyList) && 'Your Wallet in Gottam is empty'}
+                  {/*{isListLoading && 'Your data is on the way'}*/}
+                  {/*{(!isListLoading && isEmptyList) && 'Your Wallet in Gottam is empty'}*/}
+                    {(!isListLoading && isEmptyList) && <div className="flex gap-4"><BookDashed />No data</div>}
                 </div>
               </div>
             }

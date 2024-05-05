@@ -135,7 +135,7 @@ const DropdownSelect: React.FC = () => {
                               src={`/img/${wallet.chain}.png`}
                               width={24}
                               height={24}
-                              className='rounded-full'
+                              className='rounded-full border border-gray-300'
                               alt={'icon'}
                             />
                             <div className=' font-SourceSanPro flex justify-center items-end flex-col'>

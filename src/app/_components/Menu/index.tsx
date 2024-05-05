@@ -43,7 +43,7 @@ const ResponsiveSidebar: React.FC = () => {
     <div className='h-full'>
       {deviceType === 'desktop' ? (
         <div className={`pt-8
-            ${isColleapse ? 'left-0 w-46' : 'w-14'} 
+            ${isColleapse ? 'left-0 w-47' : 'w-14'} 
             h-full bg-white text-black transition-width duration-300`}>
           <div className='h-12 relative flex items-center justify-center group'>
             <div className=' font-Montserrat text-hd2mb capitalize logo flex gap-4 pl-4 pb-5'>
