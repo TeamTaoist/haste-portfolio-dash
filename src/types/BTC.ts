@@ -293,7 +293,8 @@ export interface RgbAssert {
   idx: number;
   ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
   value: number;
-
+  type_script?:any;
+  amount?:string;
 }
 
 export interface ckb_LiveCell {

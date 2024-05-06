@@ -33,13 +33,20 @@ export default function SendContent() {
   const [to,setTo] = useState('')
 
   const [assetModalVisible, setAssetModalVisible] = useState(false);
-  const [selectAsset, setSelectAsset] = useState<SelectAssetType>();
+  const [selectAsset, setSelectAsset] = useState<SelectAssetType | null>();
   const [isNative,setIsNative] = useState(false)
     const [loading,setLoading] = useState(false);
 
   const [amount, setAmount] = useState<number|string>('');
     const dispatch = useDispatch();
-    
+
+    useEffect(() => {
+        setTo("")
+        setAmount("")
+        setSelectAsset(null)
+
+    }, [selectWallet]);
+
 
   const isToCKB = (to:string) =>{
       return to.startsWith("ckb") || to.startsWith("ckt")
@@ -66,6 +73,7 @@ export default function SendContent() {
                 enqueueSnackbar("Transfer Error", {variant: "error"})
             }).finally(()=>{
                 setLoading(false)
+
             });
         }else{
             RGBHelper.instance.transferBTC(
@@ -237,10 +245,7 @@ export default function SendContent() {
     const send_ckb2btc_UDT = async() =>{
 
         const {type_script} = selectAsset?.data;
-
         let rs = await RGBHelper.instance.getRgbppAssert(to);
-        console.log(rs,selectAsset)
-
         let findUtxo: RgbAssert | undefined = undefined;
         // find same utxo
         for (let i = 0; i < rs.length; i++) {
@@ -354,7 +359,7 @@ export default function SendContent() {
                       >
                           {selectAsset ? (
                               <>
-                                  {selectAsset.type === ASSET_TYPE.UDT ? (
+                                  {selectAsset?.type === ASSET_TYPE.UDT ? (
                                       <div className="flex gap-2 items-center">
                                           <Image
                                               width={32}

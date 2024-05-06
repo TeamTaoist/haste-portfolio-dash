@@ -9,7 +9,6 @@ import {
   useRef,
 } from "react";
 import EmptyImage from "../common/Empty/image";
-import Image from "next/image";
 import {getXudtAndSpore} from "@/query/ckb/tools";
 import {ckb_SporeInfo, ckb_UDTInfo, RgbAssert} from "@/types/BTC";
 import {useSelector} from "react-redux";
