@@ -15,7 +15,7 @@ const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
   const deviceType = useSelector((state: RootState) => state.device.type);
   const activeTab = usePathname();
-  console.log(activeTab);
+
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 

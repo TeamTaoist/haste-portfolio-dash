@@ -38,10 +38,15 @@ setSporeConfig(sporeConfig);
 commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()])
   return (
     <html lang="en">
-      <body>
-        <ReduxProvider>
-          <DeviceDetector />
-            <div className="flex h-full">
+    <head>
+        <title>Haste资产管理器 | Bitcoin/RGB++/CKB</title>
+        <meta name="description" content="🤡 Haste | Bitcoin/CKB资产管理器"/>
+        <link rel="icon" href="/favicon.ico"/>
+    </head>
+    <body>
+    <ReduxProvider>
+        <DeviceDetector/>
+        <div className="flex h-full">
               <Menu />
               {children}
             </div>

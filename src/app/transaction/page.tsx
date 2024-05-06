@@ -100,7 +100,6 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
   function groupTransactionsByDate(transactions: BTCTxInfo[]): GroupedTransactions {
     const grouped: GroupedTransactions = {};
     transactions.forEach(transaction => {
-      console.log(transaction)
       const transactionDetails = processTransaction(transaction);
       // Convert the block_time to a date string
       const date = transaction.status.block_time ? new Date(transaction.status.block_time * 1000).toISOString().split('T')[0]: 'pending transaction';
