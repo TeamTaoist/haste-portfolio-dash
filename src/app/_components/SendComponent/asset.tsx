@@ -52,9 +52,9 @@ export default function AssetModal({
   }, [keyword, assetRef]);
 
   return (
-    <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black/50">
+    <div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-black/50 ">
       <div
-        className="relative w-auto mx-auto max-w-full bg-white p-6 rounded-2xl"
+        className="relative w-auto mx-auto max-w-full bg-white p-6 rounded-2xl min-h-96"
         style={{ width: "644px" }}
       >
         <div className="relative text-xl font-semibold">
