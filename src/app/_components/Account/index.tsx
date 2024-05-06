@@ -15,6 +15,7 @@ import {getBTCAsset} from "@/query/btc/tools";
 import {getCKBCapacity} from "@/query/ckb/tools";
 import BigNumber from "bignumber.js";
 import {BitcoinUnit} from "bitcoin-units";
+import {useRouter} from "next/navigation";
 
 const AccountSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
@@ -23,7 +24,7 @@ const AccountSidebar: React.FC = () => {
   const currentWallet: string | undefined = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const deviceType = useSelector((state: RootState) => state.device.type);
   const [list,setList] = useState<WalletItem[]>([])
-
+  const router = useRouter();
 
   const dispatch = useDispatch();
 
@@ -35,6 +36,7 @@ const AccountSidebar: React.FC = () => {
     unisat.on('accountsChanged',()=>{
       if(walletArr.length){
         dispatch(removeWalletItem(walletArr[0].address));
+        router.push("/")
       }
     });
   }, [wallets]);

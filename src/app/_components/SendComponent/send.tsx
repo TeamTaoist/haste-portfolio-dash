@@ -1,6 +1,6 @@
 "use client";
 
-import React, {ChangeEvent, useState} from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { RootState } from "@/store/store";
 import {setCurrentWalletAddress, WalletItem} from "@/store/wallet/walletSlice";
@@ -39,6 +39,7 @@ export default function SendContent() {
 
   const [amount, setAmount] = useState<number|string>('');
     const dispatch = useDispatch();
+    
 
   const isToCKB = (to:string) =>{
       return to.startsWith("ckb") || to.startsWith("ckt")

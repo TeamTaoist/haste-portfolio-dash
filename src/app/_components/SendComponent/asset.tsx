@@ -71,7 +71,7 @@ export default function AssetModal({
             <div className="flex p-0.5 border rounded-full transition-colors w-full h-[46px] sm:space-x-0 border-muted">
               <button
                 className={`w-full py-2 text-sm leading-5 px-3 rounded-full font-medium text-black ${
-                  selectType === ASSET_TYPE.UDT ? "bg-primary011" : ""
+                  selectType === ASSET_TYPE.UDT ? "bg-primary011 text-white font-bold" : ""
                 } focus:outline-none focus:ring-0 sm:px-4 md:px-4`}
                 onClick={() => setSelectType(ASSET_TYPE.UDT)}
               >
@@ -79,7 +79,7 @@ export default function AssetModal({
               </button>
               <button
                 className={`w-full py-2 text-sm leading-5 px-3 rounded-full font-medium text-black ${
-                  selectType === ASSET_TYPE.SPORE ? "bg-primary011" : ""
+                  selectType === ASSET_TYPE.SPORE ? "bg-primary011 text-white font-bold" : ""
                 } focus:outline-none focus:ring-0 sm:px-4 md:px-4 whitespace-nowrap`}
                 onClick={() => setSelectType(ASSET_TYPE.SPORE)}
                 disabled={selectWallet?.chain === 'btc'}
@@ -170,41 +170,23 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   }));
 
   return <>{ isLoading ? (
-      Array.from({ length: 3 }, (_, index) => (
-          <div key={index}
-               className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary011"
-          >
-            <button
-                key={index}
-                className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary011"
-            >
-              <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-                <div
-                    className="w-full h-full bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 bg-200% animate-shimmerSpore"></div>
-              </div>
-              <div className="flex flex-col justify-start items-start truncate">
-                <div className="text-xs sm:text-sm leading-5 text-default font-bold">
-                  <div
-                      className="h-4 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 bg-200% rounded animate-shimmerSpore"></div>
-                </div>
-              </div>
-            </button>
-          </div>
-      ))
-  ) :xudtList.map((udt, index) => (
-    <button
+      <div className="w-full flex justify-center py-12" >
+        <div className="loader"></div>
+      </div>
+  ) : xudtList.map((udt, index) => (
+      <button
       key={index}
-      className="group group flex rounded-md items-center justify-between w-full space-x-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary011 hover:text-white"
+      className="group group flex rounded-md items-center justify-between w-full space-x-4 px-2 sm:px-4 py-3 text-sm hover:bg-gray-100 "
       onClick={() => onSelect({ type: ASSET_TYPE.UDT, data: {...udt,...udt?.ckbCellInfo} })}
     >
       <div className="flex text-left items-center gap-2">
-        <Image
-          width={32}
-          height={32}
-          src="/img/btc.png"
-          alt="USDT"
-          className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
-        />
+        {/*<Image*/}
+        {/*  width={32}*/}
+        {/*  height={32}*/}
+        {/*  src="/img/btc.png"*/}
+        {/*  alt="USDT"*/}
+        {/*  className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"*/}
+        {/*/>*/}
         <div>
           <p className="text-xs sm:text-sm leading-5 font-semibold">{udt?.ckbCellInfo?getSymbol(udt?.ckbCellInfo?.type_script):getSymbol(udt?.type_script)}</p>
           <p className="sm:text-xs font-normal text-slate-300">{udt?.ckbCellInfo?.symbol}</p>
@@ -272,32 +254,14 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
     {
 
       isLoading ? (
-              Array.from({ length: 3 }, (_, index) => (
-                  <div key={index}
-                       className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
-                  >
-                    <button
-                        key={index}
-                        className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
-                    >
-                      <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-                        <div
-                            className="w-full h-full bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 bg-200% animate-shimmerSpore"></div>
-                      </div>
-                      <div className="flex flex-col justify-start items-start truncate">
-                        <div className="text-xs sm:text-sm leading-5 text-default font-bold">
-                          <div
-                              className="h-4 bg-gradient-to-r from-gray-200 via-gray-400 to-gray-200 bg-200% rounded animate-shimmerSpore"></div>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-              ))
+              <div className="w-full flex justify-center py-12">
+                <div className="loader"></div>
+              </div>
           ) :
           (spores.map((spore, index) => (
               <button
                   key={index}
-                  className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-primary010"
+                  className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-gray-100"
                   onClick={() => onSelect({type: ASSET_TYPE.SPORE, data: spore})}
               >
                 <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
