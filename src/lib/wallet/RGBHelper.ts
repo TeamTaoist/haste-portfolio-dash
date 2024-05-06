@@ -569,8 +569,6 @@ export class RGBHelper {
       }
     }
 
-    console.log(rgbAssertList);
-
     return rgbAssertList;
   }
 

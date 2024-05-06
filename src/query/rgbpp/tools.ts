@@ -75,7 +75,6 @@ export const getRgbppAssert = async(address: string) => {
       }
     }
 
-    console.log(rgbAssertList);
 
     return rgbAssertList;
   }

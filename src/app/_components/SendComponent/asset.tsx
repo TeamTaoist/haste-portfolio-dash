@@ -11,7 +11,7 @@ import {
 import EmptyImage from "../common/Empty/image";
 import Image from "next/image";
 import {getXudtAndSpore} from "@/query/ckb/tools";
-import {ckb_SporeInfo, ckb_UDTInfo} from "@/types/BTC";
+import {ckb_SporeInfo, ckb_UDTInfo, RgbAssert} from "@/types/BTC";
 import {useSelector} from "react-redux";
 import {RootState} from "@/store/store";
 import {formatString} from "@/utils/common";
@@ -124,7 +124,7 @@ type AssetRef = {
 
 const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, ref) => {
   // const [tokens] = useState(new Array(100).fill(0));
-  const [filteredTokens, setFilteredTokens] = useState(new Array(100).fill(0));
+  const [filteredTokens, setFilteredTokens] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | RgbAssert)[]>([]);
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   // const wallets = useSelector((state: RootState) => state.wallet.wallets);
@@ -133,6 +133,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
     setXudtList(assetsList.xudtList);
+    setFilteredTokens(assetsList.xudtList);
     setIsLoading(false);
   }
 
@@ -141,6 +142,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
     const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
     //@ts-ignore
     setXudtList(rgbAssetList)
+    setFilteredTokens(rgbAssetList);
     setIsLoading(false);
   }
 
@@ -160,12 +162,23 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
 
   useImperativeHandle(ref, () => ({
     search: (keyword?: string) => {
-      console.log(">> search in udt", keyword);
-      if (!keyword) {
-        // setFilteredTokens(tokens);
+      if (keyword) {
+        let arr:any[] = [...xudtList];
+        let newArr:any[] = [];
+
+        arr.map((udt)=>{
+          let symbol = udt?.ckbCellInfo?getSymbol(udt?.ckbCellInfo?.type_script):getSymbol(udt?.type_script);
+          newArr.push({
+            ...udt,
+            symbol
+          })
+        })
+        const tokens = newArr.filter(item=>item.symbol.indexOf(keyword) > -1);
+
+        setFilteredTokens(tokens);
+      }else{
+        setFilteredTokens(xudtList);
       }
-      // TODO filter name
-      // tokens.filter();
     },
   }));
 
@@ -173,7 +186,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
       <div className="w-full flex justify-center py-12" >
         <div className="loader"></div>
       </div>
-  ) : xudtList.map((udt, index) => (
+  ) : filteredTokens?.map((udt, index) => (
       <button
       key={index}
       className="group group flex rounded-md items-center justify-between w-full space-x-4 px-2 sm:px-4 py-3 text-sm hover:bg-gray-100 "
@@ -207,6 +220,7 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
+  const [filteredSpores, setFilteredSpores] = useState<ckb_SporeInfo[]>([]);
 
   const getCurrentAssets = async() => {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
@@ -231,22 +245,23 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
     setIsLoading(false);
   }
 
-  const [filteredSpores, setFilteredSpores] = useState(new Array(100).fill(0));
 
-  useEffect(() => {
-    // TODO
-    // get spores
-    // setFilteredSpores(spores);
-  }, []);
+
 
   useImperativeHandle(ref, () => ({
     search: (keyword?: string) => {
       console.log(">> search in spore", keyword)
       if (!keyword) {
         setFilteredSpores(spores);
+      }else{
+        spores.map((spore)=>{
+          console.log(spore.amount)
+        })
+
+        const arr = spores.filter(spore => spore.amount.indexOf(keyword) >- 1);
+
+        setFilteredSpores(arr);
       }
-      // TODO filter name
-      // spores.filter();
     },
   }));
 
@@ -258,7 +273,7 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
                 <div className="loader"></div>
               </div>
           ) :
-          (spores.map((spore, index) => (
+          (filteredSpores.map((spore, index) => (
               <button
                   key={index}
                   className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-gray-100"

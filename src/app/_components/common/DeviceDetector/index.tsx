@@ -10,19 +10,18 @@ const DeviceDetector: React.FC = () => {
   useEffect(() => {
     const handleResize = () => {
       const deviceType = window.innerWidth <= 768 ? 'mobile' : 'desktop';
-      console.log(deviceType);
       dispatch(setDeviceType(deviceType));
     };
 
     // initial detector
     handleResize();
-    
+
     //observe window size change
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [dispatch]);
 
-  return null; 
+  return null;
 };
 
 export default DeviceDetector;
