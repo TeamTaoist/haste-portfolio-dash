@@ -15,6 +15,7 @@ import {BI} from "@ckb-lumos/lumos";
 import {
   BookDashed
 } from "lucide-react";
+import {EventType} from "@/lib/enum";
 
 export default function UDTList() {
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
@@ -22,11 +23,23 @@ export default function UDTList() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const [loadingPage,setLoadingPage] = useState(false)
+  const [reloadData,setReloadData] = useState([])
 
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
     setXudtList(assetsList.xudtList);
     setIsLoading(false);
+  }
+
+  useEffect(() => {
+    document.addEventListener(EventType.dashboard_tokens_reload,refreshDom)
+    return () =>{
+      document.removeEventListener(EventType.dashboard_tokens_reload,refreshDom)
+    }
+  }, []);
+
+  const refreshDom = () =>{
+    setReloadData([])
   }
 
   const _getRgbAsset = async(address: string) => {
@@ -53,6 +66,8 @@ export default function UDTList() {
   }
 
   const getCurrentAssets = async() => {
+
+
     try{
       const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
       const chain = currentWallet?.chain;
