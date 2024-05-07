@@ -425,10 +425,9 @@ export default function SendContent() {
                   )}
               </div>
           )}
-
           <button
-              className="w-full bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer disabled: opacity-30 disabled:cursor-not-allowed"
-              disabled={!!to.length || !amount }
+              className="w-full bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+              disabled={(isNative &&(!to.length || !amount) )  || (!isNative && (!to.length || !amount || selectAsset==null))}
               onClick={onSend}
           >Send
           </button>
