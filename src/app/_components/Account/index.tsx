@@ -33,12 +33,29 @@ const AccountSidebar: React.FC = () => {
 
     const {unisat} = window as any;
     const walletArr = wallets.filter(w=>w.walletName === "unisat")
+
     unisat.on('accountsChanged',()=>{
       if(walletArr.length){
         dispatch(removeWalletItem(walletArr[0].address));
         router.push("/")
       }
     });
+
+  }, [wallets]);
+
+  useEffect(() => {
+    if(!(window as any).okxwallet?.bitcoin || !wallets?.length) return;
+
+    const {okxwallet} = window as any;
+    const walletArr = wallets.filter(w=>w.walletName === "okx")
+
+    okxwallet?.bitcoin.on('accountsChanged',()=>{
+      if(walletArr.length){
+        dispatch(removeWalletItem(walletArr[0].address));
+        router.push("/")
+      }
+    });
+
   }, [wallets]);
 
   const toggleSidebar = () => {
