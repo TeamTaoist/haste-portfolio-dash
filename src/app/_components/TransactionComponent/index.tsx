@@ -107,6 +107,7 @@ interface ITransactionItemProps {
   from: string;
   to: string;
   hours?: string;
+  txhash:string;
   transaction: string;
 }
 
@@ -118,6 +119,7 @@ export default function TransactionItem({
   to,
   hours,
   transaction,
+    txhash
 }: ITransactionItemProps) {
 
   const handleCopy = async (textToCopy: string) => {
@@ -149,8 +151,9 @@ export default function TransactionItem({
                 {hours}
               </div>
             </div>
+
             <div className="flex items-center text-slate-300 space-x-1 hover:bg-primary011 hover:text-white rounded-full">
-              <button className="p-2 items-center flex cursor-pointer w-fit" onClick={()=>handleCopy(transaction)}>
+              <button className="p-2 items-center flex cursor-pointer w-fit" onClick={()=>handleCopy(txhash)}>
                 <Copy size={16} />
               </button>
             </div>

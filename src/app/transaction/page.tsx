@@ -214,6 +214,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                                 <TransactionItem
                                     key={index}
                                     transaction={`https://${getEnv() === 'Mainnet' ? '': 'pudge.'}explorer.nervos.org/transaction/${transaction.attributes.transaction_hash}`}
+                                    txhash={transaction.attributes.transaction_hash}
                                     from={transaction.attributes.display_inputs[0].address_hash}
                                     to={transaction.attributes.display_outputs[0].address_hash}
                                     hours={transaction.attributes.created_at.split(' ')[1]}
@@ -242,6 +243,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                                     key={index}
                                     transaction={`https://mempool.space/${getEnv() === 'Testnet' && 'testnet'}/tx/${transaction.txid}`}
                                     from={transaction.fromAddress}
+                                    txhash={transaction.txid}
                                     to={transaction.toAddress!!}
                                     hours={transaction.transactionTime}
                                     type={BI.from(transaction.value).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND}
