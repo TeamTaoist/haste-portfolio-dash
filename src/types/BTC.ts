@@ -293,6 +293,7 @@ export interface RgbAssert {
   idx: number;
   ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
   value: number;
+  sum?:any;
   type_script?:any;
   amount?:string;
 }

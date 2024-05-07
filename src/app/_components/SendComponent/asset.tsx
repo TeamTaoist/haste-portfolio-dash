@@ -18,6 +18,8 @@ import {getRgbppAssert} from "@/query/rgbpp/tools";
 import {formatUnit} from "@ckb-lumos/bi";
 import {WalletItem} from "@/store/wallet/walletSlice";
 import { getSymbol } from "@/lib/utils";
+import {EventType} from "@/lib/enum";
+import {BI} from "@ckb-lumos/lumos";
 
 export enum ASSET_TYPE {
   UDT,
@@ -40,7 +42,7 @@ interface IAssetModalProps {
 export default function AssetModal({
   onSelectAsset,
   closeModal,
-                                     selectWallet
+   selectWallet
 }: IAssetModalProps) {
   const assetRef = useRef<AssetRef>(null);
   const [selectType, setSelectType] = useState<ASSET_TYPE>(ASSET_TYPE.UDT);
@@ -124,10 +126,25 @@ type AssetRef = {
 const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, ref) => {
   // const [tokens] = useState(new Array(100).fill(0));
   const [filteredTokens, setFilteredTokens] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | RgbAssert)[]>([]);
-  const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
+  const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | RgbAssert)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   // const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
+  const [reloadData,setReloadData] = useState([])
+
+
+  useEffect(() => {
+    document.addEventListener(EventType.dashboard_tokens_reload,refreshDom)
+    return () =>{
+      document.removeEventListener(EventType.dashboard_tokens_reload,refreshDom)
+    }
+  }, []);
+
+  const refreshDom = () =>{
+    console.log("==refreshDom==")
+    setReloadData([])
+  }
+
 
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
@@ -139,9 +156,24 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   const _getRgbAsset = async(address: string) => {
     const assetsList = await getRgbppAssert(address);
     const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
+
+
+    const groupedData = rgbAssetList.reduce((acc:any, obj) => {
+      const key= obj?.ckbCellInfo?.type_script?.args! ;
+      if (!acc[key]) {
+        acc[key] = { category: key, sum: BI.from(0),...obj };
+      }
+      acc[key].sum = acc[key].sum.add((obj?.ckbCellInfo?.amount));
+
+      return acc;
+    }, {});
+
+
+    const result = Object.values(groupedData);
+
     //@ts-ignore
-    setXudtList(rgbAssetList)
-    setFilteredTokens(rgbAssetList);
+    setXudtList(result)
+    setFilteredTokens(result);
     setIsLoading(false);
   }
 
@@ -205,7 +237,8 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
         </div>
       </div>
       <div className="flex flex-col items-end sm:max-w-[200px]">
-        <p className="sm:text-sm font-normal text-sm">   {udt?.ckbCellInfo?formatUnit(udt?.ckbCellInfo?.amount ?? '0',"ckb"):formatUnit(udt?.amount ?? '0',"ckb")}</p>
+        {/*<p className="sm:text-sm font-normal text-sm">   {udt?.ckbCellInfo?formatUnit(udt?.ckbCellInfo?.amount ?? '0',"ckb"):formatUnit(udt?.amount ?? '0',"ckb")}</p>*/}
+        <p className="sm:text-sm font-normal text-sm">                    {formatUnit(((udt?.sum?.toString() || udt?.amount) ?? 0), 'ckb')}</p>
         <p className="sm:text-xs font-normal text-slate-300"> $--,--</p>
       </div>
     </button>
