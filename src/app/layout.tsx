@@ -41,7 +41,7 @@ commons.common.registerCustomLockScriptInfos([createJoyIDScriptInfo()])
     <head>
         <title>Haste资产管理器 | Bitcoin/RGB++/CKB</title>
         <meta name="description" content="🤡 Haste | Bitcoin/CKB资产管理器"/>
-        <link rel="icon" href="/favicon.ico"/>
+        <link rel="icon" href="/img/favicon.ico"/>
     </head>
     <body>
     <ReduxProvider>

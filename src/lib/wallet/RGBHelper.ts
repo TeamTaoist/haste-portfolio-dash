@@ -78,6 +78,8 @@ export class RGBHelper {
     );
     const source = new DataSource(service, networkType);
 
+
+
     const psbt = await sendBtc({
       tos: [
         {
@@ -87,7 +89,7 @@ export class RGBHelper {
       ],
       source,
       from: wallet.address,
-      fromPubkey: wallet.pubkey,
+      fromPubkey: wallet.pubKey,
     });
 
     const psbtHex = await BtcHepler.instance.signPsdt(

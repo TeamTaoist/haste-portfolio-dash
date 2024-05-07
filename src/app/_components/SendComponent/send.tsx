@@ -426,12 +426,12 @@ export default function SendContent() {
               </div>
           )}
 
-          <div
-              className="w-full bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer"
+          <button
+              className="w-full bg-primary011 text-primary001 rounded-lg py-2 font-Montserrat text-center cursor-pointer disabled: opacity-30 disabled:cursor-not-allowed"
+              disabled={!!to.length || !amount }
               onClick={onSend}
-          >
-              Send
-          </div>
+          >Send
+          </button>
           {assetModalVisible && selectWallet && (
               <AssetModal
                   closeModal={() => setAssetModalVisible(false)}
@@ -446,7 +446,4 @@ export default function SendContent() {
   );
 }
 
-function registerCustomLockScriptInfos(arg0: any[]) {
-    throw new Error("Function not implemented.");
-}
 
