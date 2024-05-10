@@ -274,7 +274,9 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
     const assetsList = await getXudtAndSpore(address);
 
     setSpores(assetsList.sporeList);
+    setFilteredSpores(assetsList.sporeList);
     setIsLoading(false);
+
   }
 
 
