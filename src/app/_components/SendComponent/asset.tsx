@@ -141,7 +141,6 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   }, []);
 
   const refreshDom = () =>{
-    console.log("==refreshDom==")
     setReloadData([])
   }
 
