@@ -73,3 +73,22 @@ export const JoyIDCKBConnect = async () => {
   }
 }
 
+export const ReiConnect = async () =>{
+
+    const {ckb} = window as any;
+    if (typeof ckb !== "undefined") {
+        const curNetwork = await ckb.request({method:"ckb_getNetwork"});
+
+
+        let netData = getEnv() === 'Testnet' ?'testnet':"mainnet"
+
+        await ckb.request({method:"ckb_switchNetwork",netData})
+
+        const account: string = await ckb.request({method:"ckb_requestAccounts"});
+        const pubkey: string = await ckb.request({method:"ckb_getPublicKey"});
+        return { account, pubkey };
+    } else {
+        throw new Error("REI Wallet is no installed!");
+    }
+
+}
