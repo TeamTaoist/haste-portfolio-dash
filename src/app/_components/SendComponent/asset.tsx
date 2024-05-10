@@ -314,20 +314,25 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
                   onClick={() => onSelect({type: ASSET_TYPE.SPORE, data: spore})}
               >
                 <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-                  {Math.round(Math.random()) % 2 === 0 ? (
-                      <img
-                          src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
-                          alt=""
-                          className="w-full object-cover block rounded-lg"
-                      />
-                  ) : (
-                      <EmptyImage className="h-full w-full max-w-[5rem] max-h-[5rem]"/>
-                  )}
+                  <img
+                      src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
+                      alt=""
+                      className="w-full object-cover block rounded-lg"
+                  />
+                  {/*{Math.round(Math.random()) % 2 === 0 ? (*/}
+                  {/*    <img*/}
+                  {/*        src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}*/}
+                  {/*        alt=""*/}
+                  {/*        className="w-full object-cover block rounded-lg"*/}
+                  {/*    />*/}
+                  {/*) : (*/}
+                  {/*    <EmptyImage className="h-full w-full max-w-[5rem] max-h-[5rem]"/>*/}
+                  {/*)}*/}
                 </div>
                 <div className="flex flex-col justify-start items-start truncate">
                   <p className="text-xs sm:text-sm leading-5 text-default font-bold">
                     {formatString(spore.amount, 5)}
-        </p>
+                  </p>
       </div>
     </button>
   )))}</>
