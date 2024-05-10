@@ -54,7 +54,7 @@ export default function WalletSelect({
           {selectWallet?.address ? (
             <>
               {formatString(selectWallet.address, 5)}
-              <span className="text-slate-400">
+              <span className="text-slate-400 uppercase">
                 ({selectWallet.walletName})
               </span>
             </>
