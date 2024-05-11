@@ -420,7 +420,7 @@ export default function SendContent() {
                   {!!selectAsset && (
                       <p className="sm:text-xs font-normal text-right">
                           Available
-                          Balance: {formatUnit(selectAsset?.data?.sum.toString() || selectAsset?.data?.amount, "ckb")} <span className="uppercase">{getSymbol(selectAsset?.data?.type_script)}</span>
+                          Balance: {formatUnit( selectAsset?.data?.sum && selectAsset?.data?.sum?.toString() || selectAsset?.data?.amount, "ckb")} <span className="uppercase">{getSymbol(selectAsset?.data?.type_script)}</span>
                       </p>
                   )}
               </div>
