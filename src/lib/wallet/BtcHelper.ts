@@ -8,7 +8,7 @@ import {
   // signPsbt as joyID_signPsbt,
 } from "@joyid/bitcoin";
 import {  mainConfig, testConfig } from "./constants";
-import {getEnv} from "@/settings/env";
+import {getEnv} from "../../settings/env";
 
 export class BtcHepler {
   private static _instance: BtcHepler;

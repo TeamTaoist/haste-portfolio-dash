@@ -1,6 +1,6 @@
-import { forkSporeConfig, predefinedSporeConfigs, setSporeConfig, SporeConfig } from '@spore-sdk/core';
+import {  predefinedSporeConfigs, SporeConfig } from '@spore-sdk/core';
 
-const sporeConfig: SporeConfig = process.env.NODE_ENV === 'development' ?  predefinedSporeConfigs.Testnet : predefinedSporeConfigs.Mainnet;
+const sporeConfig: SporeConfig = import.meta.env.VITE_ENV_PARAM === 'development' ?  predefinedSporeConfigs.Testnet : predefinedSporeConfigs.Mainnet;
 // initializeConfig(sporeConfig.lumos);
 // setSporeConfig(sporeConfig);
 export {

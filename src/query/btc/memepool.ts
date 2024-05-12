@@ -1,5 +1,5 @@
-import { getEnv } from "@/settings/env";
-import { BTCAccountInfo, BTCTxInfo } from "@/types/BTC";
+import { getEnv } from "../../settings/env";
+import { BTCAccountInfo, BTCTxInfo } from "../../types/BTC";
 import superagent from "superagent";
 
 
@@ -17,7 +17,7 @@ async function fetchFromMempoolSpace(endpoint: string): Promise<any> {
 
 
 export const getBTC = async (address: string): Promise<BTCAccountInfo | undefined> => {
-  return await fetchFromMempoolSpace(`api/address/${address}`); 
+  return await fetchFromMempoolSpace(`api/address/${address}`);
 }
 
 export const getUtxo = async (address: string): Promise<any> => {

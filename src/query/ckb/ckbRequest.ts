@@ -38,9 +38,8 @@ import {
   ckb_TransferOptions,
   ckb_UDTInfo,
   UdtInfo,
-} from "@/types/BTC";
-import store from "@/store/store";
-import { setCurrentWalletAddress } from "@/store/wallet/walletSlice";
+} from "../../types/BTC";
+import store from "../../store/store";
 import {
   backend,
   ckb_explorer_api,
@@ -53,8 +52,8 @@ import {
   getSudtTypeScript,
   getXudtDep,
   getXudtTypeScript,
-} from "@/settings/variable";
-import { getEnv } from "@/settings/env";
+} from "../../settings/variable";
+import { getEnv } from "../../settings/env";
 
 
 const rpc = new RPC(CKB_RPC_URL);
@@ -89,6 +88,7 @@ export class CkbHepler {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
+
     if (wallet.walletName == "joyidckb") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
@@ -100,6 +100,12 @@ export class CkbHepler {
       console.log("amount", options.amount.toString());
 
       return this.sendTransaction(signed);
+    }else if(wallet.walletName === "rei"){
+      console.log("=====rei",unsigned)
+      const txObj = helpers.transactionSkeletonToObject(unsigned)
+      return await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
+          txSkeleton:txObj
+        }})
     }
 
     throw new Error("Please connect wallet");
@@ -124,6 +130,13 @@ export class CkbHepler {
       );
 
       return this.sendTransaction(signed);
+    }else if (wallet.walletName === "rei"){
+      console.log("===rei",unsigned)
+      const txObj = helpers.transactionSkeletonToObject(unsigned)
+      console.log("===rei",txObj)
+     return  await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
+          txSkeleton:txObj
+        }})
     }
 
     throw new Error("Please connect wallet");
@@ -421,7 +434,7 @@ export class CkbHepler {
 
   // send transaction
   async sendTransaction(tx: Transaction) {
-    return rpc.sendTransaction(tx, "passthrough");
+    return await rpc.sendTransaction(tx, "passthrough");
   }
 
   // capacityOf

@@ -1,5 +1,5 @@
-import { getEnv } from "@/settings/env";
-import { btc_utxo, RgbAssert } from "@/types/BTC";
+import { getEnv } from "../../settings/env";
+import { btc_utxo, RgbAssert } from "../../types/BTC";
 import { getUtxo } from "../btc/memepool";
 import { helpers } from "@ckb-lumos/lumos";
 import { getXudtAndSpore } from "../ckb/tools";

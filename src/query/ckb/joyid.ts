@@ -18,7 +18,7 @@ import {
   // connect,
 } from "@joyid/ckb";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
-import store from "@/store/store";
+import store from "../../store/store";
 
 const isMainnet = false;
 

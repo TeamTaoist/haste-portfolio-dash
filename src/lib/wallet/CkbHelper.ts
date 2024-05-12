@@ -34,7 +34,6 @@ import {
 } from "./constants";
 import { number, bytes } from "@ckb-lumos/codec";
 
-import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
 // import { accountStore } from "@/store/AccountStore";
 import {
@@ -42,8 +41,8 @@ import {
   genBtcTimeLockArgs,
   getBtcTimeLockScript,
 } from "@rgbpp-sdk/ckb";
-import {getEnv} from "@/settings/env";
-import store from "@/store/store";
+import {getEnv} from "../../settings/env";
+import store from "../../store/store";
 
 export class CkbHepler {
   private static _instance: CkbHepler;

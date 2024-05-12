@@ -2,7 +2,7 @@
 const stage:string = ''
 
 export const getEnv = (): string => {
-  const sysEnv = process.env.NEXT_PUBLIC_ENV_PARAM
+  const sysEnv = import.meta.env.VITE_ENV_PARAM
   if (stage === 'prepare') {
     return 'Testnet'
   } else {

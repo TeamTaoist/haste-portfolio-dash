@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family:din_regular,Roboto-Regular;
+  overflow-x: hidden;
+}
+#root{
+  height: 100%;
+}
+
+ul,li,dl,dd,dt{
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.box-shadow-30{
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2)!important;
+}
+.font-Roboto-bold{
+  font-family: Roboto-Bold;
+}
+.font-din{
+  font-family: din_bold !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat/Montserrat-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'SourceSanPro';
+  src: url('../fonts/SourceSanPro/SourceSansPro-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SourceSanPro';
+  src: url('../fonts/SourceSanPro/SourceSansPro-Bold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SourceSanPro';
+  src: url('../fonts/SourceSanPro/SourceSansPro-Semibold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'SourceSanPro';
+  src: url('../fonts/SourceSanPro/SourceSansPro-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: din_bold;
+  src: url(../fonts/din_bold.otf);
+  unicode-range: U+30-39;
+}
+@font-face {
+  font-family:din_regular;
+  src: url(../fonts/din_regular.otf);
+  unicode-range: U+30-39;
+}
+@font-face {
+  font-family: Roboto-Bold;
+  src: url(../fonts/Roboto-Bold.ttf)
+}
+@font-face {
+  font-family:Roboto-Regular;
+  src: url(../fonts/Roboto-Regular.ttf)
+}

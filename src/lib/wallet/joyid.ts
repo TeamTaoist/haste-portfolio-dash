@@ -23,8 +23,8 @@ import {
   testConfig,
 } from "./constants";
 import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
-import store from "@/store/store";
-import { getEnv } from "@/settings/env";
+import store from "../../store/store";
+import { getEnv } from "../../settings/env";
 
 const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
 const isMainnet = cfg.isMainnet;

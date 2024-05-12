@@ -308,4 +308,4 @@ export interface CellOutPutData {
 }
 
 // type
-export type WalletType = "none" | "unisat" | "okx" | "joyidckb"| "joyidbtc"| "joyid";
+export type WalletType = "none" | "unisat" | "okx" | "joyidckb"| "joyidbtc"| "joyid" |"rei";

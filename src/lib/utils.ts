@@ -15,7 +15,7 @@ import {
   mainConfig,
   testConfig,
 } from "./wallet/constants";
-import { getEnv } from "@/settings/env";
+import { getEnv } from "../settings/env";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

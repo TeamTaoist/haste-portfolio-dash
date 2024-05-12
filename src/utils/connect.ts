@@ -1,7 +1,7 @@
-import { getEnv } from '@/settings/env';
+import { getEnv } from '../settings/env';
 import { getPublicKey, initConfig as initBTCConfig, requestAccounts } from '@joyid/bitcoin'
 import { connect, initConfig } from '@joyid/ckb';
-import { mainConfig, testConfig } from '@/lib/wallet/constants';
+import { mainConfig, testConfig } from '../lib/wallet/constants';
 
 export const OKXConnect = async () => {
 
@@ -22,7 +22,7 @@ export const OKXConnect = async () => {
 export const UnisatConnect = async () => {
   const unisat = (window as any)["unisat"];
     if (typeof unisat !== "undefined") {
-      const curNetwork = await unisat.getNetwork();
+      // const curNetwork = await unisat.getNetwork();
 
       if (getEnv() === 'Testnet') {
         //@ts-ignore
@@ -77,7 +77,7 @@ export const ReiConnect = async () =>{
 
     const {ckb} = window as any;
     if (typeof ckb !== "undefined") {
-        const curNetwork = await ckb.request({method:"ckb_getNetwork"});
+        // const curNetwork = await ckb.request({method:"ckb_getNetwork"});
 
 
         let netData = getEnv() === 'Testnet' ?'testnet':"mainnet"

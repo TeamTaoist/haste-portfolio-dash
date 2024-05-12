@@ -7,7 +7,7 @@ import {
   tokensInfo,
   txInfo,
 } from "../interface";
-import store from "@/store/store";
+import store from "../../store/store";
 
 export class DataManager {
   private static _instance: DataManager;

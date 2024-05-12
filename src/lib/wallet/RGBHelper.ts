@@ -6,7 +6,6 @@ import {
   genCkbJumpBtcVirtualTx,
   Collector,
   genBtcJumpCkbVirtualTx,
-  isBtcTimeCellsSpent,
   genRgbppLockScript,
   genBtcTransferCkbVirtualTx,
 } from "@rgbpp-sdk/ckb";
@@ -26,8 +25,8 @@ import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 // import { accountStore } from "@/store/AccountStore";
 import { mainConfig, testConfig } from "./constants";
-import store from "@/store/store";
-import {getEnv} from "@/settings/env";
+import store from "../../store/store";
+import {getEnv} from "../../settings/env";
 import {BitcoinUnit} from "bitcoin-units";
 
 export class RGBHelper {

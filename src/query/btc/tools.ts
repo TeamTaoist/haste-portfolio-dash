@@ -1,5 +1,5 @@
-import { getEnv } from "@/settings/env";
-import { WalletType } from "@/types/BTC";
+import { getEnv } from "../../settings/env";
+import { WalletType } from "../../types/BTC";
 import {
   requestAccounts,
   getPublicKey,

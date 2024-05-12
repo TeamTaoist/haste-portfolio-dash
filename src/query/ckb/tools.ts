@@ -1,6 +1,6 @@
-import { getEnv } from "@/settings/env";
-import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeTypeScript, getXudtTypeScript, MainnetInfo, TestnetInfo } from "@/settings/variable";
-import { ckb_SporeInfo, ckb_UDTInfo } from "@/types/BTC";
+import { getEnv } from "../../settings/env";
+import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeTypeScript, getXudtTypeScript, MainnetInfo, TestnetInfo } from "../../settings/variable";
+import { ckb_SporeInfo, ckb_UDTInfo } from "../../types/BTC";
 import { number } from "@ckb-lumos/codec";
 import { BI, Cell, config, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
 import superagent from "superagent";
