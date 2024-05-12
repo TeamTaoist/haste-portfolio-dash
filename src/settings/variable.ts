@@ -4,8 +4,8 @@ import { getEnv } from "./env";
 
 export const isMainnet = false;
 export const CONFIG = getEnv() === 'Mainnet' ? config.MAINNET : config.TESTNET;
-export const CKB_RPC_URL = "https://testnet.ckb.dev";
-export const CKB_INDEX_URL = "https://testnet.ckb.dev";
+export const CKB_RPC_URL = "https://testnet.ckb.dev/rpc";
+export const CKB_INDEX_URL = "https://testnet.ckb.dev/indexer";
 
 export const BTC_ASSETS_API_URL = "https://btc-assets-api.testnet.mibao.pro";
 export const BTC_ASSETS_TOKEN =

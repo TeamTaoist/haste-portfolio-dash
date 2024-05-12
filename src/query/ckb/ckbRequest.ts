@@ -54,6 +54,7 @@ import {
   getXudtTypeScript,
 } from "../../settings/variable";
 import { getEnv } from "../../settings/env";
+import {getSecp256k1CellDep, MAX_FEE} from "@rgbpp-sdk/ckb";
 
 
 const rpc = new RPC(CKB_RPC_URL);
@@ -121,6 +122,8 @@ export class CkbHepler {
     }
 
     const unsigned = await this.buildTransfer(options);
+    const txObj = helpers.transactionSkeletonToObject(unsigned)
+    console.log("===unsigned",txObj)
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
     if (wallet.walletName.indexOf("joyid")>-1) {
@@ -131,8 +134,8 @@ export class CkbHepler {
 
       return this.sendTransaction(signed);
     }else if (wallet.walletName === "rei"){
-      console.log("===rei",unsigned)
-      const txObj = helpers.transactionSkeletonToObject(unsigned)
+
+      // const txObj = helpers.transactionSkeletonToObject(unsigned)
       console.log("===rei",txObj)
      return  await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
           txSkeleton:txObj
@@ -214,6 +217,7 @@ export class CkbHepler {
         { config: CONFIG }
       );
 
+
       txSkeleton = await commons.common.payFee(
         txSkeleton,
         [fromAddress],
@@ -270,7 +274,10 @@ export class CkbHepler {
       sudt_cellDeps = getSudtDep(isMainnet);
     }
 
+    let fromDeps = getSecp256k1CellDep(isMainnet)
+
     txSkeleton = addCellDep(txSkeleton, sudt_cellDeps!!);
+    txSkeleton = addCellDep(txSkeleton, fromDeps as any);
 
     // find sudt
     // <<
@@ -320,12 +327,9 @@ export class CkbHepler {
       const input = inputs_sudt[i];
       input.cellOutput.capacity = "0x0";
 
-      console.log("inputs_sudt[i]=",inputs_sudt[i],i,fromAddress,CONFIG)
+      txSkeleton = txSkeleton.update("inputs", (inputs) => inputs.push(input))
+      // txSkeleton = await commons.common.setupInputCell(txSkeleton, input,fromAddress,{ config: CONFIG });
 
-
-      txSkeleton = await commons.common.setupInputCell(txSkeleton, input,fromAddress,{ config: CONFIG });
-
-      console.log("txSkeleton",txSkeleton)
 
     }
 
@@ -382,54 +386,164 @@ export class CkbHepler {
       );
     }
 
-    const minEmptyCapacity = calculateEmptyCellMinCapacity(fromScript);
-    const needCapacity = outputCapacity
-      .sub(sudt_sumCapacity)
-      .add(minEmptyCapacity)
-      .add(2000); // fee
+    let needCapacity = outputCapacity.add(MAX_FEE);
 
-    // find ckb
-    // <<
-    const collect_ckb = indexer.collector({
-      lock: {
-        script: fromScript,
-        searchMode: "exact",
-      },
-      type: "empty",
-    });
-    const inputs_ckb: Cell[] = [];
-    let ckb_sum = BI.from(0);
-    for await (const collect of collect_ckb.collect()) {
-      inputs_ckb.push(collect);
-      ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
-      if (ckb_sum.gte(needCapacity)) {
-        break;
+    const minFromCKBCell = BI.from(
+        helpers.minimalCellCapacity({
+          cellOutput: {
+            lock: fromScript,
+            capacity: BI.from(0).toHexString(),
+          },
+          data: "0x",
+        })
+    );
+
+
+    if (needCapacity.lt(sudt_sumCapacity)) {
+      const ckb_change = sudt_sumCapacity.sub(needCapacity);
+      // if (ckb_change.gt(0)) {
+      //   const output_ckb_change = {
+      //     cellOutput: {
+      //       lock: fromScript,
+      //       capacity: ckb_change.toHexString(),
+      //     },
+      //     data: "0x",
+      //   };
+      //   txSkeleton = txSkeleton.update("outputs", (outputs) =>
+      //       outputs.push(output_ckb_change)
+      //   );
+      // }
+
+      if (ckb_change.gt(minFromCKBCell)) {
+        const output_ckb_change = {
+          cellOutput: {
+            lock: fromScript,
+            capacity: ckb_change.toHexString(),
+          },
+          data: "0x",
+        };
+
+        txSkeleton = txSkeleton.update("outputs", (outputs) =>
+            outputs.push(output_ckb_change)
+        );
+      } else {
+        // find ckb
+        // <<
+        const collect_ckb = indexer.collector({
+          lock: {
+            script: fromScript,
+            searchMode: "exact",
+          },
+          type: "empty",
+        });
+        const inputs_ckb = [];
+        let ckb_sum = BI.from(0);
+        for await (const collect of collect_ckb.collect()) {
+          inputs_ckb.push(collect);
+          ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
+          break;
+        }
+        if (inputs_ckb.length <= 0) {
+          throw new Error("Cannot find empty cell");
+        }
+        for (let i = 0; i < inputs_ckb.length; i++) {
+          const element = inputs_ckb[i];
+          element.cellOutput.capacity = "0x0";
+          txSkeleton = await commons.common.setupInputCell(txSkeleton, element);
+        }
+        const new_ckb_change = ckb_sum.add(ckb_change);
+        if (new_ckb_change.gt(0)) {
+          const output_ckb_change = {
+            cellOutput: {
+              lock: fromScript,
+              capacity: new_ckb_change.toHexString(),
+            },
+            data: "0x",
+          };
+          txSkeleton = txSkeleton.update("outputs", (outputs) =>
+              outputs.push(output_ckb_change)
+          );
+        }
+      }
+
+    }
+    else {
+      needCapacity = needCapacity.sub(sudt_sumCapacity);
+      const collect_ckb = indexer.collector({
+        lock: {
+          script: fromScript,
+          searchMode: "exact",
+        },
+        type: "empty",
+      });
+      const inputs_ckb = [];
+      let ckb_sum = BI.from(0);
+      for await (const collect of collect_ckb.collect()) {
+        inputs_ckb.push(collect);
+        ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
+        if (ckb_sum.gte(needCapacity)) {
+          break;
+        }
+      }
+      // >>
+      if (ckb_sum.lt(needCapacity)) {
+        throw new Error("No enough capacity");
+      }
+      for (let i = 0; i < inputs_ckb.length; i++) {
+        const element = inputs_ckb[i];
+
+        txSkeleton = txSkeleton.update("inputs", (inputs) => inputs.push(element));
+      }
+      const ckb_change = ckb_sum.sub(needCapacity);
+      if (ckb_change.gt(0)) {
+        const output_ckb_change = {
+          cellOutput: {
+            lock: fromScript,
+            capacity: ckb_change.toHexString(),
+          },
+          data: "0x",
+        };
+        txSkeleton = txSkeleton.update("outputs", (outputs) =>
+            outputs.push(output_ckb_change)
+        );
       }
     }
-    // >>
-    if (ckb_sum.lt(needCapacity)) {
-      throw new Error("No enough capacity");
-    }
-    for (let i = 0; i < inputs_ckb.length; i++) {
-      const element = inputs_ckb[i];
-      element.cellOutput.capacity = "0x0";
-      txSkeleton = await commons.common.setupInputCell(txSkeleton, element);
-    }
-    const ckb_change = ckb_sum.sub(needCapacity);
-    if (ckb_change.gt(0)) {
-      const output_ckb_change: Cell = {
-        cellOutput: {
-          lock: fromScript,
-          capacity: ckb_change.toHexString(),
-        },
-        data: "0x",
-      };
-      txSkeleton = txSkeleton.update("outputs", (outputs) =>
-        outputs.push(output_ckb_change)
-      );
-    }
 
+
+    const firstIndex = txSkeleton
+        .get("inputs")
+        .findIndex((input) =>
+            bytes.equal(blockchain.Script.pack(input.cellOutput.lock), blockchain.Script.pack(fromScript))
+        );
+    if (firstIndex !== -1) {
+      while (firstIndex >= txSkeleton.get("witnesses").size) {
+        txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.push("0x"));
+      }
+      let witness = txSkeleton.get("witnesses").get(firstIndex);
+      const newWitnessArgs:any = {
+        /* 65-byte zeros in hex */
+        lock: "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      };
+      if (witness !== "0x") {
+        const witnessArgs = blockchain.WitnessArgs.unpack(bytes.bytify(witness));
+        const lock = witnessArgs.lock;
+        if (!!lock && !!newWitnessArgs.lock && !bytes.equal(lock, newWitnessArgs.lock)) {
+          throw new Error("Lock field in first witness is set aside for signature!");
+        }
+        const inputType = witnessArgs.inputType;
+        if (!!inputType) {
+          newWitnessArgs.inputType = inputType;
+        }
+        const outputType = witnessArgs.outputType;
+        if (!!outputType) {
+          newWitnessArgs.outputType = outputType;
+        }
+      }
+      witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
+      txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.set(firstIndex, witness));
+    }
     return txSkeleton;
+   
   }
 
   // send transaction

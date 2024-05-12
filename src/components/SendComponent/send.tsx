@@ -12,7 +12,7 @@ import {BI, formatUnit} from "@ckb-lumos/bi";
 
 import { getSporeById,  transferSpore } from "@spore-sdk/core";
 import { sporeConfig } from "../../utils/config";
-import {commons, config, helpers, RPC} from "@ckb-lumos/lumos";
+import { helpers, RPC} from "@ckb-lumos/lumos";
 import { signRawTransaction } from "@joyid/ckb";
 import { Test_Config ,Main_Config} from "../../lib/constant";
 
@@ -23,7 +23,6 @@ import {getSymbol} from "../../lib/utils";
 import {RGBHelper} from "../../lib/wallet/RGBHelper";
 import {RgbAssert} from "../../lib/interface";
 import Loading from "../../components/loading";
-import {mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 
 
 // import BtcImg from "../../assets/img/btc.png";
@@ -185,7 +184,7 @@ export default function SendContent() {
         if(selectWallet.walletName === "joyidckb"){
             const tx = helpers.createTransactionFromSkeleton(txSkeleton);
             try {
-                const signTx = await signRawTransaction(tx, selectWallet.address);
+                const signTx = await signRawTransaction(tx as any, selectWallet.address);
                 await rpc.sendTransaction(signTx, "passthrough");
                 enqueueSnackbar("Transfer Successful", {variant: "success"})
             } catch(e) {
