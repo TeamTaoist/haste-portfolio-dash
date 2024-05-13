@@ -7,7 +7,7 @@ import {
   Collector,
   genBtcJumpCkbVirtualTx,
   genRgbppLockScript,
-  genBtcTransferCkbVirtualTx,
+  genBtcTransferCkbVirtualTx, getSecp256k1CellDep,
 } from "@rgbpp-sdk/ckb";
 import { serializeScript } from "@nervosnetwork/ckb-sdk-utils";
 import {
@@ -174,9 +174,15 @@ export class RGBHelper {
       );
 
       return CkbHepler.instance.sendTransaction(signed);
+    }else if(wallet.walletName === "rei"){
+      console.log("=====rei",unsignedRawTx)
+      return await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
+          txSkeleton:unsignedRawTx
+        }})
     }
 
-    // throw new Error("Please connect wallet");
+
+    throw new Error("Please connect wallet");
   }
 
   async transfer_btc_to_ckb(
@@ -373,10 +379,19 @@ export class RGBHelper {
 
       console.log("unsignedTx====",unsignedTx)
       return unsignedTx;
+    }else{
+      const emptyWitness = { lock: '', inputType: '', outputType: '' };
+      let unsignedTx = {
+        ...ckbRawTx,
+        cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(getEnv() === "mainnet")],
+
+        witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
+      };
+      return unsignedTx;
     }
     // >>
 
-    throw new Error("Now Just support joyid");
+    // throw new Error("Now Just support joyid");
   }
 
   async btc_to_ckb_buildTx(
