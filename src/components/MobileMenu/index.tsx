@@ -15,6 +15,9 @@ import {getCKBCapacity} from "../../query/ckb/tools";
 import BigNumber from "bignumber.js";
 import {BitcoinUnit} from "bitcoin-units";
 
+import BtcImg from "../../assets/img/btc.png";
+import CkbImg from "../../assets/img/ckb.png";
+
 const DropdownSelect: React.FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const wallets = useSelector((state: RootState) => state.wallet.wallets);
@@ -107,7 +110,7 @@ const DropdownSelect: React.FC = () => {
               `}
               onClick={toggleDropdown}>
                 <img
-                  src={`/img/${currentWallet?.chain}.png`}
+                  src={currentWallet?.chain === 'btc'?BtcImg:CkbImg}
                   width={24}
                   height={24}
                   className='rounded-full border border-gray-200'
@@ -130,7 +133,7 @@ const DropdownSelect: React.FC = () => {
                           setIsOpen(false)
                         }}>
                             <img
-                              src={`/img/${wallet.chain}.png`}
+                              src={wallet?.chain === 'btc'?BtcImg:CkbImg}
                               width={24}
                               height={24}
                               className='rounded-full border border-gray-300'

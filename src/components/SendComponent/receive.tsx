@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { WalletItem } from "@/store/wallet/walletSlice";
+import { RootState } from "../../store/store";
+import { WalletItem } from "../../store/wallet/walletSlice";
 import WalletSelect from "./walletSelect";
 import QRCode from "react-qr-code";
 import { Copy } from "lucide-react";

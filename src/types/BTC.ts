@@ -114,6 +114,7 @@ export interface tokensInfo {
 export interface ckb_TransferOptions {
   from: string;
   to: string;
+  walletName?: string;
   amount: BIish;
   typeScript?: Script;
 }

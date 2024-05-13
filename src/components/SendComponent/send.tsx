@@ -210,11 +210,13 @@ export default function SendContent() {
 
     }
     const send_ckb2ckb_UDT = () =>{
+
         CkbHepler.instance
             .transfer_udt({
                 from: selectWallet.address,
                 to: to,
                 amount: parseUnit(amount?.toString(), "ckb"),
+                walletName:selectWallet.walletName,
                 typeScript: selectAsset?.data.type_script,
             },selectWallet.address)
             .then((txHash) => {
@@ -283,6 +285,8 @@ export default function SendContent() {
     const send_ckb2btc_UDT = async() =>{
 
         const {type_script} = selectAsset?.data;
+
+
         let rs = await RGBHelper.instance.getRgbppAssert(to);
         let findUtxo: RgbAssert | undefined = undefined;
         // find same utxo

@@ -6,7 +6,6 @@ import {
   Script,
   Transaction,
   commons,
-  config,
   helpers,
   utils,
 } from "@ckb-lumos/lumos";
@@ -22,14 +21,11 @@ import { addCellDep } from "@ckb-lumos/common-scripts/lib/helper";
 
 import {
   CKBTransaction,
-  connect,
-  initConfig,
   signRawTransaction,
 } from "@joyid/ckb";
 import { createJoyIDScriptInfo } from "./joyid";
 
 import { number, bytes } from "@ckb-lumos/codec";
-import { calculateEmptyCellMinCapacity } from "../utils";
 import { blockchain } from "@ckb-lumos/base";
 import superagent from "superagent";
 import {
@@ -180,7 +176,7 @@ export class CkbHepler {
   async buildTransfer(options: ckb_TransferOptions) {
     const sudtScript = getSudtTypeScript(isMainnet);
     const xudtScript = getXudtTypeScript(isMainnet);
-    const sporeScript = getSporeTypeScript(isMainnet);
+    // const sporeScript = getSporeTypeScript(isMainnet);
 
     if (
       options.typeScript &&
@@ -233,6 +229,8 @@ export class CkbHepler {
   // build sudt and xudt transfer
   async sudt_xudt_buildTransfer(options: ckb_TransferOptions) {
     let txSkeleton = helpers.TransactionSkeleton({ cellProvider: indexer });
+
+    console.log("---options",options)
 
     const sudtToken = options.typeScript;
     if (!sudtToken) {
@@ -322,24 +320,22 @@ export class CkbHepler {
       throw new Error("Not enough sudt amount");
     }
 
-    console.log("inputs_sudt",inputs_sudt)
+
     for (let i = 0; i < inputs_sudt.length; i++) {
       const input = inputs_sudt[i];
       input.cellOutput.capacity = "0x0";
 
-      txSkeleton = txSkeleton.update("inputs", (inputs) => inputs.push(input))
-      // txSkeleton = await commons.common.setupInputCell(txSkeleton, input,fromAddress,{ config: CONFIG });
-
-
+      if(options.walletName === "joyidckb"){
+        txSkeleton = await commons.common.setupInputCell(txSkeleton, input,fromAddress,{ config: CONFIG });
+      }else{
+        txSkeleton = txSkeleton.update("inputs", (inputs) => inputs.push(input))
+      }
     }
-
-
 
     let outputCapacity = BI.from(0);
 
     const outputData = number.Uint128LE.pack(options.amount);
     const newOutputData = outputData;
-
 
 
     const outputs_sudt: Cell = {
@@ -509,41 +505,47 @@ export class CkbHepler {
       }
     }
 
-
-    const firstIndex = txSkeleton
-        .get("inputs")
-        .findIndex((input) =>
-            bytes.equal(blockchain.Script.pack(input.cellOutput.lock), blockchain.Script.pack(fromScript))
-        );
-    if (firstIndex !== -1) {
-      while (firstIndex >= txSkeleton.get("witnesses").size) {
-        txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.push("0x"));
+    if(options.walletName === "joyidckb"){
+      txSkeleton = commons.common.prepareSigningEntries(txSkeleton);
+    }else{
+      const firstIndex = txSkeleton
+          .get("inputs")
+          .findIndex((input) =>
+              bytes.equal(blockchain.Script.pack(input.cellOutput.lock), blockchain.Script.pack(fromScript))
+          );
+      if (firstIndex !== -1) {
+        while (firstIndex >= txSkeleton.get("witnesses").size) {
+          txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.push("0x"));
+        }
+        let witness = txSkeleton.get("witnesses").get(firstIndex);
+        const newWitnessArgs:any = {
+          /* 65-byte zeros in hex */
+          lock: "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        };
+        if (witness !== "0x") {
+          const witnessArgs = blockchain.WitnessArgs.unpack(bytes.bytify(witness!));
+          const lock = witnessArgs.lock;
+          if (!!lock && !!newWitnessArgs.lock && !bytes.equal(lock, newWitnessArgs.lock)) {
+            throw new Error("Lock field in first witness is set aside for signature!");
+          }
+          const inputType = witnessArgs.inputType;
+          if (!!inputType) {
+            newWitnessArgs.inputType = inputType;
+          }
+          const outputType = witnessArgs.outputType;
+          if (!!outputType) {
+            newWitnessArgs.outputType = outputType;
+          }
+        }
+        witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
+        txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.set(firstIndex, witness));
       }
-      let witness = txSkeleton.get("witnesses").get(firstIndex);
-      const newWitnessArgs:any = {
-        /* 65-byte zeros in hex */
-        lock: "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-      };
-      if (witness !== "0x") {
-        const witnessArgs = blockchain.WitnessArgs.unpack(bytes.bytify(witness));
-        const lock = witnessArgs.lock;
-        if (!!lock && !!newWitnessArgs.lock && !bytes.equal(lock, newWitnessArgs.lock)) {
-          throw new Error("Lock field in first witness is set aside for signature!");
-        }
-        const inputType = witnessArgs.inputType;
-        if (!!inputType) {
-          newWitnessArgs.inputType = inputType;
-        }
-        const outputType = witnessArgs.outputType;
-        if (!!outputType) {
-          newWitnessArgs.outputType = outputType;
-        }
-      }
-      witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
-      txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.set(firstIndex, witness));
     }
+
+
+
     return txSkeleton;
-   
+
   }
 
   // send transaction
@@ -749,7 +751,7 @@ export class CkbHepler {
           page + 1
         }&page_size=10&sort=time.desc`,
       })
-      .catch((err) => {
+      .catch((err:any) => {
         console.error(err);
       });
 
@@ -766,7 +768,7 @@ export class CkbHepler {
       .send({
         req: url,
       })
-      .catch((err) => {
+      .catch((err:any) => {
         console.error(err);
       });
 
