@@ -1,8 +1,8 @@
 import { getEnv } from "../../settings/env";
-import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, CONFIG, getSporeTypeScript, getXudtTypeScript, MainnetInfo, TestnetInfo } from "../../settings/variable";
+import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, getSporeTypeScript, getXudtTypeScript} from "../../settings/variable";
 import { ckb_SporeInfo, ckb_UDTInfo } from "../../types/BTC";
 import { number } from "@ckb-lumos/codec";
-import { BI, Cell, config, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
+import { BI, Cell, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
 import superagent from "superagent";
 
 // config.initializeConfig(CONFIG);
@@ -50,7 +50,7 @@ export const getSpore = async(address: string) => {
 
 
 export const getXudtAndSpore = async(address: string) => {
-    const cfg = getEnv() === 'Mainnet' ? TestnetInfo : MainnetInfo;
+    // const cfg = getEnv() === 'Mainnet' ? TestnetInfo : MainnetInfo;
 
     const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
     const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');

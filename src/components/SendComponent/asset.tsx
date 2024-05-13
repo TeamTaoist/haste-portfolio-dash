@@ -127,7 +127,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | RgbAssert)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   // const wallets = useSelector((state: RootState) => state.wallet.wallets);
-  const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
+  // const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const [reloadData,setReloadData] = useState([])
 
 
@@ -140,6 +140,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
 
   const refreshDom = () =>{
     setReloadData([])
+    console.log(reloadData)
   }
 
 
@@ -170,7 +171,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
 
     //@ts-ignore
     setXudtList(result)
-    setFilteredTokens(result);
+    setFilteredTokens(result as any);
     setIsLoading(false);
   }
 
@@ -180,7 +181,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
     if ( chain && chain === 'btc') {
       await _getRgbAsset(selectWallet?.address!!)
     } else if (chain && chain === 'ckb') {
-      const list = await _getSporeAndXudt(selectWallet?.address!!);
+      await _getSporeAndXudt(selectWallet?.address!!);
     }
   }
 
@@ -253,12 +254,13 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
 
   const getCurrentAssets = async() => {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
+    console.log(selectWallet)
 
     const chain = currentWallet?.chain;
     if ( chain && chain === 'btc') {
 
     } else if (chain && chain === 'ckb') {
-      const list = await _getSpore(currentWallet?.address!!);
+      await _getSpore(currentWallet?.address!!);
     }
   }
 

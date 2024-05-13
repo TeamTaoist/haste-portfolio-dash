@@ -1,6 +1,7 @@
 import { BI, Cell, Script, helpers } from "@ckb-lumos/lumos";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { Buffer } from 'buffer/';
 
 import {
   PERSONAL,

@@ -1,7 +1,6 @@
 
 import {
   Copy,
-  ChevronRight,
   CircleArrowOutUpRight,
   CircleArrowOutDownLeft,
   ExternalLink,
@@ -39,7 +38,7 @@ const TokenBlock = ({
         {type === TRANSACTION_TYPE.RECEIVE ? (
           <div className="text-lime-600">+{amount}</div>
         ) : (
-          <div className="text-red-600">-{Math.abs(amount)}</div>
+          <div className="text-red-600">-{Math.abs(Number(amount))}</div>
         )}
         <div className="text-slate-600 uppercase">{token}</div>
       </div>
@@ -47,49 +46,49 @@ const TokenBlock = ({
   );
 };
 
-const AccountBlock = ({token, address,type}:{ token: string, address: string,type:TRANSACTION_TYPE;}) => {
-  return (
-    <div className="flex items-center gap-2">
-      <img
-        width={32}
-        height={32}
-        src={`/img/${token}.png`}
-        alt=""
-        className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
-      />
-      <div className="">
-        <span>{type === TRANSACTION_TYPE.SEND ? "To" : "From"}</span>
-        <div className="text-slate-600">{address}</div>
-      </div>
-    </div>
-  );
-};
+// const AccountBlock = ({token, address,type}:{ token: string, address: string,type:TRANSACTION_TYPE;}) => {
+//   return (
+//     <div className="flex items-center gap-2">
+//       <img
+//         width={32}
+//         height={32}
+//         src={`/img/${token}.png`}
+//         alt=""
+//         className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
+//       />
+//       <div className="">
+//         <span>{type === TRANSACTION_TYPE.SEND ? "To" : "From"}</span>
+//         <div className="text-slate-600">{address}</div>
+//       </div>
+//     </div>
+//   );
+// };
 
-const ReceiveBlock = ({ amount, token, address,type }: { amount: number | string, token: string, address: string ,type:TRANSACTION_TYPE}) => {
-  return (
-    <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
-      <AccountBlock token={token} address={address} type={type} />
-      <div className="mx-1 sm:mx-2 text-sm">
-        <ChevronRight />
-      </div>
-      <TokenBlock amount={amount} type={TRANSACTION_TYPE.RECEIVE} token={ token } />
-    </div>
-  );
-};
+// const ReceiveBlock = ({ amount, token, address,type }: { amount: number | string, token: string, address: string ,type:TRANSACTION_TYPE}) => {
+//   return (
+//     <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
+//       <AccountBlock token={token} address={address} type={type} />
+//       <div className="mx-1 sm:mx-2 text-sm">
+//         <ChevronRight />
+//       </div>
+//       <TokenBlock amount={amount} type={TRANSACTION_TYPE.RECEIVE} token={ token } />
+//     </div>
+//   );
+// };
 
-const SendBlock = ({ amount, token, address,type }: { amount: number | string, token: string, address: string ,type:TRANSACTION_TYPE }) => {
-  return (
-    <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
-      <TokenBlock amount={amount} type={TRANSACTION_TYPE.SEND} token={token} />
-      <div className="mx-1 sm:mx-2 text-sm">
-        <ChevronRight />
-      </div>
-      <AccountBlock token={token} address={address}  type={type} />
-    </div>
-  );
-};
+// const SendBlock = ({ amount, token, address,type }: { amount: number | string, token: string, address: string ,type:TRANSACTION_TYPE }) => {
+//   return (
+//     <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
+//       <TokenBlock amount={amount} type={TRANSACTION_TYPE.SEND} token={token} />
+//       <div className="mx-1 sm:mx-2 text-sm">
+//         <ChevronRight />
+//       </div>
+//       <AccountBlock token={token} address={address}  type={type} />
+//     </div>
+//   );
+// };
 
-const BalanceBlock = ({ amount, token, address,type }: { amount: number | string, token: string, address: string ,type:TRANSACTION_TYPE }) => {
+const BalanceBlock = ({ amount, token,type }: { amount: number | string, token: string, address?: string ,type:TRANSACTION_TYPE }) => {
     return (
         <div className="flex sm:flex-1 sm:justify-start items-center space-x-2 sm:space-x-4">
             <TokenBlock amount={amount} type={type} token={token} />
@@ -116,7 +115,6 @@ export default function TransactionItem({
   type,
   amount,
   token,
-  from,
   to,
   hours,
   transaction,

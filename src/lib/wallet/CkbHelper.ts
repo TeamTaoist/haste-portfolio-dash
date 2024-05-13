@@ -1,6 +1,5 @@
 import {
   BI,
-  Cell,
   Indexer,
   RPC,
   Script,
@@ -27,7 +26,6 @@ import { createJoyIDScriptInfo } from "./joyid";
 import {
   backend,
   getSporeTypeScript,
-  getSudtTypeScript,
   getXudtTypeScript,
   mainConfig,
   testConfig,
@@ -218,9 +216,9 @@ export class CkbHepler {
   async buildTransfer(options: ckb_TransferOptions) {
     const cfg =  getEnv() === 'Testnet' ? testConfig : mainConfig;
 
-    const sudtScript = getSudtTypeScript(cfg.isMainnet);
-    const xudtScript = getXudtTypeScript(cfg.isMainnet);
-    const sporeScript = getSporeTypeScript(cfg.isMainnet);
+    // const sudtScript = getSudtTypeScript(cfg.isMainnet);
+    // const xudtScript = getXudtTypeScript(cfg.isMainnet);
+    // const sporeScript = getSporeTypeScript(cfg.isMainnet);
 
     // if (
     //   options.typeScript &&

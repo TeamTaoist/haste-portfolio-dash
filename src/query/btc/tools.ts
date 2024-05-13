@@ -1,8 +1,8 @@
 import { getEnv } from "../../settings/env";
 import { WalletType } from "../../types/BTC";
 import {
-  requestAccounts,
-  getPublicKey,
+  // requestAccounts,
+  // getPublicKey,
   signPsbt
 } from "@joyid/bitcoin";
 import { getBTC } from "./memepool";

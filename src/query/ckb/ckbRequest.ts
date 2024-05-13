@@ -42,7 +42,7 @@ import {
   CKB_INDEX_URL,
   CKB_RPC_URL,
   CONFIG,
-  getSporeDep,
+  // getSporeDep,
   getSporeTypeScript,
   getSudtDep,
   getSudtTypeScript,

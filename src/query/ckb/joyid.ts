@@ -6,14 +6,14 @@ import {
   helpers,
   Script,
   Cell,
-  utils,
-  CellDep,
+  // utils,
+  // CellDep,
 } from "@ckb-lumos/lumos";
 import type * as api from "@ckb-lumos/base";
 import {
   getJoyIDLockScript,
   getJoyIDCellDep,
-  Aggregator,
+  // Aggregator,
   getConfig,
   // connect,
 } from "@joyid/ckb";
@@ -146,7 +146,7 @@ export function createJoyIDScriptInfo(): commons.LockScriptInfo {
           console.log("JoyID config: ", getConfig());
           // console.log("JoyID connection: ", connection);
 
-          const lock = helpers.parseAddress(wallet.address);
+          // const lock = helpers.parseAddress(wallet.address);
 
           // will change if the connection.keyType is a sub_key
           let newWitnessArgs: WitnessArgs = {

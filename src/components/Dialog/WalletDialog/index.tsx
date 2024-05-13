@@ -1,5 +1,4 @@
 import ModalContext from '../../../context/ModalContext';
-import { getBTCAsset } from '../../../query/btc/tools';
 import { RootState } from '../../../store/store';
 import { addWalletItem } from '../../../store/wallet/walletSlice';
 import {JoyIDBTCconnect, JoyIDCKBConnect, OKXConnect, ReiConnect, UnisatConnect} from '../../../utils/connect';
@@ -7,7 +6,6 @@ import { enqueueSnackbar } from 'notistack';
 import React, { useContext, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { getCKBCapacity } from '../../../query/ckb/tools';
 
 import UnisatImg from "../../../assets/img/unisat.png";
 import JoyidImg from "../../../assets/img/joyid.png";
@@ -25,16 +23,16 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const _getBTCBalance = async (address: string) => {
-    const rlt = await getBTCAsset(address);
-
-    return rlt
-  }
-
-  const _getCKBCapacity = async (address: string) => {
-    const rlt = await getCKBCapacity(address);
-    return rlt
-  }
+  // const _getBTCBalance = async (address: string) => {
+  //   const rlt = await getBTCAsset(address);
+  //
+  //   return rlt
+  // }
+  //
+  // const _getCKBCapacity = async (address: string) => {
+  //   const rlt = await getCKBCapacity(address);
+  //   return rlt
+  // }
 
   const checkWalletByAddress = async (props: {
     address: string,
@@ -45,7 +43,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     if(wallets.some(wallet => wallet.address === props.address)) {
       enqueueSnackbar("Account Already Connected", {variant: "error"})
     } else {
-      let balance;
+      // let balance;
       onClose();
       console.log('here close')
       // if(props.chain === 'btc') {

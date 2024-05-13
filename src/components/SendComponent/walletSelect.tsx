@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { formatString } from "../../utils/common";
 import { WalletItem } from "../../store/wallet/walletSlice";
 import { ChevronDown, Check } from "lucide-react";

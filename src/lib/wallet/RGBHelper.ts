@@ -269,10 +269,10 @@ export class RGBHelper {
 
     const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex,  btc_wallet?.walletName!);
 
-    const rgbppState = await service.sendRgbppCkbTransaction({
-      btc_txid: btcTxId,
-      ckb_virtual_result: ckbVirtualTxResult,
-    });
+    // const rgbppState = await service.sendRgbppCkbTransaction({
+    //   btc_txid: btcTxId,
+    //   ckb_virtual_result: ckbVirtualTxResult,
+    // });
 
 
     await this.retryBtcTxId(btcTxId);
@@ -292,10 +292,10 @@ export class RGBHelper {
     const cfg = getEnv() ? testConfig : mainConfig;
 
 
-    const sudtBalance = await CkbHepler.instance.sudtBalance(
-      ckb_wallet.address,
-      typeScript
-    );
+    // const sudtBalance = await CkbHepler.instance.sudtBalance(
+    //   ckb_wallet.address,
+    //   typeScript
+    // );
 
     const collector = new Collector({
       ckbNodeUrl: cfg.CKB_RPC_URL,

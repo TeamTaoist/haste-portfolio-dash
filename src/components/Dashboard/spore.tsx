@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { getXudtAndSpore } from "../../query/ckb/tools";
 import { ckb_SporeInfo } from "../../types/BTC";
-import { formatString, isImageMIMEType } from "../../utils/common";
+import { formatString } from "../../utils/common";
 import {getSporeById, unpackToRawSporeData} from "@spore-sdk/core";
 import {sporeConfig} from "../../utils/config.ts";
 import { Buffer } from 'buffer/';
@@ -47,7 +47,7 @@ export default function SporeList() {
   const _getSpore = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
     const list = await handleSporeList(assetsList.sporeList)
-    setSpores(list);
+    setSpores(list as any);
     setIsLoading(false);
   }
 
@@ -65,17 +65,17 @@ export default function SporeList() {
     getCurrentAssets()
   }, [currentAddress])
 
-  const getImg = async(id:string,type:string) =>{
+  const getImg = async(id:string) =>{
     const cell = await getSporeById(id, sporeConfig)
     const spore = unpackToRawSporeData(cell.data);
 
     const buffer = Buffer.from(spore.content.toString().slice(2), 'hex');
-    const base64 = Buffer.from(buffer, "binary" ).toString("base64");
+    const base64 = Buffer.from(buffer as any, "binary").toString("base64");
 
-    type = spore.contentType;
+    let type = spore.contentType;
     let textContent,image;
     if( type.indexOf("text") > -1){
-      textContent =  Buffer.from(buffer, "binary" ).toString()
+      textContent =  Buffer.from(buffer as any, "binary" ).toString()
     }else{
       image = `data:${spore.contentType};base64,${base64}`;
     }
