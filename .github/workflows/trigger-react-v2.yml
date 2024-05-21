@@ -2,7 +2,7 @@ name: trigger-netlify-build | react-v2 Branch
 
 on:
   push:
-    branches: [ feature/react-v2 ]
+    branches: [ react-v2 ]
 
 jobs:
   trigger:
