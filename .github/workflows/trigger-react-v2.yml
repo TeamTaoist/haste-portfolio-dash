@@ -1,0 +1,12 @@
+name: trigger-netlify-build | react-v2 Branch
+
+on:
+  push:
+    branches: [ feature/react-v2 ]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl request
+        run: curl -X POST -d {} "https://api.netlify.com/build_hooks/664cdb8c82b5cb1ec24050e9"
