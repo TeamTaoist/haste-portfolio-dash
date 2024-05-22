@@ -137,7 +137,7 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
         walletName: 'joyidckb',
         pubKey: rlt.publickKey
       });
-      enqueueSnackbar("Connect JoyID BTC Wallet Successful", {variant: 'success'});
+      enqueueSnackbar("Connect JoyID CKB Wallet Successful", {variant: 'success'});
     } catch {
       enqueueSnackbar("Connect Failed", {variant: 'error'});
     }finally {
