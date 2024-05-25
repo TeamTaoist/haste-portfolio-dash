@@ -5,8 +5,8 @@ import { initializeWallets } from '../../store/wallet/walletSlice';
 import { AlignJustify, ChevronsLeft, ChevronsRight, LayoutDashboard, NotebookText, SendToBack } from 'lucide-react';
 import DropdownSelect from '../MobileMenu';
 import {useNavigate,useLocation} from "react-router-dom";
-import LogoImg from "../../assets/img/logo.png"
-
+import LogoImg from "../../assets/img/hasteLogo.png"
+import LogoCol from "../../assets/img/logo.png";
 
 const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
@@ -44,16 +44,16 @@ const ResponsiveSidebar: React.FC = () => {
             ${isColleapse ? 'left-0 w-47' : 'w-14'} 
             h-full bg-white text-black transition-width duration-300`}>
           <div className='h-12 relative flex items-center justify-center group'>
-            <div className=' font-Montserrat text-hd2mb capitalize logo flex gap-4 pl-4 pb-5'>
+            <div className=' font-Montserrat text-hd2mb capitalize logo flex gap-4 pl-2 pb-5'>
 
               {
                 isColleapse && <>
                     <img src={LogoImg} alt=""/>
-                    <span>Haste</span>
+                    {/*<span>Haste</span>*/}
                   </>
               }
               {
-                  !isColleapse && <img src={LogoImg} alt=""/>
+                  !isColleapse && <img src={LogoCol} alt=""/>
               }
             </div>
             <div
