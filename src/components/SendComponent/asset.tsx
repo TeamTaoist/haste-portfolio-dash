@@ -265,7 +265,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
         {/*  className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"*/}
         {/*/>*/}
         <div>
-          <p className="text-xs sm:text-sm leading-5 font-semibold">{udt?.cellOutput?getSymbol(udt?.cellOutput?.type):getSymbol(udt?.type_script)}</p>
+          <p className="text-xs sm:text-sm leading-5 font-semibold uppercase">{udt?.cellOutput?getSymbol(udt?.cellOutput?.type):getSymbol(udt?.type_script)}</p>
           <p className="sm:text-xs font-normal text-slate-300">{udt?.ckbCellInfo?.symbol}</p>
         </div>
       </div>

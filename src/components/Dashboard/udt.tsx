@@ -154,7 +154,7 @@ export default function UDTList() {
                           </div>
                           <div>
 
-                            <p className="font-semibold">{xudt?.cellOutput?getSymbol(xudt?.cellOutput?.type):getSymbol(xudt?.type_script)}</p>
+                            <p className="font-semibold uppercase">{xudt?.cellOutput?getSymbol(xudt?.cellOutput?.type):getSymbol(xudt?.type_script)}</p>
 
                             {/*<p className="font-bold">{xudt && xudt.symbol}</p>*/}
 
