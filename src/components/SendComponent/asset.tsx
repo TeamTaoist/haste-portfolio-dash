@@ -12,7 +12,7 @@ import {ckb_SporeInfo, ckb_UDTInfo, RgbAssert} from "../../types/BTC";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store/store";
 import {formatString} from "../../utils/common";
-import {getRgbAssets, getRgbppAssert} from "../../query/rgbpp/tools";
+import {getRgbAssets} from "../../query/rgbpp/tools";
 import {formatUnit} from "@ckb-lumos/bi";
 import {WalletItem} from "../../store/wallet/walletSlice";
 import { getSymbol } from "../../lib/utils";
@@ -169,7 +169,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
     })
 
 
-    const groupedData = udtList.reduce((acc:any, obj) => {
+    const groupedData = udtList.reduce((acc:any, obj:any) => {
       const key= obj?.cellOutput?.type?.args! ;
       if (!acc[key]) {
         acc[key] = { category: key, sum: BI.from(0),...obj };

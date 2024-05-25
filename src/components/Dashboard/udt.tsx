@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from "../../store/store";
 import { getXudtAndSpore } from "../../query/ckb/tools";
 import { ckb_SporeInfo, ckb_UDTInfo } from "../../types/BTC";
-import {getRgbAssets, getRgbppAssert} from "../../query/rgbpp/tools";
+import {getRgbAssets} from "../../query/rgbpp/tools";
 import { getSymbol } from "../../lib/utils";
 import { formatUnit } from "@ckb-lumos/bi";
 import Loading from "../loading";
@@ -59,7 +59,7 @@ export default function UDTList() {
     })
 
 
-    const groupedData = udtList.reduce((acc:any, obj) => {
+    const groupedData = udtList.reduce((acc:any, obj:any) => {
       const key= obj?.cellOutput?.type?.args! ;
       if (!acc[key]) {
         acc[key] = { category: key, sum: BI.from(0),...obj };

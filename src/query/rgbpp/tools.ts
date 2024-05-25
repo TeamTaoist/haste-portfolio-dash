@@ -5,8 +5,6 @@ import { helpers } from "@ckb-lumos/lumos";
 import { getXudtAndSpore } from "../ckb/tools";
 import { buildRgbppLockArgs, genRgbppLockScript } from "@rgbpp-sdk/ckb"
 import superagent from "superagent";
-import {BtcAssetsApi} from "@rgbpp-sdk/service";
-import {DataSource} from "@rgbpp-sdk/btc";
 import {mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 
 
