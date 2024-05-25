@@ -12,12 +12,15 @@ import {ckb_SporeInfo, ckb_UDTInfo, RgbAssert} from "../../types/BTC";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store/store";
 import {formatString} from "../../utils/common";
-import {getRgbppAssert} from "../../query/rgbpp/tools";
+import {getRgbAssets, getRgbppAssert} from "../../query/rgbpp/tools";
 import {formatUnit} from "@ckb-lumos/bi";
 import {WalletItem} from "../../store/wallet/walletSlice";
 import { getSymbol } from "../../lib/utils";
 import {EventType} from "../../lib/enum";
 import {BI} from "@ckb-lumos/lumos";
+import {getXudtTypeScript} from "../../settings/variable.ts";
+import {getEnv} from "../../settings/env.ts";
+import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
 
 export enum ASSET_TYPE {
   UDT,
@@ -123,7 +126,7 @@ type AssetRef = {
 
 const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, ref) => {
   // const [tokens] = useState(new Array(100).fill(0));
-  const [filteredTokens, setFilteredTokens] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | RgbAssert)[]>([]);
+  const [filteredTokens, setFilteredTokens] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | RgbAssert | any)[]>([]);
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | RgbAssert)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   // const wallets = useSelector((state: RootState) => state.wallet.wallets);
@@ -152,27 +155,59 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   }
 
   const _getRgbAsset = async(address: string) => {
-    const assetsList = await getRgbppAssert(address);
-    const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
+
+    const list = await getRgbAssets(address);
+
+    const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
+    const {codeHash} = xudtTypeScript
+
+    const udtList = list.filter((item:any)=>item.cellOutput.type.codeHash === codeHash);
+
+    udtList.map((item:any)=>{
+      item.amount  = unpackAmount(item.data).toString();
+
+    })
 
 
-    const groupedData = rgbAssetList.reduce((acc:any, obj) => {
-      const key= obj?.ckbCellInfo?.type_script?.args! ;
+    const groupedData = udtList.reduce((acc:any, obj) => {
+      const key= obj?.cellOutput?.type?.args! ;
       if (!acc[key]) {
         acc[key] = { category: key, sum: BI.from(0),...obj };
       }
-      acc[key].sum = acc[key].sum.add((obj?.ckbCellInfo?.amount));
+      acc[key].sum = acc[key].sum.add((obj?.amount));
 
       return acc;
     }, {});
 
 
     const result = Object.values(groupedData);
-
-    //@ts-ignore
-    setXudtList(result)
+    // @ts-ignore
+    setXudtList(result as any)
     setFilteredTokens(result as any);
     setIsLoading(false);
+
+
+    // const assetsList = await getRgbppAssert(address);
+    // const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
+    //
+    //
+    // const groupedData = rgbAssetList.reduce((acc:any, obj) => {
+    //   const key= obj?.ckbCellInfo?.type_script?.args! ;
+    //   if (!acc[key]) {
+    //     acc[key] = { category: key, sum: BI.from(0),...obj };
+    //   }
+    //   acc[key].sum = acc[key].sum.add((obj?.ckbCellInfo?.amount));
+    //
+    //   return acc;
+    // }, {});
+    //
+    //
+    // const result = Object.values(groupedData);
+    //
+    // //@ts-ignore
+    // setXudtList(result)
+    // setFilteredTokens(result as any);
+    // setIsLoading(false);
   }
 
   const getCurrentAssets = async() => {
@@ -230,7 +265,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
         {/*  className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"*/}
         {/*/>*/}
         <div>
-          <p className="text-xs sm:text-sm leading-5 font-semibold">{udt?.ckbCellInfo?getSymbol(udt?.ckbCellInfo?.type_script):getSymbol(udt?.type_script)}</p>
+          <p className="text-xs sm:text-sm leading-5 font-semibold">{udt?.cellOutput?getSymbol(udt?.cellOutput?.type):getSymbol(udt?.type_script)}</p>
           <p className="sm:text-xs font-normal text-slate-300">{udt?.ckbCellInfo?.symbol}</p>
         </div>
       </div>

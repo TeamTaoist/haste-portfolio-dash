@@ -4,6 +4,25 @@ import { getUtxo } from "../btc/memepool";
 import { helpers } from "@ckb-lumos/lumos";
 import { getXudtAndSpore } from "../ckb/tools";
 import { buildRgbppLockArgs, genRgbppLockScript } from "@rgbpp-sdk/ckb"
+import superagent from "superagent";
+import {BtcAssetsApi} from "@rgbpp-sdk/service";
+import {DataSource} from "@rgbpp-sdk/btc";
+import {mainConfig, testConfig} from "../../lib/wallet/constants.ts";
+
+
+export const getRgbAssets = async (address:string) =>{
+  const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
+
+  const result = await superagent
+      .get(`${cfg.BTC_ASSETS_API_URL}/rgbpp/v1/address/${address}/assets?no_cache=false`)
+      .set("Origin",cfg.BTC_ASSETS_ORGIN)
+      .set("Authorization",`Bearer ${cfg.BTC_ASSETS_TOKEN}`)
+  ;
+
+  if (result.status === 200) {
+    return result.body;
+  }
+}
 
 
 export const getRgbppAssert = async(address: string) => {

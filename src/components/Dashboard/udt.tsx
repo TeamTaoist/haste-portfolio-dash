@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from "../../store/store";
 import { getXudtAndSpore } from "../../query/ckb/tools";
 import { ckb_SporeInfo, ckb_UDTInfo } from "../../types/BTC";
-import { getRgbppAssert } from "../../query/rgbpp/tools";
+import {getRgbAssets, getRgbppAssert} from "../../query/rgbpp/tools";
 import { getSymbol } from "../../lib/utils";
 import { formatUnit } from "@ckb-lumos/bi";
 import Loading from "../loading";
@@ -15,9 +15,12 @@ import {
 import {EventType} from "../../lib/enum";
 
 import BtcImg from "../../assets/img/btc.png";
+import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
+import {getXudtTypeScript} from "../../settings/variable.ts";
+import {getEnv} from "../../settings/env.ts";
 
 export default function UDTList() {
-  const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined)[]>([]);
+  const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | any)[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
@@ -43,30 +46,37 @@ export default function UDTList() {
   }
 
   const _getRgbAsset = async(address: string) => {
-    const assetsList = await getRgbppAssert(address);
-    const rgbAssetList = assetsList.filter(asset => asset.ckbCellInfo);
+    const list = await getRgbAssets(address);
+
+    const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
+    const {codeHash} = xudtTypeScript
+
+    const udtList = list.filter((item:any)=>item.cellOutput.type.codeHash === codeHash);
+
+    udtList.map((item:any)=>{
+      item.amount  = unpackAmount(item.data).toString();
+
+    })
 
 
-    const groupedData = rgbAssetList.reduce((acc:any, obj) => {
-      const key= obj?.ckbCellInfo?.type_script?.args! ;
+    const groupedData = udtList.reduce((acc:any, obj) => {
+      const key= obj?.cellOutput?.type?.args! ;
       if (!acc[key]) {
         acc[key] = { category: key, sum: BI.from(0),...obj };
       }
-      acc[key].sum = acc[key].sum.add((obj?.ckbCellInfo?.amount));
+      acc[key].sum = acc[key].sum.add((obj?.amount));
 
       return acc;
     }, {});
 
 
     const result = Object.values(groupedData);
-    //@ts-ignore
-    // setXudtList(rgbAssetList)
-    setXudtList(result)
+    // @ts-ignore
+    setXudtList(result as any)
     setIsLoading(false);
   }
 
   const getCurrentAssets = async() => {
-
 
     try{
       const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
@@ -144,12 +154,12 @@ export default function UDTList() {
                           </div>
                           <div>
 
-                            <p className="font-semibold">{xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}</p>
+                            <p className="font-semibold">{xudt?.cellOutput?getSymbol(xudt?.cellOutput?.type):getSymbol(xudt?.type_script)}</p>
 
                             {/*<p className="font-bold">{xudt && xudt.symbol}</p>*/}
 
                             <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
-                              {xudt?.ckbCellInfo?getSymbol(xudt?.ckbCellInfo?.type_script):getSymbol(xudt?.type_script)}
+                              {xudt?.cellOutput?getSymbol(xudt?.cellOutput?.type):getSymbol(xudt?.type_script)}
                             </p>
                           </div>
                         </div>
