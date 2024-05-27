@@ -149,7 +149,7 @@ const AccountSidebar: React.FC = () => {
         <WalletModalContent onClose={() => setIsOpenWalletModal(false)}></WalletModalContent>
       </CustomModal>
       {deviceType === 'desktop' ? (
-        <div className={`pt-8
+        <div className={`pt-3
             ${isColleapse ? 'left-0 w-72' : 'w-14'} 
             h-full bg-gray-100 transition-width duration-300 border-r border-gray-300`}>
           <div className='h-12 relative flex items-center justify-center group'>
@@ -184,7 +184,7 @@ const AccountSidebar: React.FC = () => {
             }
           </div>
           </div>
-          <div className='flex flex-col mt-8 border-t border-gray-200'>
+          <div className='flex flex-col mt-3 border-t border-gray-200'>
             {list.map(wallet => (
               <div key={wallet.address} className={` 
                 flex items-center py-2 border-b border-gray-200 ba cursor-pointer firstLi
