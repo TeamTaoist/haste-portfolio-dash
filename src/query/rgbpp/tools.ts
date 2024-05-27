@@ -12,8 +12,7 @@ export const getRgbAssets = async (address:string) =>{
   const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
 
   const result = await superagent
-      .get(`${cfg.BTC_ASSETS_API_URL}/rgbpp/v1/address/${address}/assets?no_cache=false`)
-      .set("Origin",cfg.BTC_ASSETS_ORGIN)
+      .get(`${cfg.BTC_ASSETS_API_URL}/rgbpp/v1/address/${address}/assets`)
       .set("Authorization",`Bearer ${cfg.BTC_ASSETS_TOKEN}`)
   ;
 
