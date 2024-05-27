@@ -1,5 +1,8 @@
 import { CellDep, Script, config } from "@ckb-lumos/lumos";
 import { NetworkType } from "@rgbpp-sdk/btc";
+import {getEnv} from "../../settings/env.ts";
+
+export const CONFIG = getEnv() === 'Mainnet' ? config.MAINNET : config.TESTNET;
 
 export const testConfig = {
   isMainnet: false,
@@ -12,11 +15,6 @@ export const testConfig = {
   BTC_ASSETS_TOKEN:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU",
   BTC_ASSETS_ORGIN: "localhost",
-
-  // BTC_ASSETS_TOKEN:
-  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYWJvcm9jYSIsImF1ZCI6ImNhYm9yb2NhLnh5eiIsImlhdCI6MTcxMjA2MzIzMX0.j6E1CYS-l-7k2x9qscfdVsKPOaluxVwY8oYtarrPuk4",
-  // BTC_ASSETS_ORGIN: "caboroca.xyz",
-
 
   ckb_explorer_api: "testnet-api.explorer.nervos.org",
   rgb_networkType: NetworkType.TESTNET,
@@ -340,52 +338,27 @@ const MainnetInfo = {
   } as CKBComponents.CellDep,
 };
 
-export const getInscriptionInfoTypeScript = (isMainnet: boolean) =>
-  isMainnet
-    ? MainnetInfo.InscriptionInfoTypeScript
-    : TestnetInfo.InscriptionInfoTypeScript;
-export const getInscriptionInfoDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.InscriptionInfoDep : TestnetInfo.InscriptionInfoDep;
-
-export const getUniqueCellTypeScript = (isMainnet: boolean) =>
-  isMainnet
-    ? MainnetInfo.UniqueCellTypeScript
-    : TestnetInfo.UniqueCellTypeScript;
-export const getUniqueCellTypeDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.UniqueCellTypeDep : TestnetInfo.UniqueCellTypeDep;
-
-export const getJoyIDLockScript = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.JoyIDLockScript : TestnetInfo.JoyIDLockScript;
-export const getJoyIDCellDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.JoyIDLockDep : TestnetInfo.JoyIDLockDep;
 
 export const getCotaTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.CotaTypeScript : TestnetInfo.CotaTypeScript;
-export const getCotaCellDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.CotaTypeDep : TestnetInfo.CotaTypeDep;
-
-export const getDexLockScript = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.DexLockScript : TestnetInfo.DexLockScript;
-export const getDexCellDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.DexLockDep : TestnetInfo.DexLockDep;
 
 export const getXudtTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.XUDTTypeScript : TestnetInfo.XUDTTypeScript;
-export const getXudtDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.XUDTTypeDep : TestnetInfo.XUDTTypeDep;
-
-export const getSudtTypeScript = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.SUDTTypeScript : TestnetInfo.SUDTTypeScript;
-export const getSudtDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.SUDTTypeDep : TestnetInfo.SUDTTypeDep;
 
 export const getSporeTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.SporeTypeScript : TestnetInfo.SporeTypeScript;
-export const getSporeDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.SporeTypeDep : TestnetInfo.SporeTypeDep;
 
-export const getMNftTypeScript = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.MNftTypeScript : TestnetInfo.MNftTypeScript;
-export const getMNftDep = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.MNftTypeDep : TestnetInfo.MNftTypeDep;
+
+
+
+
+export const getXudtDep = (isMainnet: boolean) =>
+    isMainnet ? MainnetInfo.XUDTTypeDep : TestnetInfo.XUDTTypeDep;
+
+export const getSudtTypeScript = (isMainnet: boolean) =>
+    isMainnet ? MainnetInfo.SUDTTypeScript : TestnetInfo.SUDTTypeScript;
+export const getSudtDep = (isMainnet: boolean) =>
+    isMainnet ? MainnetInfo.SUDTTypeDep : TestnetInfo.SUDTTypeDep;
+
+
 

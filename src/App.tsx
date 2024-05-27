@@ -12,6 +12,22 @@ import Menu from "./components/Menu";
 import "./assets/css/layout.css"
 import "./assets/css/loading.css"
 import "./assets/css/globals.css"
+import styled from "styled-components";
+
+const BottomBox = styled.div`
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    background: #fff;
+    font-size: 10px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(17, 24, 39,0.5);
+    border-top: 1px solid #f2f2f2;
+`
 
 
 function App() {
@@ -41,16 +57,13 @@ function App() {
       <Router>
       <ReduxProvider>
           <DeviceDetector/>
-
-
           <div className="flex h-full" >
               <Menu/>
               {/*{children}*/}
-
               <RouterLink/>
-
           </div>
 
+          <BottomBox>Copyright &copy; haste.pro</BottomBox>
       </ReduxProvider>
       </Router>
   )

@@ -16,8 +16,8 @@ import {EventType} from "../../lib/enum";
 
 import BtcImg from "../../assets/img/btc.png";
 import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
-import {getXudtTypeScript} from "../../settings/variable.ts";
 import {getEnv} from "../../settings/env.ts";
+import {getXudtTypeScript} from "../../lib/wallet/constants.ts";
 
 export default function UDTList() {
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | any)[]>([]);
@@ -45,24 +45,25 @@ export default function UDTList() {
     setReloadData([])
   }
 
-  const _getRgbAsset = async(address: string) => {
+  const _getRgbAsset = async (address: string) => {
     const list = await getRgbAssets(address);
 
     const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
     const {codeHash} = xudtTypeScript
 
-    const udtList = list.filter((item:any)=>item.cellOutput.type.codeHash === codeHash);
+    const udtList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
 
-    udtList.map((item:any)=>{
-      item.amount  = unpackAmount(item.data).toString();
+
+    udtList.map((item: any) => {
+      item.amount = unpackAmount(item.data).toString();
 
     })
 
 
-    const groupedData = udtList.reduce((acc:any, obj:any) => {
-      const key= obj?.cellOutput?.type?.args! ;
+    const groupedData = udtList.reduce((acc: any, obj: any) => {
+      const key = obj?.cellOutput?.type?.args!;
       if (!acc[key]) {
-        acc[key] = { category: key, sum: BI.from(0),...obj };
+        acc[key] = {category: key, sum: BI.from(0), ...obj};
       }
       acc[key].sum = acc[key].sum.add((obj?.amount));
 
@@ -74,7 +75,7 @@ export default function UDTList() {
     // @ts-ignore
     setXudtList(result as any)
     setIsLoading(false);
-  }
+  };
 
   const getCurrentAssets = async() => {
 

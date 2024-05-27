@@ -18,9 +18,9 @@ import {WalletItem} from "../../store/wallet/walletSlice";
 import { getSymbol } from "../../lib/utils";
 import {EventType} from "../../lib/enum";
 import {BI} from "@ckb-lumos/lumos";
-import {getXudtTypeScript} from "../../settings/variable.ts";
 import {getEnv} from "../../settings/env.ts";
 import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
+import {getXudtTypeScript} from "../../lib/wallet/constants.ts";
 
 export enum ASSET_TYPE {
   UDT,

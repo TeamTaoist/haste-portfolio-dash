@@ -36,25 +36,26 @@ import {
   UdtInfo,
 } from "../../types/BTC";
 import store from "../../store/store";
+import { getEnv } from "../../settings/env";
+import {getSecp256k1CellDep, MAX_FEE} from "@rgbpp-sdk/ckb";
 import {
   backend,
-  ckb_explorer_api,
-  CKB_INDEX_URL,
-  CKB_RPC_URL,
-  CONFIG,
-  // getSporeDep,
-  getSporeTypeScript,
+  CONFIG, getSporeTypeScript,
   getSudtDep,
   getSudtTypeScript,
   getXudtDep,
   getXudtTypeScript,
-} from "../../settings/variable";
-import { getEnv } from "../../settings/env";
-import {getSecp256k1CellDep, MAX_FEE} from "@rgbpp-sdk/ckb";
+  mainConfig,
+  testConfig
+} from "../../lib/wallet/constants.ts";
 
+let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
+let indexURL = getEnv() === 'Mainnet'?mainConfig.CKB_INDEX_URL:testConfig.CKB_INDEX_URL
 
-const rpc = new RPC(CKB_RPC_URL);
-const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
+const rpc = new RPC(rpcURL);
+const indexer = new Indexer(indexURL, rpcURL);
+
+let explorerUrl = getEnv() === 'Mainnet' ?  mainConfig.ckb_explorer_api : testConfig.ckb_explorer_api
 
 const isMainnet = getEnv() == "Testnet" ? false : true;
 
@@ -747,7 +748,7 @@ export class CkbHepler {
       .post(`${backend}/api/explore`)
       .set("Content-Type", "application/json")
       .send({
-        req: `https://${ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
+        req: `https://${explorerUrl}/api/v1/address_transactions/${address}?page=${
           page + 1
         }&page_size=10&sort=time.desc`,
       })
@@ -779,21 +780,21 @@ export class CkbHepler {
 
   async getAddressInfo(address: string): Promise<ckb_AddressInfo | undefined> {
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/suggest_queries?q=${address}`
+      `https://${explorerUrl}/api/v1/suggest_queries?q=${address}`
     );
     return result;
   }
 
   async getUDTInfo(type_hash: string) {
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/udts/${type_hash}`
+      `https://${explorerUrl}/api/v1/udts/${type_hash}`
     );
     return result;
   }
 
   async getAddress(address: string) {
     const result = await this.sendExploreApi(
-      `https://${ckb_explorer_api}/api/v1/addresses?q=${address}`
+      `https://${explorerUrl}/api/v1/addresses?q=${address}`
     );
     return result;
   }

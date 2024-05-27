@@ -1,14 +1,18 @@
 import { getEnv } from "../../settings/env";
-import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, getSporeTypeScript, getXudtTypeScript} from "../../settings/variable";
+// import { backend, ckb_explorer_api, CKB_INDEX_URL, CKB_RPC_URL, getSporeTypeScript, getXudtTypeScript} from "../../settings/variable";
 import { ckb_SporeInfo, ckb_UDTInfo } from "../../types/BTC";
 import { number } from "@ckb-lumos/codec";
 import { BI, Cell, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
 import superagent from "superagent";
+import {backend, getSporeTypeScript, getXudtTypeScript, mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 
 // config.initializeConfig(CONFIG);
 
-export const rpc = new RPC(CKB_RPC_URL);
-export const indexer = new Indexer(CKB_INDEX_URL, CKB_RPC_URL);
+let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
+let indexURL = getEnv() === 'Mainnet'?mainConfig.CKB_INDEX_URL:testConfig.CKB_INDEX_URL
+
+export const rpc = new RPC(rpcURL);
+export const indexer = new Indexer(indexURL, rpcURL);
 
 export const getCKBCapacity = async (address: string) => {
   const collector = indexer.collector({
@@ -139,7 +143,7 @@ export const getTx = async(address: string, page: number = 0) => {
     .post(`${backend}/api/explore`)
     .set("Content-Type", "application/json")
     .send({
-      req: `https://${getEnv() === 'Mainnet' ? 'mainnet-api': 'testnet-api'}.${ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
+      req: `https://${getEnv() === 'Mainnet' ?  mainConfig.ckb_explorer_api : testConfig.ckb_explorer_api}/api/v1/address_transactions/${address}?page=${
         page + 1
       }&page_size=10&sort=time.desc`,
     })
