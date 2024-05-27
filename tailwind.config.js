@@ -37,8 +37,7 @@ export default {
         shimmerSpore: 'shimmerSpore 2s infinite linear'
       },
       fontFamily: {
-        'Montserrat': ['Montserrat'],
-        'SourceSanPro': ['SourceSanPro']
+        'Montserrat': ['Montserrat']
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
