@@ -23,6 +23,7 @@ import {getSymbol} from "../../lib/utils";
 import {RGBHelper} from "../../lib/wallet/RGBHelper";
 import {RgbAssert} from "../../lib/interface";
 import Loading from "../../components/loading";
+import {get_feeRate} from "../../query/ckb/feerate.ts";
 
 
 // import BtcImg from "../../assets/img/btc.png";
@@ -162,17 +163,35 @@ export default function SendContent() {
       const cfg = getEnv() === 'Mainnet' ? Main_Config.CKB_RPC_URL: Test_Config.CKB_RPC_URL ;
       const rpc = new RPC(cfg);
 
-      let sporeCell = await getSporeById(selectAsset?.data.amount, sporeConfig);
+      let feeRateRt = await get_feeRate();
+      let feeRate = BI.from(feeRateRt.median).toString()
 
-    let amount = parseUnit("3","ckb");
+      let sporeCell = await getSporeById(selectAsset?.data.amount, sporeConfig);
+      let outputCell = JSON.parse(JSON.stringify(sporeCell));
+        outputCell.cellOutput.lock = helpers.parseAddress(to, {config: sporeConfig.lumos});
+        let inputMin = helpers.minimalCellCapacityCompatible(sporeCell);
+        let outputMin = helpers.minimalCellCapacityCompatible(outputCell);
+
+        let minBi = outputMin.sub(inputMin.toString());
+
+        let amount:any;
+        if(minBi.gt("0")){
+            amount = minBi
+        }else{
+            amount = BI.from("0")
+        }
+
       const { txSkeleton } = await transferSpore({
         outPoint: sporeCell.outPoint!!,
         fromInfos: [selectWallet.address],
         toLock: helpers.parseAddress(to, {config: sporeConfig.lumos}),
         config: sporeConfig,
-          capacityMargin:amount,
+          feeRate,
+         capacityMargin:amount,
         useCapacityMarginAsFee:false
       });
+
+        console.log("=======txSkeleton=",txSkeleton)
       //@ts-ignore
 
         if(selectWallet.walletName === "joyidckb"){

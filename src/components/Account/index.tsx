@@ -44,8 +44,6 @@ const AccountSidebar: React.FC = () => {
   useEffect(() => {
     if(!(window as any).ckb || !wallets?.length) return;
 
-    console.log(wallets)
-
     const {ckb} = window as any;
     const walletArr = wallets.filter(w=>w.walletName === "rei")
 
@@ -56,7 +54,6 @@ const AccountSidebar: React.FC = () => {
       }
     });
     ckb.on('chainChanged', function () {
-      console.log("===chainChanged==")
       window.location.reload()
       if(walletArr.length){
         dispatch(removeWalletItem(walletArr[0].address));
