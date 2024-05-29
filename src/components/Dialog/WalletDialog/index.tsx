@@ -149,7 +149,6 @@ const WalletModalContent: React.FC<walletModalProps> = () => {
     setIsLoading(true);
     try {
       let rlt = await ReiConnect();
-      console.log("===rlt",rlt)
       checkWalletByAddress({
         address: rlt.account,
         chain: 'ckb',

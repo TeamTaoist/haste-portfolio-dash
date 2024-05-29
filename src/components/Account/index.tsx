@@ -42,6 +42,31 @@ const AccountSidebar: React.FC = () => {
   }, [wallets]);
 
   useEffect(() => {
+    if(!(window as any).ckb || !wallets?.length) return;
+
+    console.log(wallets)
+
+    const {ckb} = window as any;
+    const walletArr = wallets.filter(w=>w.walletName === "rei")
+
+    ckb.on('accountsChanged',()=>{
+      if(walletArr.length){
+        dispatch(removeWalletItem(walletArr[0].address));
+        navigate("/")
+      }
+    });
+    ckb.on('chainChanged', function () {
+      console.log("===chainChanged==")
+      window.location.reload()
+      if(walletArr.length){
+        dispatch(removeWalletItem(walletArr[0].address));
+        navigate("/")
+      }
+    });
+
+  }, [wallets]);
+
+  useEffect(() => {
     if(!(window as any).okxwallet?.bitcoin || !wallets?.length) return;
 
     const {okxwallet} = window as any;
