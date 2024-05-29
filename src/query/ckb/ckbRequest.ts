@@ -726,8 +726,8 @@ export class CkbHepler {
       lock,
       type: {
         script: {
-          codeHash: sporeType.codeHash,
-          hashType: sporeType.hashType,
+          codeHash: sporeType?.codeHash!,
+          hashType: sporeType?.hashType!,
           args: "0x",
         },
         searchMode: "prefix",
@@ -819,8 +819,8 @@ export class CkbHepler {
       lock: helpers.parseAddress(address),
       type: {
         script: {
-          codeHash: sporeTypeScript.codeHash,
-          hashType: sporeTypeScript.hashType,
+          codeHash: sporeTypeScript?.codeHash!,
+          hashType: sporeTypeScript?.hashType!,
           args: "0x",
         },
         searchMode: "prefix",

@@ -37,8 +37,8 @@ export const getSpore = async(address: string) => {
       lock,
       type: {
         script: {
-          codeHash: sporeType.codeHash,
-          hashType: sporeType.hashType,
+          codeHash: sporeType?.codeHash!,
+          hashType: sporeType?.hashType!,
           args: "0x",
         },
         searchMode: "prefix",
@@ -74,8 +74,8 @@ export const getXudtAndSpore = async(address: string) => {
       lock: helpers.parseAddress(address),
       type: {
         script: {
-          codeHash: sporeTypeScript.codeHash,
-          hashType: sporeTypeScript.hashType,
+          codeHash: sporeTypeScript?.codeHash!,
+          hashType: sporeTypeScript?.hashType!,
           args: "0x",
         },
         searchMode: "prefix",
@@ -86,6 +86,7 @@ export const getXudtAndSpore = async(address: string) => {
     const sporeList: ckb_SporeInfo[] = [];
 
     const xudtMap: { [key: string]: ckb_UDTInfo } = {};
+
 
     for await (const xudtCell of xudt_collector.collect()) {
       if (xudtCell.cellOutput.type) {
@@ -121,9 +122,11 @@ export const getXudtAndSpore = async(address: string) => {
     for await (const sporeCell of spore_collector.collect()) {
       if (sporeCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(sporeCell.cellOutput.type);
+
         //@ts-ignore
         sporeList.push({
           symbol: "DOBs",
+          data:sporeCell.data,
           amount: sporeCell.cellOutput.type.args,
           outPoint:sporeCell.outPoint,
           type_hash: typeHash,

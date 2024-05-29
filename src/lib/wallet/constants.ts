@@ -1,6 +1,7 @@
 import { CellDep, Script, config } from "@ckb-lumos/lumos";
 import { NetworkType } from "@rgbpp-sdk/btc";
 import {getEnv} from "../../settings/env.ts";
+import {predefinedSporeConfigs} from "@spore-sdk/core";
 
 export const CONFIG = getEnv() === 'Mainnet' ? config.MAINNET : config.TESTNET;
 
@@ -345,11 +346,12 @@ export const getCotaTypeScript = (isMainnet: boolean) =>
 export const getXudtTypeScript = (isMainnet: boolean) =>
   isMainnet ? MainnetInfo.XUDTTypeScript : TestnetInfo.XUDTTypeScript;
 
-export const getSporeTypeScript = (isMainnet: boolean) =>
-  isMainnet ? MainnetInfo.SporeTypeScript : TestnetInfo.SporeTypeScript;
+export const getSporeTypeScript = (isMainnet: boolean) => {
+  const config = isMainnet?predefinedSporeConfigs.Mainnet:predefinedSporeConfigs.Testnet;
+  const findV2 = config?.scripts?.Spore.versions.find((item)=>item.tags.includes("v2"))
 
-
-
+  return findV2?.script;
+}
 
 
 export const getXudtDep = (isMainnet: boolean) =>

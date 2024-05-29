@@ -160,6 +160,7 @@ export interface ckb_SporeInfo {
   amount: string;
   type_hash: string;
   type?: string;
+  data?: string;
   image?: string;
   udt_icon_file?: string;
   udt_type: "spore_cell";

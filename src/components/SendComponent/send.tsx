@@ -10,7 +10,7 @@ import {formatString} from "../../utils/common";
 import { CkbHepler } from "../../query/ckb/ckbRequest";
 import {BI, formatUnit} from "@ckb-lumos/bi";
 
-import { getSporeById,  transferSpore } from "@spore-sdk/core";
+import {getSporeById, transferSpore} from "@spore-sdk/core";
 import { sporeConfig } from "../../utils/config";
 import { helpers, RPC} from "@ckb-lumos/lumos";
 import { signRawTransaction } from "@joyid/ckb";
@@ -164,21 +164,15 @@ export default function SendContent() {
 
       let sporeCell = await getSporeById(selectAsset?.data.amount, sporeConfig);
 
-
-      //
-      // let feeRt = await rpc.getFeeRateStatistics();
-      // const {median} = feeRt;
-      //   console.log(median,BI.from(median))
-
-
+    let amount = parseUnit("3","ckb");
       const { txSkeleton } = await transferSpore({
         outPoint: sporeCell.outPoint!!,
         fromInfos: [selectWallet.address],
         toLock: helpers.parseAddress(to, {config: sporeConfig.lumos}),
         config: sporeConfig,
+          capacityMargin:amount,
+        useCapacityMarginAsFee:false
       });
-
-
       //@ts-ignore
 
         if(selectWallet.walletName === "joyidckb"){
@@ -419,13 +413,24 @@ export default function SendContent() {
                                   ) : (
                                       <div className="flex gap-2 items-center">
                                           <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-                                              <img
-                                                  src={`https://a-simple-demo.spore.pro/api/media/${selectAsset?.data?.amount}`}
-                                                  alt=""
-                                                  width={32}
-                                                  height={0}
-                                                  className="w-full object-cover block rounded-lg"
-                                              />
+                                              {/*<img*/}
+                                              {/*    src={`https://a-simple-demo.spore.pro/api/media/${selectAsset?.data?.amount}`}*/}
+                                              {/*    alt=""*/}
+                                              {/*    width={32}*/}
+                                              {/*    height={0}*/}
+                                              {/*    className="w-full object-cover block rounded-lg"*/}
+                                              {/*/>*/}
+                                              {
+                                                  // eslint-disable-next-line @next/next/no-img-element
+                                                  selectAsset?.data?.type?.startsWith('image') && <img src={selectAsset?.data?.image} alt="" className="w-full object-cover block rounded-lg" />
+                                              }
+                                              {
+                                                  // eslint-disable-next-line @next/next/no-img-element
+                                                  selectAsset?.data?.url && <img src={selectAsset?.data?.url} alt="" className="w-full object-cover block" />
+                                              }
+                                              {
+                                                  (!selectAsset?.data?.type?.startsWith('image') && !selectAsset?.data?.url) && <p className="p-3">{selectAsset?.data?.textContent}</p>
+                                              }
                                           </div>
                                           <div>{formatString(selectAsset?.data?.amount, 5)}</div>
                                       </div>

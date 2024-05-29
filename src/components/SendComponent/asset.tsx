@@ -11,7 +11,7 @@ import {getXudtAndSpore} from "../../query/ckb/tools";
 import {ckb_SporeInfo, ckb_UDTInfo, RgbAssert} from "../../types/BTC";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store/store";
-import {formatString} from "../../utils/common";
+import {formatString, getImg} from "../../utils/common";
 import {getRgbAssets} from "../../query/rgbpp/tools";
 import {formatUnit} from "@ckb-lumos/bi";
 import {WalletItem} from "../../store/wallet/walletSlice";
@@ -306,11 +306,20 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
 
   const _getSpore = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
-
-    setSpores(assetsList.sporeList);
-    setFilteredSpores(assetsList.sporeList);
+    const list = await handleSporeList(assetsList.sporeList)
+    setSpores(list as any);
+    setFilteredSpores(list as any);
     setIsLoading(false);
 
+  }
+
+  const handleSporeList = async(list: ckb_SporeInfo[]) => {
+
+    const updatedList = list.map(item => {
+      let sporeInfo = getImg(item?.data)
+      return {...item, image:sporeInfo.image, type: sporeInfo.type, textContent: sporeInfo.textContent};
+    });
+    return updatedList
   }
 
 
@@ -348,20 +357,34 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
                   onClick={() => onSelect({type: ASSET_TYPE.SPORE, data: spore})}
               >
                 <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-                  <img
-                      src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}
-                      alt=""
-                      className="w-full object-cover block rounded-lg"
-                  />
-                  {/*{Math.round(Math.random()) % 2 === 0 ? (*/}
-                  {/*    <img*/}
-                  {/*        src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}*/}
-                  {/*        alt=""*/}
-                  {/*        className="w-full object-cover block rounded-lg"*/}
-                  {/*    />*/}
-                  {/*) : (*/}
-                  {/*    <EmptyImage className="h-full w-full max-w-[5rem] max-h-[5rem]"/>*/}
-                  {/*)}*/}
+
+
+                  {
+                    // eslint-disable-next-line @next/next/no-img-element
+                      spore.type?.startsWith('image') && <img src={spore.image} alt="" className="w-full object-cover block rounded-lg" />
+                  }
+                  {
+                    // eslint-disable-next-line @next/next/no-img-element
+                      spore.url && <img src={spore.url} alt="" className="w-full object-cover block" />
+                  }
+                  {
+                      (!spore.type?.startsWith('image') && !spore.url) && <p className="p-3">{spore.textContent}</p>
+                  }
+
+                  {/*<img*/}
+                  {/*    src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}*/}
+                  {/*    alt=""*/}
+                  {/*    className="w-full object-cover block rounded-lg"*/}
+                  {/*/>*/}
+                  {/*/!*{Math.round(Math.random()) % 2 === 0 ? (*!/*/}
+                  {/*/!*    <img*!/*/}
+                  {/*/!*        src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}*!/*/}
+                  {/*/!*        alt=""*!/*/}
+                  {/*/!*        className="w-full object-cover block rounded-lg"*!/*/}
+                  {/*/!*    />*!/*/}
+                  {/*/!*) : (*!/*/}
+                  {/*/!*    <EmptyImage className="h-full w-full max-w-[5rem] max-h-[5rem]"/>*!/*/}
+                  {/*/!*)}*!/*/}
                 </div>
                 <div className="flex flex-col justify-start items-start truncate">
                   <p className="text-xs sm:text-sm leading-5 text-default font-bold">

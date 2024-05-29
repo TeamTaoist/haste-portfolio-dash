@@ -3,10 +3,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { getXudtAndSpore } from "../../query/ckb/tools";
 import { ckb_SporeInfo } from "../../types/BTC";
-import { formatString } from "../../utils/common";
-import {getSporeById, unpackToRawSporeData} from "@spore-sdk/core";
-import {sporeConfig} from "../../utils/config.ts";
-import { Buffer } from 'buffer/';
+import {formatString, getImg} from "../../utils/common";
+
 
 export default function SporeList() {
   const [spores, setSpores] = useState<ckb_SporeInfo[]>([]);
@@ -14,33 +12,13 @@ export default function SporeList() {
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
 
-  // const getSporeTypeScript = async(id:string) => {
-  //   let contentType = await getImg(id);
-  //   let blob = await contentType.blob();
-  //   let isImage = isImageMIMEType(blob.type);
-  //   let textContent: string = '';
-  //   let url: string = ''
-  //   if (!isImage) {
-  //     textContent = await blob.text();
-  //   }
-  //   try {
-  //     let jsonData = JSON.parse(textContent);
-  //     url = jsonData.resource.url;
-  //   } catch {
-  //
-  //   }
-  //
-  //   return { type: blob.type, url: url, textContent }
-  // }
-
 
   const handleSporeList = async(list: ckb_SporeInfo[]) => {
-    const promises = list.map(async item => {
-        let sporeInfo = await getImg(item.amount)
 
+    const updatedList = list.map(item => {
+        let sporeInfo = getImg(item?.data)
         return {...item, image:sporeInfo.image, type: sporeInfo.type, textContent: sporeInfo.textContent};
     });
-    const updatedList = await Promise.all(promises);
     return updatedList
   }
 
@@ -65,28 +43,7 @@ export default function SporeList() {
     getCurrentAssets()
   }, [currentAddress])
 
-  const getImg = async(id:string) =>{
-    const cell = await getSporeById(id, sporeConfig)
-    const spore = unpackToRawSporeData(cell.data);
 
-    const buffer = Buffer.from(spore.content.toString().slice(2), 'hex');
-    const base64 = Buffer.from(buffer as any, "binary").toString("base64");
-
-    let type = spore.contentType;
-    let textContent,image;
-    if( type.indexOf("text") > -1){
-      textContent =  Buffer.from(buffer as any, "binary" ).toString()
-    }else{
-      image = `data:${spore.contentType};base64,${base64}`;
-    }
-
-    return {
-      image,
-      textContent,
-      type
-    }
-
-  }
 
 
   return (
