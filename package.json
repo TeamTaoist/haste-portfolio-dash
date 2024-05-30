@@ -1,7 +1,7 @@
 {
-  "name": "bitcoin-portfolio-dash-v2",
+  "name": "haste.pro",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "VITE_ENV_PARAM=development  vite",
