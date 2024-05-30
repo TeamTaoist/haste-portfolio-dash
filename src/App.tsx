@@ -13,6 +13,7 @@ import "./assets/css/layout.css"
 import "./assets/css/loading.css"
 import "./assets/css/globals.css"
 import styled from "styled-components";
+import Version from "./version.jsx";
 
 const BottomBox = styled.div`
     position: fixed;
@@ -27,6 +28,7 @@ const BottomBox = styled.div`
     justify-content: center;
     color: rgba(17, 24, 39,0.5);
     border-top: 1px solid #f2f2f2;
+    gap: 10px;
 `
 
 
@@ -63,7 +65,7 @@ function App() {
               <RouterLink/>
           </div>
 
-          <BottomBox>Copyright &copy; haste.pro</BottomBox>
+          <BottomBox><span>Copyright &copy; haste.pro</span> <Version /></BottomBox>
       </ReduxProvider>
       </Router>
   )

@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "VITE_ENV_PARAM=development  vite",
-    "dev:production": "VITE_ENV_PARAM=production vite",
-    "build": "VITE_ENV_PARAM=development tsc && vite build",
-    "build:production": "VITE_ENV_PARAM=production tsc && vite build",
+    "dev": "node version.js && VITE_ENV_PARAM=development  vite",
+    "dev:production": "node version.js && VITE_ENV_PARAM=production vite",
+    "build": "node version.js && VITE_ENV_PARAM=development tsc && vite build",
+    "build:production": "node version.js && VITE_ENV_PARAM=production tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
