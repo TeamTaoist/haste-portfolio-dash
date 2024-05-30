@@ -964,8 +964,8 @@ export class CkbHepler {
       }),
       type: {
         script: {
-          codeHash: sporeTypeScript.codeHash,
-          hashType: sporeTypeScript.hashType,
+          codeHash: sporeTypeScript!.codeHash,
+          hashType: sporeTypeScript!.hashType,
           args: "0x",
         },
         searchMode: "prefix",
