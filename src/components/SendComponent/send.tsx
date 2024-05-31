@@ -191,7 +191,7 @@ export default function SendContent() {
         useCapacityMarginAsFee:false
       });
 
-        console.log("=======txSkeleton=",txSkeleton)
+
       //@ts-ignore
 
         if(selectWallet.walletName === "joyidckb"){
