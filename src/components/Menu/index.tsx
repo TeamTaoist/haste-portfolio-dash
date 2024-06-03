@@ -7,6 +7,30 @@ import DropdownSelect from '../MobileMenu';
 import {useNavigate,useLocation} from "react-router-dom";
 import LogoImg from "../../assets/img/hasteLogo.png"
 import LogoCol from "../../assets/img/logo.png";
+import styled from "styled-components";
+import TgLogo from "../../assets/img/Telegram.svg";
+
+const LinkBox = styled.div<{ isopen: string }>`
+    position: fixed;
+    left:20px;
+  bottom: 40px;
+
+  a{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  img{
+    width: 24px;
+  }
+  span{
+    opacity: 0.6;
+    font-size: 12px;
+    display: ${props => props.isopen === "true"? "block":"none"};
+  }
+  
+`
 
 const ResponsiveSidebar: React.FC = () => {
   const [isColleapse, setIsColleapse] = useState<boolean>(true);
@@ -107,9 +131,16 @@ const ResponsiveSidebar: React.FC = () => {
               }
             </div>
           </div>
+
+          <LinkBox isopen={isColleapse.toString()}>
+            <a href="https://t.me/hastepro" target="_blank" rel="noreferrer"> <img src={TgLogo} alt=""/>
+              <span>Telegram</span></a>
+
+          </LinkBox>
+
         </div>
       ) : (
-        // 移动视图
+          // 移动视图
           <>
             <div className="fixed top-0 px-4 left-0 w-full h-16 bg-gray-100 text-black flex justify-between items-center z-50">
                 {
@@ -160,6 +191,11 @@ const ResponsiveSidebar: React.FC = () => {
                       }
                     </div>
                   </div>
+                  <LinkBox isopen={isColleapse.toString()}>
+                    <a href="https://t.me/hastepro" target="_blank" rel="noreferrer"> <img src={TgLogo} alt=""/>
+                      <span>Telegram</span></a>
+
+                  </LinkBox>
                 </div>
             </div>
           </>
