@@ -13,7 +13,7 @@ import "./assets/css/layout.css"
 import "./assets/css/loading.css"
 import "./assets/css/globals.css"
 import styled from "styled-components";
-import Version from "./version.jsx";
+import Version from "./version";
 
 const BottomBox = styled.div`
     position: fixed;
