@@ -9,7 +9,7 @@ on:
     types: [ closed ]
     paths-ignore: [ "package.json", "CHANGELOG.md", ".gitignore", ".github"]
 
-jobs:
+jobs:     
   bump:
     name: bump version
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true}}
@@ -32,11 +32,24 @@ jobs:
           output-file: 'CHANGELOG.md'
           skip-tag: false
           release-count: '50'
-    
-  trigger:
-    name: trigger-netlify-build | Main Branch
+          
+  build:
+    name: build
     if: ${{ always() }}
     needs: [ bump ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Build
+        run: |
+          npm install
+          npm run build
+          
+  trigger:
+    name: trigger-netlify-build | Main Branch
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
       - name: Curl request

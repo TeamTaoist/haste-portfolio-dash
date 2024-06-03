@@ -1,14 +1,17 @@
 # Haste
 
-The default asset mamangment tool for Bitcoin/RGB++/CKB.
+[![ci build | Dev Branch](https://github.com/TeamTaoist/bitcoin-portfolio-dash/actions/workflows/dev-ci-build.yml/badge.svg?branch=dev)](https://github.com/TeamTaoist/bitcoin-portfolio-dash/actions/workflows/dev-ci-build.yml)
 
+[![trigger-netlify-build | Main Branch](https://github.com/TeamTaoist/bitcoin-portfolio-dash/actions/workflows/trigger-main.yml/badge.svg?branch=main)](https://github.com/TeamTaoist/bitcoin-portfolio-dash/actions/workflows/trigger-main.yml)
+
+The default asset mamangment tool for Bitcoin/RGB++/CKB.
 
 The site is deployed with netlify.
 
-Main Branch   
+Main Branch Deploy Status 👇  
 [![Netlify Status](https://api.netlify.com/api/v1/badges/c2fe7e44-f189-4ccc-86ca-aa9309101ba6/deploy-status)](https://app.netlify.com/sites/caboroca-portfolio/deploys)
 
-Dev Branch  
+Dev Branch Deploy Status 👇  
 [![Netlify Status](https://api.netlify.com/api/v1/badges/4109aab3-dc72-4225-a4da-126134dea892/deploy-status)](https://app.netlify.com/sites/clever-sprinkles-2c0505/deploys)
 
 
