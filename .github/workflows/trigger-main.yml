@@ -1,8 +1,8 @@
 name: trigger-netlify-build | Main Branch
 
 on:
-  push:
-    branches: [ main ]
+  # push:
+  #   branches: [ main ]
 
   pull_request:
     branches: [ main ]
