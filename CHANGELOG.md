@@ -1,4 +1,13 @@
-# 0.2.0 (2024-06-03)
+## [0.2.1](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.2.0...v0.2.1) (2024-06-03)
+
+
+### Bug Fixes
+
+* remove useless code in version ([b2599af](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/b2599afc4ba77c1da7d1e658402fdf655ddd0f04))
+
+
+
+# [0.2.0](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/cece16d84c9afc2b52f90c2b3e3890712ec10a9b...v0.2.0) (2024-06-03)
 
 
 ### Bug Fixes
