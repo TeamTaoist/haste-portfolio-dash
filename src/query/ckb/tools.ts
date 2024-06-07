@@ -6,6 +6,7 @@ import { BI, Cell, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
 import superagent from "superagent";
 import {backend, getSporeTypeScript, getXudtTypeScript, mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 
+import {predefined} from "@ckb-lumos/config-manager";
 // config.initializeConfig(CONFIG);
 
 let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
@@ -15,8 +16,13 @@ export const rpc = new RPC(rpcURL);
 export const indexer = new Indexer(indexURL, rpcURL);
 
 export const getCKBCapacity = async (address: string) => {
+
+
+
+    const lumosConfig =getEnv() === 'Mainnet' ? predefined.LINA :predefined.AGGRON4 ;
+
   const collector = indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: "empty",
     });
     let balance = BI.from(0);
