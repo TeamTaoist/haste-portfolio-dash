@@ -123,8 +123,7 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
       try {
           const list = await getCKBTx(currentAddress!!);
           const groupedTx = groupTransaction(list.data);
-          console.log("=======groupedTx==",groupedTx)
-
+          
           setIsEmptyList(list.data.length === 0);
           setGroupedData(groupedTx);
       } catch (error) {

@@ -6,6 +6,7 @@ import { BI, Cell, helpers, Indexer, RPC, utils } from "@ckb-lumos/lumos";
 import superagent from "superagent";
 import {backend, getSporeTypeScript, getXudtTypeScript, mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 
+import {predefined} from "@ckb-lumos/config-manager";
 // config.initializeConfig(CONFIG);
 
 let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
@@ -15,8 +16,13 @@ export const rpc = new RPC(rpcURL);
 export const indexer = new Indexer(indexURL, rpcURL);
 
 export const getCKBCapacity = async (address: string) => {
+
+
+
+    const lumosConfig =getEnv() === 'Mainnet' ? predefined.LINA :predefined.AGGRON4 ;
+
   const collector = indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: "empty",
     });
     let balance = BI.from(0);
@@ -55,11 +61,11 @@ export const getSpore = async(address: string) => {
 
 export const getXudtAndSpore = async(address: string) => {
     // const cfg = getEnv() === 'Mainnet' ? TestnetInfo : MainnetInfo;
-
+    const lumosConfig =getEnv() === 'Mainnet' ? predefined.LINA :predefined.AGGRON4 ;
     const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
     const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');
     const xudt_collector = indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: {
         script: {
           codeHash: xudtTypeScript.codeHash,
@@ -70,8 +76,9 @@ export const getXudtAndSpore = async(address: string) => {
       },
     });
 
+
     const spore_collector = indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: {
         script: {
           codeHash: sporeTypeScript?.codeHash!,
