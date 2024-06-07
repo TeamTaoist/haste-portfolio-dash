@@ -61,11 +61,11 @@ export const getSpore = async(address: string) => {
 
 export const getXudtAndSpore = async(address: string) => {
     // const cfg = getEnv() === 'Mainnet' ? TestnetInfo : MainnetInfo;
-
+    const lumosConfig =getEnv() === 'Mainnet' ? predefined.LINA :predefined.AGGRON4 ;
     const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
     const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');
     const xudt_collector = indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: {
         script: {
           codeHash: xudtTypeScript.codeHash,
@@ -76,8 +76,9 @@ export const getXudtAndSpore = async(address: string) => {
       },
     });
 
+
     const spore_collector = indexer.collector({
-      lock: helpers.parseAddress(address),
+      lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: {
         script: {
           codeHash: sporeTypeScript?.codeHash!,
