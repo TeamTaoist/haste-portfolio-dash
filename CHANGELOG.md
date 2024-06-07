@@ -1,3 +1,13 @@
+## [0.2.2](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.2.1...v0.2.2) (2024-06-07)
+
+
+### Bug Fixes
+
+* update ckb lock ([201ec2f](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/201ec2fc28536699e22e360e1fffd9fb61787f0a))
+* update ckb lock ([aa624e4](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/aa624e484ee0a371ffe48cc61b7842eda16da9c6))
+
+
+
 ## [0.2.1](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.2.0...v0.2.1) (2024-06-03)
 
 
