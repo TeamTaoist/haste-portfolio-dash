@@ -68,7 +68,7 @@ export default function SporeList() {
             key={spore.amount}
             className="relative translate-y-0 hover:z-10 hover:shadow-2xl hover:-translate-y-0.5 bg-inherit rounded-lg shadow-xl transition-all cursor-pointer group bg-white"
           >
-            <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-gray-100 ">
+            <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-gray-200 ">
               {
                 // eslint-disable-next-line @next/next/no-img-element
                 spore.type?.startsWith('image') && <img src={spore.image} alt="" className="w-full object-cover block" />

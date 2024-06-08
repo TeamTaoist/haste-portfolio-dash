@@ -2,7 +2,7 @@ import {getEnv} from "../../settings/env.ts";
 import {Main_Config, Test_Config} from "../../lib/constant.ts";
 
 let jsonRpcId = 0;
-const _request = async(obj:any) => {
+export const _request = async(obj:any) => {
     ++jsonRpcId;
     const {method,params,url} = obj;
 
