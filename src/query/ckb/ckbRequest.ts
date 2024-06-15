@@ -86,6 +86,8 @@ export class CkbHepler {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
+    console.log("===transfer_ckb====tx",tx)
+
 
     if (wallet.walletName == "joyidckb") {
       const signed = await signRawTransaction(
