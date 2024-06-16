@@ -1,15 +1,30 @@
 import styled from "styled-components";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {helpers} from "@ckb-lumos/lumos";
+import {formatUnit} from "@ckb-lumos/bi";
 
 const Box = styled.div`
     line-height: 2em;
 `
-export default function usage(){
+export default function usage({xUdt}:any){
+    const [jsonStr,setJsonStr] = useState<any>(null)
 
-    const [jsonStr] = useState({
-        "code_hash":"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
-        "hash_type":"type",
-        "args": "0x20fa7347e90a1ff59d571b818ef0827eaf32cd35"})
+
+    useEffect(() => {
+        if(!xUdt)return;
+        const {allObj} = xUdt;
+        const minCapacity = helpers.minimalCellCapacityCompatible(allObj);
+
+        const declared = allObj.cellOutput.capacity;
+
+         setJsonStr({
+             declared:`${formatUnit(declared,"ckb")} CKBytes`,
+             occupied:`${formatUnit(minCapacity.toString(),"ckb")} CKBytes`,
+         })
+
+    }, [xUdt]);
+
+
     return <Box><div className="bg-gray-100 p-4 h-56 scroll-auto text-gray-500">
         <pre>
             {

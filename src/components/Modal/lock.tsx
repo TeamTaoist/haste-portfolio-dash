@@ -18,8 +18,6 @@ export default function Lock(){
         const lS = helpers.parseAddress(currentAddress, {
             config: cfg.CONFIG,
         });
-
-        console.log(lS);
         setJsonStr(lS)
 
     }, [currentAddress]);

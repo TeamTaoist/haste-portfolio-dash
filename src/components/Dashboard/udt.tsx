@@ -11,7 +11,7 @@ import Loading from "../loading";
 import {BI} from "@ckb-lumos/lumos";
 import {
   BookDashed,
-  EllipsisIcon
+  EllipsisVerticalIcon
 } from "lucide-react";
 import {EventType} from "../../lib/enum";
 
@@ -20,6 +20,19 @@ import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
 import {getEnv} from "../../settings/env.ts";
 import {getXudtTypeScript} from "../../lib/wallet/constants.ts";
 import CellInfo from "../Modal/cellInfo.tsx";
+import styled from "styled-components";
+
+const RhtBox = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  span{
+    opacity: 0.8;
+    font-size: 12px;
+  }
+`
 
 export default function UDTList() {
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | any)[]>([]);
@@ -34,6 +47,7 @@ export default function UDTList() {
 
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
+
     setXudtList(assetsList.xudtList);
     setIsLoading(false);
   }
@@ -46,7 +60,6 @@ export default function UDTList() {
   }, []);
 
   const refreshDom = () =>{
-    console.log(reloadData)
     setReloadData([])
   }
 
@@ -71,7 +84,6 @@ export default function UDTList() {
         acc[key] = {category: key, sum: BI.from(0), ...obj};
 
       }
-
 
       acc[key].sum = acc[key].sum.add((obj?.amount));
 
@@ -110,17 +122,21 @@ export default function UDTList() {
 
   const handleCurrent = (xUdt:any) =>{
 
+
     setCurrentToken(xUdt);
     setShow(true)
   }
 
+  const handleClose = () => {
+    setShow(false);
+  }
   return (
     <div className="w-full h-full relative">
       {
           loadingPage && <Loading />
       }
       {
-        show && <CellInfo xUdt={currentToken} />
+        show && <CellInfo xUdt={currentToken} handleClose={handleClose} />
       }
       <table className="w-full">
         <thead>
@@ -183,11 +199,14 @@ export default function UDTList() {
                       </td>
 
                       <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-6 flex justify-between">
-                        <p className="text-sm sm:text-base text-default font-semibold truncate text-base font-din">
+                        <p className="text-sm sm:text-base font-semibold truncate text-base font-din">
                           {/*{formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}*/}
                           {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
                         </p>
-                        <EllipsisIcon size={16} className="cursor-pointer mt-4" onClick={()=>handleCurrent(xudt)} />
+                        <RhtBox onClick={()=>handleCurrent(xudt)}>
+                          <span>Cell Info</span>
+                          <EllipsisVerticalIcon size={16} className="cursor-pointer" /></RhtBox>
+
                         {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--
                   </p> */}

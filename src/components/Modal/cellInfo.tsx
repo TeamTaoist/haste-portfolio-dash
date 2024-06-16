@@ -5,8 +5,7 @@ import Type from "./type.tsx";
 import Data from "./data.tsx";
 import Usage from "./usage.tsx";
 import {XIcon} from "lucide-react";
-import {useSelector} from "react-redux";
-import {RootState} from "../../store/store.ts";
+
 
 const MaskBox = styled.div`
     width: 100%;
@@ -25,10 +24,13 @@ const BgBox = styled.div`
     background: #fff;
     padding: 30px;
     border-radius: 10px;
-    min-width: 700px;
+    min-width: 950px;
+    .iconClose{
+        cursor: pointer;
+    }
 `
 
-export default function CellInfo({xUdt}:any){
+export default function CellInfo({xUdt,handleClose}:any){
     const [currentTab, setCurrentTab] = useState<string>("lock");
 
     const [tabs] = useState([
@@ -49,12 +51,6 @@ export default function CellInfo({xUdt}:any){
             label: "Capacity Usage",
         }
     ])
-
-    useEffect(() => {
-        if(!xUdt) return;
-        console.log(xUdt);
-
-    }, [xUdt]);
 
     return <MaskBox>
         <BgBox>
@@ -78,7 +74,7 @@ export default function CellInfo({xUdt}:any){
 
 
                 </div>
-                <XIcon />
+                <XIcon className="iconClose"  onClick={handleClose}/>
             </div>
 
             <div className="mt-4">
@@ -89,10 +85,10 @@ export default function CellInfo({xUdt}:any){
                     currentTab === 'type' && <Type typeScript={xUdt.type_script}/>
                 }
                 {
-                    currentTab === 'data' && <Data/>
+                    currentTab === 'data' && <Data xUdt={xUdt}/>
                 }
                 {
-                    currentTab === 'usage' && <Usage/>
+                    currentTab === 'usage' && <Usage xUdt={xUdt} />
                 }
             </div>
         </BgBox>

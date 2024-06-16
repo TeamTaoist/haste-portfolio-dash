@@ -97,16 +97,21 @@ export const getXudtAndSpore = async(address: string) => {
     const xudtMap: { [key: string]: ckb_UDTInfo } = {};
 
 
+
+
     for await (const xudtCell of xudt_collector.collect()) {
       if (xudtCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(xudtCell.cellOutput.type);
+
         if (!xudtMap[typeHash]) {
           const ckbUDTInfo: ckb_UDTInfo = {
             symbol: "UNKNOWN",
             amount: BI.from(0).toString(),
             type_hash: typeHash,
             udt_type: "xUDT",
+            data:xudtCell.data,
             type_script: xudtCell.cellOutput.type,
+              allObj:xudtCell
           };
 
           xudtMap[typeHash] = ckbUDTInfo;
@@ -141,6 +146,7 @@ export const getXudtAndSpore = async(address: string) => {
           type_hash: typeHash,
           udt_type: "spore_cell",
           type_script: sporeCell.cellOutput.type,
+            allObj:sporeCell
         });
       }
     }
