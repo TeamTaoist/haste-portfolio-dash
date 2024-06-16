@@ -3,6 +3,13 @@ import {useEffect, useState} from "react";
 
 const Box = styled.div`
     line-height: 2em;
+    pre{
+        word-break: break-all;
+        white-space: pre-wrap;
+        width:950px;
+        height: 200px;
+        overflow: auto;
+    }
 `
 export default function Data({xUdt}:any){
 

@@ -16,6 +16,7 @@ import {
 import {EventType} from "../../lib/enum";
 
 import BtcImg from "../../assets/img/btc.png";
+import CkbImg from "../../assets/img/ckb.png";
 import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
 import {getEnv} from "../../settings/env.ts";
 import {getXudtTypeScript} from "../../lib/wallet/constants.ts";
@@ -41,6 +42,8 @@ export default function UDTList() {
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
   const [loadingPage,setLoadingPage] = useState(false)
   const [reloadData,setReloadData] = useState([])
+
+  const [chain,setChain] = useState<string>("");
 
   const [show,setShow] = useState(false)
   const [currentToken,setCurrentToken] = useState(null);
@@ -71,12 +74,10 @@ export default function UDTList() {
 
     const udtList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
 
-
     udtList.map((item: any) => {
       item.amount = unpackAmount(item.data).toString();
 
     })
-
 
     const groupedData = udtList.reduce((acc: any, obj: any) => {
       const key = obj?.cellOutput?.type?.args!;
@@ -90,7 +91,6 @@ export default function UDTList() {
       return acc;
     }, {});
 
-
     const result = Object.values(groupedData);
     // @ts-ignore
     setXudtList(result as any)
@@ -102,6 +102,7 @@ export default function UDTList() {
     try{
       const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
       const chain = currentWallet?.chain;
+      setChain(chain)
       if ( chain && chain === 'btc') {
         await _getRgbAsset(currentWallet?.address!!)
       } else if (chain && chain === 'ckb') {
@@ -180,9 +181,9 @@ export default function UDTList() {
                             <img
                                 width={32}
                                 height={32}
-                                src={BtcImg}
+                                src={ chain === 'btc' ? BtcImg : CkbImg}
                                 alt="USDT"
-                                className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+                                className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
                             />
                           </div>
                           <div>
@@ -203,9 +204,14 @@ export default function UDTList() {
                           {/*{formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}*/}
                           {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
                         </p>
-                        <RhtBox onClick={()=>handleCurrent(xudt)}>
-                          <span>Cell Info</span>
-                          <EllipsisVerticalIcon size={16} className="cursor-pointer" /></RhtBox>
+
+                        {
+                          chain === "ckb" &&<RhtBox onClick={()=>handleCurrent(xudt)}>
+                              <span>Cell Info</span>
+                              <EllipsisVerticalIcon size={16} className="cursor-pointer" /></RhtBox>
+                        }
+
+
 
                         {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--

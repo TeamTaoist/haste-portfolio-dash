@@ -14,7 +14,7 @@ const MaskBox = styled.div`
     background: rgba(0,0,0,0.5);
     left: 0;
     top: 0;
-    z-index: 9;
+    z-index: 99999999;
     display: flex;
     align-items: center;
     justify-content: center;
