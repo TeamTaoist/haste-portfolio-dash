@@ -12,10 +12,11 @@ export default function usage({xUdt}:any){
 
     useEffect(() => {
         if(!xUdt)return;
-        const {allObj} = xUdt;
-        const minCapacity = helpers.minimalCellCapacityCompatible(allObj);
 
-        const declared = allObj.cellOutput.capacity;
+        const minCapacity = helpers.minimalCellCapacityCompatible(xUdt?.allObj);
+        console.log(minCapacity);
+
+        const declared = xUdt?.allObj?.cellOutput?.capacity || xUdt.output.capacity;
 
          setJsonStr({
              declared:`${formatUnit(declared,"ckb")} CKBytes`,

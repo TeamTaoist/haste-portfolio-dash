@@ -5,6 +5,7 @@ import {getClusterList} from "../../query/ckb/tools";
 import { ckb_SporeInfo } from "../../types/BTC";
 import {formatString} from "../../utils/common";
 import {unpackToRawClusterData} from "@spore-sdk/core";
+import CellInfo from "../Modal/cellInfo.tsx";
 
 
 export default function ClusterList() {
@@ -12,7 +13,8 @@ export default function ClusterList() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const wallets = useSelector((state: RootState) => state.wallet.wallets);
-
+  const [show,setShow] = useState(false)
+  const [currentToken,setCurrentToken] = useState(null);
 
   const handleClusterList = async(list: ckb_SporeInfo[]) => {
 
@@ -27,6 +29,7 @@ export default function ClusterList() {
     //     // let sporeInfo = getImg(item?.data)
     //     // return {...item, image:sporeInfo.image, type: sporeInfo.type, textContent: sporeInfo.textContent};
     // });
+
 
     let clArr = [...list];
     clArr.map(async(item:any)=>{
@@ -60,10 +63,22 @@ export default function ClusterList() {
   }, [currentAddress])
 
 
+  const handleClose = () => {
+    setShow(false);
+  }
 
+  const handleCurrent = (dob:any) =>{
+
+
+    setCurrentToken(dob);
+    setShow(true)
+  }
 
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-x-6 md:grid-cols-3 md:gap-x-6 lg:grid-cols-6 xl:grid-cols-5 2xl:grid-cols-6 xl:gap-x-8 text-black mt-8">
+      {
+          show && <CellInfo xUdt={currentToken} handleClose={handleClose} noCapacity={true} />
+      }
       {isLoading ? (
         Array.from({ length: 3 }, (_, index) => (
           <div key={index}
@@ -83,6 +98,7 @@ export default function ClusterList() {
           <div
             key={`cluster_${index}`}
             className="relative translate-y-0 hover:z-10 hover:shadow-2xl hover:-translate-y-0.5 bg-inherit rounded-lg shadow-xl transition-all cursor-pointer group bg-white"
+            onClick={()=>handleCurrent(item)}
           >
             <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-gray-200 justify-center">
               {/*{*/}

@@ -30,10 +30,10 @@ const BgBox = styled.div`
     }
 `
 
-export default function CellInfo({xUdt,handleClose}:any){
+export default function CellInfo({xUdt,handleClose,noCapacity}:any){
     const [currentTab, setCurrentTab] = useState<string>("lock");
 
-    const [tabs] = useState([
+    const [tabs,setTabs] = useState([
         {
             value: "lock",
             label: "Lock Script",
@@ -51,6 +51,14 @@ export default function CellInfo({xUdt,handleClose}:any){
             label: "Capacity Usage",
         }
     ])
+
+    useEffect(() => {
+        if(!noCapacity)return;
+        let arr = [...tabs]
+        arr.pop()
+        setTabs(arr)
+        
+    }, [noCapacity]);
 
     return <MaskBox>
         <BgBox>
@@ -82,7 +90,7 @@ export default function CellInfo({xUdt,handleClose}:any){
                     currentTab === 'lock' && <Lock/>
                 }
                 {
-                    currentTab === 'type' && <Type typeScript={xUdt.type_script}/>
+                    currentTab === 'type' && <Type typeScript={xUdt?.type_script || xUdt?.output.type}/>
                 }
                 {
                     currentTab === 'data' && <Data xUdt={xUdt}/>

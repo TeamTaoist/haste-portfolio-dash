@@ -15,8 +15,7 @@ export default function Data({xUdt}:any){
 
     useEffect(() => {
         if(!xUdt)return;
-        const {data} = xUdt;
-        setJsonStr({data})
+        setJsonStr({data:xUdt.data || xUdt.output_data})
     }, [xUdt]);
 
     const [jsonStr,setJsonStr] = useState<any>(null)
