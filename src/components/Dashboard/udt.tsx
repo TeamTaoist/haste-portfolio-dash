@@ -57,6 +57,7 @@ export default function UDTList() {
 
   useEffect(() => {
     document.addEventListener(EventType.dashboard_tokens_reload,refreshDom)
+    console.log(reloadData)
     return () =>{
       document.removeEventListener(EventType.dashboard_tokens_reload,refreshDom)
     }
@@ -102,7 +103,7 @@ export default function UDTList() {
     try{
       const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
       const chain = currentWallet?.chain;
-      setChain(chain)
+      setChain(chain!)
       if ( chain && chain === 'btc') {
         await _getRgbAsset(currentWallet?.address!!)
       } else if (chain && chain === 'ckb') {
