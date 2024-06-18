@@ -17,6 +17,12 @@ Dev Branch Deploy Status 👇
 
 ## How to build
 
+Run below commands to install packages.
+
+```
+npm install
+```
+
 Run below commands to run different versions.
 
 
