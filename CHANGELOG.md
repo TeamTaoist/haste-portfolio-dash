@@ -1,3 +1,22 @@
+# [0.3.0](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.2.2...v0.3.0) (2024-06-18)
+
+
+### Bug Fixes
+
+* add cell info to cluster ([af484e1](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/af484e1dac379d249818aed49fa8d836aa7db9eb))
+* add cell info to spore ([90a790b](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/90a790b8bccbdb3762ffb1520c101f28c5462d75))
+* add cell info to udt ([7ee1659](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/7ee16591ac8addc82693994f502c5b19d922e115))
+* remove undefined warning ([96d5964](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/96d59643a39aec9dab6d6befb5378589607d7dbc))
+* update cluster list ([9d43276](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/9d4327633cca4bf7dadb09aed13c8ae6be147e8b))
+* update warnings ([b4b1b01](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/b4b1b019ced0039b8f8e3d24700d55b0e95f6216))
+
+
+### Features
+
+* add cell info to udt ([16d0b97](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/16d0b97d6759ab185384e23b85fa0626200b7a70))
+
+
+
 ## [0.2.2](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.2.1...v0.2.2) (2024-06-07)
 
 
