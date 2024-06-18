@@ -10,14 +10,30 @@ import { formatUnit } from "@ckb-lumos/bi";
 import Loading from "../loading";
 import {BI} from "@ckb-lumos/lumos";
 import {
-  BookDashed
+  BookDashed,
+  EllipsisVerticalIcon
 } from "lucide-react";
 import {EventType} from "../../lib/enum";
 
 import BtcImg from "../../assets/img/btc.png";
+import CkbImg from "../../assets/img/ckb.png";
 import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
 import {getEnv} from "../../settings/env.ts";
 import {getXudtTypeScript} from "../../lib/wallet/constants.ts";
+import CellInfo from "../Modal/cellInfo.tsx";
+import styled from "styled-components";
+
+const RhtBox = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  span{
+    opacity: 0.8;
+    font-size: 12px;
+  }
+`
 
 export default function UDTList() {
   const [xudtList, setXudtList] = useState<(ckb_UDTInfo | ckb_SporeInfo | undefined | any)[]>([]);
@@ -27,21 +43,27 @@ export default function UDTList() {
   const [loadingPage,setLoadingPage] = useState(false)
   const [reloadData,setReloadData] = useState([])
 
+  const [chain,setChain] = useState<string>("");
+
+  const [show,setShow] = useState(false)
+  const [currentToken,setCurrentToken] = useState(null);
+
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
+
     setXudtList(assetsList.xudtList);
     setIsLoading(false);
   }
 
   useEffect(() => {
     document.addEventListener(EventType.dashboard_tokens_reload,refreshDom)
+    console.log(reloadData)
     return () =>{
       document.removeEventListener(EventType.dashboard_tokens_reload,refreshDom)
     }
   }, []);
 
   const refreshDom = () =>{
-    console.log(reloadData)
     setReloadData([])
   }
 
@@ -53,23 +75,22 @@ export default function UDTList() {
 
     const udtList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
 
-
     udtList.map((item: any) => {
       item.amount = unpackAmount(item.data).toString();
 
     })
 
-
     const groupedData = udtList.reduce((acc: any, obj: any) => {
       const key = obj?.cellOutput?.type?.args!;
       if (!acc[key]) {
         acc[key] = {category: key, sum: BI.from(0), ...obj};
+
       }
+
       acc[key].sum = acc[key].sum.add((obj?.amount));
 
       return acc;
     }, {});
-
 
     const result = Object.values(groupedData);
     // @ts-ignore
@@ -82,6 +103,7 @@ export default function UDTList() {
     try{
       const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
       const chain = currentWallet?.chain;
+      setChain(chain!)
       if ( chain && chain === 'btc') {
         await _getRgbAsset(currentWallet?.address!!)
       } else if (chain && chain === 'ckb') {
@@ -100,11 +122,23 @@ export default function UDTList() {
     getCurrentAssets()
   }, [currentAddress])
 
+  const handleCurrent = (xUdt:any) =>{
 
+
+    setCurrentToken(xUdt);
+    setShow(true)
+  }
+
+  const handleClose = () => {
+    setShow(false);
+  }
   return (
     <div className="w-full h-full relative">
       {
           loadingPage && <Loading />
+      }
+      {
+        show && <CellInfo xUdt={currentToken} handleClose={handleClose} />
       }
       <table className="w-full">
         <thead>
@@ -112,7 +146,7 @@ export default function UDTList() {
             <th className="col-span-7 lg:col-span-5 cursor-pointer px-8">
               Token
             </th>
-            <th className="col-span-4 lg:col-span-2 cursor-pointer px-8">
+            <th className="col-span-7 lg:col-span-2 cursor-pointer px-8">
               Balance
             </th>
           </tr>
@@ -148,9 +182,9 @@ export default function UDTList() {
                             <img
                                 width={32}
                                 height={32}
-                                src={BtcImg}
+                                src={ chain === 'btc' ? BtcImg : CkbImg}
                                 alt="USDT"
-                                className="w-8 h-8 rounded-full object-cover min-w-[2rem]"
+                                className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"
                             />
                           </div>
                           <div>
@@ -166,15 +200,25 @@ export default function UDTList() {
                         </div>
                       </td>
 
-                      <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-2">
-                        <p className="text-sm sm:text-base text-default font-semibold truncate text-base font-din">
+                      <td className="px-2 whitespace-nowrap sm:w-auto col-span-3 lg:col-span-6 flex justify-between">
+                        <p className="text-sm sm:text-base font-semibold truncate text-base font-din">
                           {/*{formatUnit(((xudt?.ckbCellInfo?.amount || xudt?.amount) ?? 0), 'ckb')}*/}
                           {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
                         </p>
+
+                        {
+                          chain === "ckb" &&<RhtBox onClick={()=>handleCurrent(xudt)}>
+                              <span>Cell Info</span>
+                              <EllipsisVerticalIcon size={16} className="cursor-pointer" /></RhtBox>
+                        }
+
+
+
                         {/* <p className="text-xs sm:text-sm leading-5 font-normal text-slate-300 truncate">
                     $--,--
                   </p> */}
                       </td>
+
                     </tr>
                 ))}
 

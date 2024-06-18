@@ -176,6 +176,7 @@ export interface ckb_SporeInfo {
   sum?: any;
   type_script: Script;
   ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
+  allObj?:any
 }
 
 export interface ckb_UDTInfo {
@@ -186,6 +187,8 @@ export interface ckb_UDTInfo {
   udt_type: "xUDT";
   type_script: Script;
   sum?: any;
+  data?:any;
+  allObj?:any;
   ckbCellInfo?: ckb_UDTInfo | ckb_SporeInfo;
 }
 

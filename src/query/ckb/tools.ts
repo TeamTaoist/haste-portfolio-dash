@@ -7,6 +7,8 @@ import superagent from "superagent";
 import {backend, getSporeTypeScript, getXudtTypeScript, mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 
 import {predefined} from "@ckb-lumos/config-manager";
+import {getSporeScript, predefinedSporeConfigs} from "@spore-sdk/core";
+import {_request} from "./feerate.ts";
 // config.initializeConfig(CONFIG);
 
 let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
@@ -95,16 +97,21 @@ export const getXudtAndSpore = async(address: string) => {
     const xudtMap: { [key: string]: ckb_UDTInfo } = {};
 
 
+
+
     for await (const xudtCell of xudt_collector.collect()) {
       if (xudtCell.cellOutput.type) {
         const typeHash = utils.computeScriptHash(xudtCell.cellOutput.type);
+
         if (!xudtMap[typeHash]) {
           const ckbUDTInfo: ckb_UDTInfo = {
             symbol: "UNKNOWN",
             amount: BI.from(0).toString(),
             type_hash: typeHash,
             udt_type: "xUDT",
+            data:xudtCell.data,
             type_script: xudtCell.cellOutput.type,
+              allObj:xudtCell
           };
 
           xudtMap[typeHash] = ckbUDTInfo;
@@ -139,12 +146,12 @@ export const getXudtAndSpore = async(address: string) => {
           type_hash: typeHash,
           udt_type: "spore_cell",
           type_script: sporeCell.cellOutput.type,
+            allObj:sporeCell
         });
       }
     }
 
     return { xudtList, sporeList };
-
 
 }
 
@@ -166,3 +173,42 @@ export const getTx = async(address: string, page: number = 0) => {
   }
 }
 
+export const getClusterList = async(address: string) => {
+    const lumosConfig =getEnv() === 'Mainnet' ? predefined.LINA :predefined.AGGRON4 ;
+    const hashObj = helpers.parseAddress(address,{config:lumosConfig});
+    const{codeHash,hashType,args} = hashObj;
+
+
+    const clusterConfig = getEnv() === "mainnet" ? predefinedSporeConfigs.Mainnet : predefinedSporeConfigs.Testnet;
+
+    const clusterType = getSporeScript(clusterConfig,"Cluster",["v2"]);
+
+
+    return await _request({
+        method:"get_cells",
+        url:indexURL,
+        params:[
+            {
+                script: {
+                    code_hash: codeHash,
+                    hash_type:hashType,
+                    args
+                },
+                "script_type": "lock",
+                script_search_mode: "exact",
+                filter: {
+                    script: {
+                        code_hash: clusterType.script.codeHash,
+                        hash_type: clusterType.script.hashType,
+                        args: "0x",
+                    },
+                    script_search_mode: 'prefix',
+                    script_type: 'type',
+                },
+            },
+            "desc",
+            "0x64"
+        ]
+    })
+
+}

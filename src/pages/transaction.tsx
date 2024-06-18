@@ -122,10 +122,12 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
       setGroupedData(null);
       try {
           const list = await getCKBTx(currentAddress!!);
-          const groupedTx = groupTransaction(list.data);
-          
-          setIsEmptyList(list.data.length === 0);
-          setGroupedData(groupedTx);
+          const isEmpty = !list || !list.data || list.data.length === 0;
+          setIsEmptyList(isEmpty);
+          if(!isEmpty) {
+            const groupedTx = groupTransaction(list.data);
+            setGroupedData(groupedTx);
+          }
       } catch (error) {
           console.error("Failed to fetch CKB transactions:", error);
           setIsEmptyList(true);

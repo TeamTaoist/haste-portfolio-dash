@@ -5,6 +5,7 @@ import SporeList from "./spore";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { TabsType } from "../../types/tabs";
+import ClusterList from "./cluster.tsx";
 
 const TAB_LIST: TabsType[] = [
   {
@@ -30,6 +31,10 @@ export default function Dashboard() {
         value: "spore",
         label: "SPORE",
         component: <SporeList />,
+      },{
+        value: "cluster",
+        label: "CLUSTER",
+        component: <ClusterList />,
       }]);
     } else if (currentWallet?.chain === 'btc') {
       setTabs(TAB_LIST);
@@ -62,7 +67,13 @@ export default function Dashboard() {
       </div>
       <div className="mt-4">
         {
-          currentTab === 'udt' ? <UDTList /> : <SporeList />
+          currentTab === 'udt' && <UDTList />
+        }
+        {
+          currentTab === 'spore' && <SporeList />
+        }
+        {
+          currentTab === 'cluster' && <ClusterList />
         }
       </div>
     </div>
