@@ -45,9 +45,11 @@ export default function SendContent() {
         setAmount("")
         setSelectAsset(null)
 
+
     }, [selectWallet]);
 
     useEffect(() => {
+
 
         if( selectAsset?.type === ASSET_TYPE.SPORE){
             setAmount(1)
@@ -249,8 +251,8 @@ export default function SendContent() {
 
 
     const send_btc2ckb_UDT = () =>{
-
-        const {txHash,idx,type_script} = selectAsset?.data;
+        const {outPoint:{txHash,index:idx},cellOutput:{type:type_script,lock}} = selectAsset?.data;
+        // const {txHash,idx,type_script} = selectAsset?.data;
         RGBHelper.instance
             .transfer_btc_to_ckb(
                 to,
@@ -258,6 +260,7 @@ export default function SendContent() {
                 BI.from(parseUnit(amount.toString(), "ckb")).toBigInt(),
                 txHash,
                 idx,
+                lock
             )
             .then((rs) => {
                 console.log("btc to ckb tx hash:", rs);
@@ -271,15 +274,16 @@ export default function SendContent() {
         });
     }
     const send_btc2btc_UDT = () =>{
-        console.log("===send_btc2btc_UDT====",selectWallet,to,selectAsset,amount)
-        const {txHash,idx,type_script} = selectAsset?.data;
+        const {outPoint:{txHash,index:idx},cellOutput:{type:type_script,lock}} = selectAsset?.data;
+
         RGBHelper.instance
             .transfer_btc_to_btc(
                 txHash,
                 idx,
                 to,
                 type_script,
-                BI.from(parseUnit(amount.toString(), "ckb")).toBigInt()
+                BI.from(parseUnit(amount.toString(), "ckb")).toBigInt(),
+                lock
             )
             .then((rs) => {
                 console.log("btc to btc tx hash:", rs);
@@ -291,12 +295,9 @@ export default function SendContent() {
             }).finally(()=>{
             setLoading(false)
         });
-
-
     }
 
     const send_ckb2btc_UDT = async() =>{
-
         const {type_script} = selectAsset?.data;
 
 
@@ -425,7 +426,7 @@ export default function SendContent() {
                                           {/*/>*/}
                                           <div className="leading-5">
                                               <div
-                                                  className="font-semibold ">{getSymbol(selectAsset?.data?.type_script)}</div>
+                                                  className="font-semibold uppercase">{getSymbol(selectAsset?.data?.type_script || selectAsset?.data?.cellOutput?.type)}</div>
                                               <div className="text-xs text-gray-500">{selectAsset?.data?.symbol}</div>
                                           </div>
                                       </div>
@@ -483,10 +484,10 @@ export default function SendContent() {
                       onChange={(e) => handleInput(e)}
                   />
 
-                  {!!selectAsset && (
+                  {!!selectAsset && !isNative&& (
                       <p className="sm:text-xs font-normal text-right text-xs">
                           Available
-                          Balance: {formatUnit( selectAsset?.data?.sum && selectAsset?.data?.sum?.toString() || selectAsset?.data?.amount, "ckb")} <span className="uppercase">{getSymbol(selectAsset?.data?.type_script)}</span>
+                          Balance: {formatUnit( selectAsset?.data?.sum && selectAsset?.data?.sum?.toString() || selectAsset?.data?.amount, "ckb")} <span className="uppercase">{getSymbol(selectAsset?.data?.type_script || selectAsset?.data?.cellOutput?.type)}</span>
                       </p>
                   )}
               </div>

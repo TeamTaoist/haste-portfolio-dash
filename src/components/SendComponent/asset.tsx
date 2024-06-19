@@ -168,7 +168,6 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
 
     })
 
-
     const groupedData = udtList.reduce((acc:any, obj:any) => {
       const key= obj?.cellOutput?.type?.args! ;
       if (!acc[key]) {
