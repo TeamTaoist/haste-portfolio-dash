@@ -101,8 +101,7 @@ export class RGBHelper {
   }
 
   async transfer_btc_to_btc(
-    btcTxHash: string,
-    btcTxIdx: number,
+
     toAddress: string,
     typeScript: Script,
 
@@ -115,6 +114,8 @@ export class RGBHelper {
     if (!curAccount) {
       throw new Error("Please choose a wallet");
     }
+
+
 
     const wallets = store.getState().wallet.wallets;
 
@@ -190,8 +191,7 @@ export class RGBHelper {
     toCkbAddress: string,
     typeScript: Script,
     transferAmount: bigint,
-    btcTxHash: string,
-    btcTxIdx: number,
+
     lock:Script
   ) {
     // const curAccount = DataManager.instance.getCurAccount();

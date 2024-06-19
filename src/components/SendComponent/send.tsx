@@ -251,15 +251,13 @@ export default function SendContent() {
 
 
     const send_btc2ckb_UDT = () =>{
-        const {outPoint:{txHash,index:idx},cellOutput:{type:type_script,lock}} = selectAsset?.data;
+        const {cellOutput:{type:type_script,lock}} = selectAsset?.data;
         // const {txHash,idx,type_script} = selectAsset?.data;
         RGBHelper.instance
             .transfer_btc_to_ckb(
                 to,
                 type_script,
                 BI.from(parseUnit(amount.toString(), "ckb")).toBigInt(),
-                txHash,
-                idx,
                 lock
             )
             .then((rs) => {
@@ -274,12 +272,11 @@ export default function SendContent() {
         });
     }
     const send_btc2btc_UDT = () =>{
-        const {outPoint:{txHash,index:idx},cellOutput:{type:type_script,lock}} = selectAsset?.data;
+        const {cellOutput:{type:type_script,lock}} = selectAsset?.data;
 
         RGBHelper.instance
             .transfer_btc_to_btc(
-                txHash,
-                idx,
+
                 to,
                 type_script,
                 BI.from(parseUnit(amount.toString(), "ckb")).toBigInt(),
