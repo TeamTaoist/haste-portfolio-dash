@@ -29,7 +29,7 @@ export default function Dashboard() {
     if(currentWallet?.chain === 'ckb') {
       setTabs([...TAB_LIST,  {
         value: "spore",
-        label: "SPORE",
+        label: "DOB",
         component: <SporeList />,
       },{
         value: "cluster",
