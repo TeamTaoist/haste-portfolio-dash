@@ -101,12 +101,13 @@ export class RGBHelper {
   }
 
   async transfer_btc_to_btc(
-    btcTxHash: string,
-    btcTxIdx: number,
+
     toAddress: string,
     typeScript: Script,
+
     //@ts-ignore
-    amount: bigint = 0n
+    amount: bigint = 0n,
+    lock:Script,
   ) {
     // const curAccount = DataManager.instance.getCurAccount();
     const curAccount = store.getState().wallet.currentWalletAddress;
@@ -114,7 +115,7 @@ export class RGBHelper {
       throw new Error("Please choose a wallet");
     }
 
-    // const walletAddr = accountStore.currentAddress;
+
 
     const wallets = store.getState().wallet.wallets;
 
@@ -128,7 +129,8 @@ export class RGBHelper {
     if (wallet.chain.toUpperCase() != "BTC") return;
 
     const txHash = await this.btc_to_btc_buildTx(
-      [buildRgbppLockArgs(btcTxIdx, btcTxHash)],
+      // [buildRgbppLockArgs(btcTxIdx, btcTxHash)],
+      [lock.args],
       toAddress,
       wallet as WalletInfo,
       typeScript,
@@ -189,8 +191,8 @@ export class RGBHelper {
     toCkbAddress: string,
     typeScript: Script,
     transferAmount: bigint,
-    btcTxHash: string,
-    btcTxIdx: number
+
+    lock:Script
   ) {
     // const curAccount = DataManager.instance.getCurAccount();
 
@@ -211,7 +213,8 @@ export class RGBHelper {
     if (wallet.chain.toUpperCase() != "BTC") return;
 
     const txHash = await this.btc_to_ckb_buildTx(
-      [buildRgbppLockArgs(btcTxIdx, btcTxHash)],
+      // [buildRgbppLockArgs(btcTxIdx, btcTxHash)],
+      [lock.args],
       toCkbAddress,
       transferAmount,
       typeScript,

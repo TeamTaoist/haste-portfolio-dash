@@ -86,7 +86,7 @@ export default function AssetModal({
                 onClick={() => setSelectType(ASSET_TYPE.SPORE)}
                 disabled={selectWallet?.chain === 'btc'}
               >
-                {selectWallet?.chain === 'btc'?"RGB++ Spore":"Spore"}
+                {selectWallet?.chain === 'btc'?"RGB++ DOB":"DOB"}
               </button>
             </div>
             <div className="flex items-center gap-3 bg-white border outline-none px-4 pl-4 py-2.5 border-slate-300 !mr-0 w-full mr-3 rounded-md ">
@@ -167,7 +167,6 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
       item.amount  = unpackAmount(item.data).toString();
 
     })
-
 
     const groupedData = udtList.reduce((acc:any, obj:any) => {
       const key= obj?.cellOutput?.type?.args! ;
