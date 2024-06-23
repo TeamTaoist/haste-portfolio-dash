@@ -1,4 +1,4 @@
-import { BI, Script, helpers, utils } from "@ckb-lumos/lumos";
+import {BI, Script, helpers, utils, Indexer, RPC} from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -28,6 +28,10 @@ import { mainConfig, testConfig } from "./constants";
 import store from "../../store/store";
 import {getEnv} from "../../settings/env";
 import {BitcoinUnit} from "bitcoin-units";
+
+import {
+  OutPoint,
+} from "@ckb-lumos/base";
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -114,8 +118,6 @@ export class RGBHelper {
     if (!curAccount) {
       throw new Error("Please choose a wallet");
     }
-
-
 
     const wallets = store.getState().wallet.wallets;
 
@@ -237,6 +239,8 @@ export class RGBHelper {
       ckbNodeUrl: cfg.CKB_RPC_URL,
       ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
+
+
 
     const networkType = cfg.rgb_networkType;
     const service = BtcAssetsApi.fromToken(
@@ -383,14 +387,35 @@ export class RGBHelper {
       console.log("unsignedTx====",unsignedTx)
       return unsignedTx;
     }else{
+      let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
+      let indexURL = getEnv() === 'Mainnet'?mainConfig.CKB_INDEX_URL:testConfig.CKB_INDEX_URL
+      const indexer = new Indexer(indexURL, rpcURL);
       const emptyWitness = { lock: '', inputType: '', outputType: '' };
       let unsignedTx = {
         ...ckbRawTx,
+        cellProvider:indexer,
         cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(getEnv() === "mainnet")],
-
-        witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
+        fixedEntries: [],
+        signingEntries: [],
+        inputSinces: {},
+        // witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
       };
-      return unsignedTx;
+      // return unsignedTx;
+
+      const rpc = new RPC(rpcURL);
+      const fetcher = async(outPoint: OutPoint) => {
+        let rt = await rpc.getLiveCell(outPoint, true)
+        console.log("==rt.cell====",{...rt.cell,outPoint})
+        const{data,output} = rt.cell as any
+        return {data,cellOutput:output,outPoint}
+      }
+
+
+      const txSkeleton = await helpers.createTransactionSkeleton((unsignedTx as any), fetcher );
+      console.log("txSkeleton---fetcher",txSkeleton);
+      const txObj = helpers.transactionSkeletonToObject(txSkeleton)
+      console.log("txObj",txObj);
+      return txObj;
     }
     // >>
 
