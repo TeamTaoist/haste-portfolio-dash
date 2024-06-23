@@ -430,7 +430,7 @@ export class RGBHelper {
       let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
       let indexURL = getEnv() === 'Mainnet'?mainConfig.CKB_INDEX_URL:testConfig.CKB_INDEX_URL
       const indexer = new Indexer(indexURL, rpcURL);
-      const emptyWitness = { lock: '', inputType: '', outputType: '' };
+      // const emptyWitness = { lock: '', inputType: '', outputType: '' };
       let unsignedTx = {
         ...ckbRawTx,
         cellProvider:indexer,
