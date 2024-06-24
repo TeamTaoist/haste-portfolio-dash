@@ -1,11 +1,22 @@
+## [0.3.2](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.3.1...v0.3.2) (2024-06-24)
+
+
+### Bug Fixes
+
+* update ckb transaction ([4cac5fd](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/4cac5fd83476db896052cda419451c1ba8f0c580))
+* update ckb/btc transfer with udt ([9553e02](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/9553e021de6cc59423b5124d07b85d413816ca41))
+
+
+
 ## [0.3.1](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.3.0...v0.3.1) (2024-06-20)
 
 
 ### Bug Fixes
 
-* fix rgb++ transactions in BTC ([cce9bac](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/cce9bace597a30af17294a3a3d2574c354085282))
-* fix "DOB" from "Spore" ([c7a878e](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/c7a878e87c1fe80546550984714ba9b1950d77ca))
+* rgb++ transactions ([cce9bac](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/cce9bace597a30af17294a3a3d2574c354085282))
+* update "DOB" ([c7a878e](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/c7a878e87c1fe80546550984714ba9b1950d77ca))
 * update build warnings ([0a2e0d6](https://github.com/TeamTaoist/bitcoin-portfolio-dash/commit/0a2e0d611c82d938ad82670d88503e1123bda8c9))
+
 
 
 # [0.3.0](https://github.com/TeamTaoist/bitcoin-portfolio-dash/compare/v0.2.2...v0.3.0) (2024-06-18)
