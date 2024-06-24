@@ -1,4 +1,4 @@
-import { BI, Script, helpers, utils } from "@ckb-lumos/lumos";
+import {BI, Script, helpers, utils, Indexer, RPC} from "@ckb-lumos/lumos";
 import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
@@ -28,6 +28,46 @@ import { mainConfig, testConfig } from "./constants";
 import store from "../../store/store";
 import {getEnv} from "../../settings/env";
 import {BitcoinUnit} from "bitcoin-units";
+
+import {
+  OutPoint,
+} from "@ckb-lumos/base";
+
+const updateWitness = (fromScript:Script, txSkeleton:any) => {
+  const firstIndex = txSkeleton
+      .get("inputs")
+      .findIndex((input:any) =>
+          bytes.equal(blockchain.Script.pack(input.cellOutput.lock), blockchain.Script.pack(fromScript))
+      );
+  if (firstIndex !== -1) {
+    while (firstIndex >= txSkeleton.get("witnesses").size) {
+      txSkeleton = txSkeleton.update("witnesses", (witnesses:any) => witnesses.push("0x"));
+    }
+    let witness = txSkeleton.get("witnesses").get(firstIndex);
+    const newWitnessArgs = {
+      /* 65-byte zeros in hex */
+      lock: "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    };
+    if (witness !== "0x") {
+      const witnessArgs = blockchain.WitnessArgs.unpack(bytes.bytify(witness));
+      const lock = witnessArgs.lock;
+      if (!!lock && !!newWitnessArgs.lock && !bytes.equal(lock, newWitnessArgs.lock)) {
+        throw new Error("Lock field in first witness is set aside for signature!");
+      }
+      const inputType = witnessArgs.inputType;
+      if (!!inputType) {
+        (newWitnessArgs as any).inputType = inputType;
+      }
+      const outputType = witnessArgs.outputType;
+      if (!!outputType) {
+        (newWitnessArgs as any).outputType = outputType;
+      }
+    }
+    witness = bytes.hexify(blockchain.WitnessArgs.pack(newWitnessArgs));
+    txSkeleton = txSkeleton.update("witnesses", (witnesses:any) => witnesses.set(firstIndex, witness));
+  }
+  return txSkeleton;
+}
 
 export class RGBHelper {
   private static _instance: RGBHelper;
@@ -115,8 +155,6 @@ export class RGBHelper {
       throw new Error("Please choose a wallet");
     }
 
-
-
     const wallets = store.getState().wallet.wallets;
 
     const wallet = wallets.find((wallet) => wallet.address === curAccount);
@@ -178,6 +216,9 @@ export class RGBHelper {
       return CkbHepler.instance.sendTransaction(signed);
     }else if(wallet.walletName === "rei"){
       console.log("=====rei",unsignedRawTx)
+
+
+
       return await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
           txSkeleton:unsignedRawTx
         }})
@@ -186,6 +227,7 @@ export class RGBHelper {
 
     throw new Error("Please connect wallet");
   }
+
 
   async transfer_btc_to_ckb(
     toCkbAddress: string,
@@ -237,6 +279,8 @@ export class RGBHelper {
       ckbNodeUrl: cfg.CKB_RPC_URL,
       ckbIndexerUrl: cfg.CKB_INDEX_URL,
     });
+
+
 
     const networkType = cfg.rgb_networkType;
     const service = BtcAssetsApi.fromToken(
@@ -332,6 +376,7 @@ export class RGBHelper {
       transferAmount: amount,
       witnessLockPlaceholderSize: 1000,
     });
+    console.log("ckbRawTx",ckbRawTx);
 
     // joy id
     // <<
@@ -380,22 +425,43 @@ export class RGBHelper {
         witnesses: [witness, ...ckbRawTx.witnesses.slice(1)],
       };
 
-      console.log("unsignedTx====",unsignedTx)
       return unsignedTx;
     }else{
-      const emptyWitness = { lock: '', inputType: '', outputType: '' };
+      let rpcURL = getEnv() === 'Mainnet'?mainConfig.CKB_RPC_URL:testConfig.CKB_RPC_URL;
+      let indexURL = getEnv() === 'Mainnet'?mainConfig.CKB_INDEX_URL:testConfig.CKB_INDEX_URL
+      const indexer = new Indexer(indexURL, rpcURL);
+      // const emptyWitness = { lock: '', inputType: '', outputType: '' };
       let unsignedTx = {
         ...ckbRawTx,
+        cellProvider:indexer,
         cellDeps: [...ckbRawTx.cellDeps, getSecp256k1CellDep(getEnv() === "mainnet")],
-
-        witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
+        fixedEntries: [],
+        signingEntries: [],
+        inputSinces: {},
+        // witnesses: [emptyWitness, ...ckbRawTx.witnesses.slice(1)],
       };
-      return unsignedTx;
+      // return unsignedTx;
+
+      const rpc = new RPC(rpcURL);
+      const fetcher = async(outPoint: OutPoint) => {
+        let rt = await rpc.getLiveCell(outPoint, true)
+        const{data,output} = rt.cell as any
+        return {data,cellOutput:output,outPoint}
+      }
+
+
+      const txSkeleton = await helpers.createTransactionSkeleton((unsignedTx as any), fetcher );
+      const fromScript = helpers.parseAddress(ckb_wallet.address, {config: cfg.CONFIG});
+      const rt = updateWitness(fromScript,txSkeleton)
+      const txObj = helpers.transactionSkeletonToObject(rt)
+      return txObj;
     }
     // >>
 
     // throw new Error("Now Just support joyid");
   }
+
+
 
   async btc_to_ckb_buildTx(
     rgbppLockArgsList: string[],

@@ -86,9 +86,6 @@ export class CkbHepler {
     const unsigned = await this.buildTransfer(options);
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
-    console.log("===transfer_ckb====tx",tx)
-
-
     if (wallet.walletName == "joyidckb") {
       const signed = await signRawTransaction(
         tx as CKBTransaction,
@@ -122,7 +119,6 @@ export class CkbHepler {
 
     const unsigned = await this.buildTransfer(options);
     const txObj = helpers.transactionSkeletonToObject(unsigned)
-    console.log("===unsigned",txObj)
     const tx = helpers.createTransactionFromSkeleton(unsigned);
 
     if (wallet.walletName.indexOf("joyid")>-1) {
@@ -307,7 +303,6 @@ export class CkbHepler {
       } catch (error: any) {
         console.warn(error.message);
       }
-
       if (addNum) {
         sudt_sumAmount = sudt_sumAmount.add(addNum);
 
@@ -468,6 +463,17 @@ export class CkbHepler {
     }
     else {
       needCapacity = needCapacity.sub(sudt_sumCapacity);
+
+      const minFromCKBCell = BI.from(
+          helpers.minimalCellCapacity({
+            cellOutput: {
+              lock: fromScript,
+              capacity: BI.from(0).toHexString(),
+            },
+            data: "0x",
+          })
+      );
+
       const collect_ckb = indexer.collector({
         lock: {
           script: fromScript,
@@ -480,12 +486,16 @@ export class CkbHepler {
       for await (const collect of collect_ckb.collect()) {
         inputs_ckb.push(collect);
         ckb_sum = ckb_sum.add(collect.cellOutput.capacity);
-        if (ckb_sum.gte(needCapacity)) {
+        // if (ckb_sum.gte(needCapacity)) {
+        //   break;
+        // }
+        if (ckb_sum.sub(needCapacity).gte(minFromCKBCell)) {
           break;
         }
       }
       // >>
-      if (ckb_sum.lt(needCapacity)) {
+      // if (ckb_sum.lt(needCapacity)) {
+      if (ckb_sum.sub(needCapacity).lt(minFromCKBCell)) {
         throw new Error("No enough capacity");
       }
       for (let i = 0; i < inputs_ckb.length; i++) {
