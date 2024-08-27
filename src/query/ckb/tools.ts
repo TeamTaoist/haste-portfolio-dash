@@ -210,5 +210,23 @@ export const getClusterList = async(address: string) => {
             "0x64"
         ]
     })
+}
 
+
+export const getCells = async(address: string, page: number = 0) => {
+    const rs = await superagent
+        .post(`${backend}/api/explore`)
+        .set("Content-Type", "application/json")
+        .send({
+            req: `https://${getEnv() === 'Mainnet' ?  mainConfig.ckb_explorer_api : testConfig.ckb_explorer_api}/api/v1/addresses/${address}?page=${
+                page + 1
+            }&page_size=1000`,
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+
+    if (rs && rs.status == 200) {
+        return rs.text !== '' ? JSON.parse(rs.text): [];
+    }
 }
