@@ -19,6 +19,13 @@ import {mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 import {BtcHepler} from "../../lib/wallet/BtcHelper.ts";
 import {WalletType} from "../../lib/interface.ts";
 import {bitcoin} from "@rgbpp-sdk/btc";
+import {RefreshCcw} from  "lucide-react";
+import styled from "styled-components";
+import {formatString} from "../../utils/common.ts";
+import {BtcAssetsApi} from "@rgbpp-sdk/service";
+import Record from "../Modal/record.tsx";
+import {useIndexedDB} from "react-indexed-db-hook";
+
 
 
 export default function SplitContent() {
@@ -34,6 +41,9 @@ export default function SplitContent() {
     const [currentIndex, setCurrentIndex] = useState<number|null>(null);
 
     const[selectSplit, setSelectSplit] = useState<{txHash:string; index:number}|null>(null);
+
+    const [show,setShow] = useState<boolean>(false);
+    const { add } = useIndexedDB("records");
 
     const dispatch = useDispatch();
 
@@ -78,7 +88,6 @@ export default function SplitContent() {
 
     const onConfirm = async() => {
         setLoading(true)
-        console.log(selectWallet)
         try{
 
             const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
@@ -104,12 +113,18 @@ export default function SplitContent() {
             );
             console.log("psbtHex",bitcoin.Psbt.fromHex(psbtHex))
 
-            const btcTxId = await rgbppLeapHelper.sendPsbt({
+            const btcTxIdObj = await rgbppLeapHelper.sendPsbt({
                 ckbVirtualTxResult,
                 psbt: bitcoin.Psbt.fromHex(psbtHex),
             });
 
-            console.log("btcTxId",btcTxId)
+            console.log("btcTxId",btcTxIdObj)
+
+            add({
+                txHash:(btcTxIdObj as any)?.btcTxHash,
+                timestamp: new Date().valueOf(),
+                status:"delayed",
+            })
 
         }catch(error){
             console.error(error)
@@ -138,16 +153,21 @@ export default function SplitContent() {
         const txHashFomat = Uint256LE.pack(append0x(txHash));
         const txHashFinished = bytes.hexify(txHashFomat)
         setCurrentIndex(Itemindex)
-
-        console.log({
-            txHash: txHashFinished,
-            index:indexFinished
-        })
         setSelectSplit({
             txHash: txHashFinished,
             index:indexFinished
         })
     }
+
+    const handleClose =()=>{
+        setShow(false)
+    }
+
+    const handleShow = () =>{
+        setShow(true)
+    }
+
+
 
     return (
         <>
@@ -155,7 +175,11 @@ export default function SplitContent() {
                 loading && <Loading />
             }
             <div className="flex flex-col gap-2">
-                <p className="font-semibold ">Send from</p>
+                <div className="flex justify-between">
+                    <p className="font-semibold ">From</p>
+                    <div className="underline text-primary011 cursor-pointer text-sm" onClick={()=>handleShow()}>Records</div>
+                </div>
+
                 <WalletSelect
                     selectWallet={selectWallet}
                     wallets={filterwallet}
@@ -179,6 +203,11 @@ export default function SplitContent() {
                 onClick={onConfirm} disabled={selectSplit == null}
             >Split
             </button>
+
+            {
+                show &&   <Record handleClose={handleClose} />
+            }
+
 
         </>
     );

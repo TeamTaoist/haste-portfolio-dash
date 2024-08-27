@@ -9,7 +9,6 @@ import SporeImg from "../../assets/img/spore.svg";
 
 import BigNumber from "bignumber.js";
 import LoadingBtn from "../../context/loadingBtn.tsx";
-import {WalletItem} from "../../store/wallet/walletSlice.ts";
 
 const DlBox = styled.dl`
     background: #fff;
