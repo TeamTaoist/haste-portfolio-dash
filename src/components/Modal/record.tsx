@@ -50,7 +50,7 @@ const BgBox = styled.div`
         &.failed{
             color: rgb(220, 38, 38);
         }
-        &.success{
+        &.completed{
             color: rgb(22, 163, 74);
         }
     }

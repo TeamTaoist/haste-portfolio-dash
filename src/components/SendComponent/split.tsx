@@ -81,8 +81,25 @@ export default function SplitContent() {
 
 
         const result = Object.values(groupedData);
+        const filterArr = result.filter((item:any) => {
+            if(item.length > 1)
+            {
+                const groupedArgs = item.reduce((acc:any, obj:any) => {
+                    const key= obj?.cellOutput?.type?.codeHash!;
+                    if (!acc[key]) {
+                        acc[key] = []
+                    }
+                    acc[key].push(obj)
 
-        const filterArr = result.filter((item:any) => item.length > 1) ?? []
+                    return acc;
+                }, {});
+
+                let newKeys = Object.keys(groupedArgs);
+                return newKeys.length >1
+            }else{
+                return false
+            }
+        }) ?? []
         setList(filterArr)
     }
 

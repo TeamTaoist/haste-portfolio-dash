@@ -322,11 +322,11 @@ export class RGBHelper {
 
     const btcTxId = await BtcHepler.instance.pushPsbt(psbtHex,  btc_wallet?.walletName!);
 
-    // const rgbppState = await service.sendRgbppCkbTransaction({
-    //   btc_txid: btcTxId,
-    //   ckb_virtual_result: ckbVirtualTxResult,
-    // });
-
+    const rgbppState = await service.sendRgbppCkbTransaction({
+      btc_txid: btcTxId,
+      ckb_virtual_result: ckbVirtualTxResult,
+    });
+    console.log("rgbppState", rgbppState);
 
     await this.retryBtcTxId(btcTxId);
 

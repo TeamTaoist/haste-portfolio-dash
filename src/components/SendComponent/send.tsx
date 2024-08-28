@@ -266,7 +266,7 @@ export default function SendContent() {
             })
             .catch((err) => {
                 console.error(err);
-                enqueueSnackbar("Transfer Error", {variant: "error"})
+                enqueueSnackbar(err.message, {variant: "error"})
             }).finally(()=>{
                 setLoading(false)
         });
@@ -288,7 +288,7 @@ export default function SendContent() {
             })
             .catch((err) => {
                 console.error(err);
-                enqueueSnackbar("Transfer Error", {variant: "error"})
+                enqueueSnackbar(err.message, {variant: "error"})
             }).finally(()=>{
             setLoading(false)
         });
