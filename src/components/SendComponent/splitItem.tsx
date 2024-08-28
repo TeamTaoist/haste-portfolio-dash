@@ -60,13 +60,10 @@ const FlexLine = styled.div`
     }
 `
 
-export default function SplitItem({item,handleSelectSplit,Itemindex,currentIndex}){
+export default function SplitItem({item,handleSelectSplit,Itemindex,currentIndex}:any){
 
     const [loading,setLoading] = useState(false);
     const [assetList, setAssetList] = useState<any>([]);
-    const [selectItem,setSelectItem] = useState();
-
-
 
     useEffect(() => {
         getDetail()

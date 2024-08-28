@@ -6,7 +6,6 @@ import {mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 import {BtcAssetsApi} from "@rgbpp-sdk/service";
 import { useIndexedDB } from "react-indexed-db-hook";
 import {useEffect, useState} from "react";
-import LoadingBtn from "../../context/loadingBtn.tsx";
 
 const BgBox = styled.div`
     background: #fff;
@@ -98,9 +97,9 @@ const LoadingBox = styled.div`
         100%{transform: rotate(1turn)}
     }
 `
-export default function Record({handleClose}){
+export default function Record({handleClose}:{handleClose:()=>void}) {
 
-    const { getAll,deleteRecord,update,getByID } = useIndexedDB("records");
+    const { getAll,deleteRecord,update } = useIndexedDB("records");
     const [list,setList] = useState<any[]>([]);
     const [loading,setLoading] = useState(false);
     const[current,setCurrent]=useState<string>('')

@@ -19,10 +19,6 @@ import {mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 import {BtcHepler} from "../../lib/wallet/BtcHelper.ts";
 import {WalletType} from "../../lib/interface.ts";
 import {bitcoin} from "@rgbpp-sdk/btc";
-import {RefreshCcw} from  "lucide-react";
-import styled from "styled-components";
-import {formatString} from "../../utils/common.ts";
-import {BtcAssetsApi} from "@rgbpp-sdk/service";
 import Record from "../Modal/record.tsx";
 import {useIndexedDB} from "react-indexed-db-hook";
 
@@ -157,7 +153,7 @@ export default function SplitContent() {
         dispatch(setCurrentWalletAddress(w.address))
     }
 
-    const handleSelectSplit = (asset:any,Itemindex) =>{
+    const handleSelectSplit = (asset:any,Itemindex:number) =>{
         const str = asset[0]?.cellOutput?.lock?.args.substring(2);
 
         const index = str.substring(0, 8);
@@ -199,7 +195,7 @@ export default function SplitContent() {
 
                 <WalletSelect
                     selectWallet={selectWallet}
-                    wallets={filterwallet}
+                    wallets={filterwallet!}
                     onChangeSelect={(w) => handleSelect(w)}
                 />
             </div>
