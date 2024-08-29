@@ -10,13 +10,13 @@ const Send: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'send' | 'receive' | 'split'>('send');
 
   return (
-    <main className="flex flex-col flex-1 min-h-screen bg-gray-100 text-black h-full">
+    <main className="flex flex-col flex-1 min-h-screen bg-gray-100 text-black h-full w-full">
       <div className="pb-10 md:mx-4 my-4 lg:mx-8 lg:my-0 h-full flex flex-col">
-        <div className=" text-hd1mb w-full py-4 px-4 font-Montserrat my-4 pt-2">
+        <div className="sm:mt-20 text-hd1mb w-full py-4 px-4 font-Montserrat my-4 pt-2">
           Send & Receive
         </div>
         <div className="flex items-center justify-center w-full flex-1 flex-grow">
-          <div className="rounded-2xl bg-white p-4  px-4 sm:px-6 h-auto w-[520px] sm:w-full py-8  sm:rounded-none">
+          <div className="rounded-2xl bg-white p-4  px-4 sm:px-6 h-auto w-[520px] sm:w-full py-8  sm:rounded-none ">
             <div className="flex -mx-4 top-0 overflow-hidden sm:space-x-0 sm:px-7 bg-inherit  border-none z-1 static px-4">
               <div
                 onClick={() => {
