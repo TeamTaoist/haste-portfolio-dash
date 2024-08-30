@@ -5,6 +5,13 @@ import { getXudtAndSpore } from "../../query/ckb/tools";
 import { ckb_SporeInfo } from "../../types/BTC";
 import {formatString, getImg} from "../../utils/common";
 import CellInfo from "../Modal/cellInfo.tsx";
+import {getRgbAssets} from "../../query/rgbpp/tools.ts";
+import {getSporeTypeScript, getXudtTypeScript} from "../../lib/wallet/constants.ts";
+import {getEnv} from "../../settings/env.ts";
+import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
+import {BI} from "@ckb-lumos/lumos";
+import {getSporeScript, predefinedSporeConfigs} from "@spore-sdk/core";
+import SporeItem from "./sporeItem.tsx";
 
 
 export default function SporeList() {
@@ -31,11 +38,29 @@ export default function SporeList() {
     setIsLoading(false);
   }
 
+
+  const _getRgbAsset = async (address: string) => {
+    const list = await getRgbAssets(address);
+
+    const sporeConfig = getEnv()==="Testnet"? predefinedSporeConfigs.Testnet:predefinedSporeConfigs.Mainnet;
+    const versionStr = getEnv() === 'Testnet'?"preview":"latest";
+    const sporeType = getSporeScript(sporeConfig,"Spore",["v2",versionStr]);
+
+    const {codeHash} = sporeType.script
+    const sporeList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
+
+    console.log("sporeList",sporeList);
+
+    // @ts-ignore
+    setSpores(sporeList as any)
+    setIsLoading(false);
+  };
+
   const getCurrentAssets = async() => {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
     const chain = currentWallet?.chain;
     if ( chain && chain === 'btc') {
-
+      await _getRgbAsset(currentWallet?.address!!)
     } else if (chain && chain === 'ckb') {
       await _getSpore(currentWallet?.address!!);
     }
@@ -51,8 +76,6 @@ export default function SporeList() {
   }
 
   const handleCurrent = (dob:any) =>{
-
-
     setCurrentToken(dob);
     setShow(true)
   }
@@ -80,24 +103,25 @@ export default function SporeList() {
       ) : (
         spores.map((spore) => (
           <div
-            key={spore.amount}
+            key={spore.amount || (spore as any)?.cellOutput?.type?.args}
             className="relative translate-y-0 hover:z-10 hover:shadow-2xl hover:-translate-y-0.5 bg-inherit rounded-lg shadow-xl transition-all cursor-pointer group bg-white"
             onClick={()=>handleCurrent(spore)}
           >
-            <div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-gray-200 ">
-              {
-                // eslint-disable-next-line @next/next/no-img-element
-                spore.type?.startsWith('image') && <img src={spore.image} alt="" className="w-full object-cover block" />
-              }
-              {
-                // eslint-disable-next-line @next/next/no-img-element
-                spore.url && <img src={spore.url} alt="" className="w-full object-cover block" />
-              }
-              {
-                (!spore.type?.startsWith('image') && !spore.url) && <p className="p-3">{spore.textContent}</p>
-              }
-            </div>
-            <div className="p-3">{formatString(spore.amount, 5)}</div>
+            <SporeItem tokenKey={(spore as any)?.cellOutput?.type?.args} data={spore?.data} key={(spore as any)?.cellOutput?.type?.args} />
+            {/*<div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-gray-200 ">*/}
+            {/*  {*/}
+            {/*    // eslint-disable-next-line @next/next/no-img-element*/}
+            {/*    spore.type?.startsWith('image') && <img src={spore.image} alt="" className="w-full object-cover block" />*/}
+            {/*  }*/}
+            {/*  {*/}
+            {/*    // eslint-disable-next-line @next/next/no-img-element*/}
+            {/*    spore.url && <img src={spore.url} alt="" className="w-full object-cover block" />*/}
+            {/*  }*/}
+            {/*  {*/}
+            {/*    (!spore.type?.startsWith('image') && !spore.url) && <p className="p-3">{spore.textContent}</p>*/}
+            {/*  }*/}
+            {/*</div>*/}
+            <div className="p-3">{formatString(spore.amount || (spore as any)?.cellOutput?.type?.args, 5)}</div>
           </div>
         ))
       )}

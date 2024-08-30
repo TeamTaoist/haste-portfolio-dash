@@ -12,6 +12,11 @@ const TAB_LIST: TabsType[] = [
     value: "udt",
     label: "UDT",
     component: <UDTList />,
+  },
+  {
+    value: "spore",
+    label: "DOB",
+    component: <SporeList />,
   }
 ];
 
@@ -28,10 +33,6 @@ export default function Dashboard() {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
     if(currentWallet?.chain === 'ckb') {
       setTabs([...TAB_LIST,  {
-        value: "spore",
-        label: "DOB",
-        component: <SporeList />,
-      },{
         value: "cluster",
         label: "CLUSTER",
         component: <ClusterList />,

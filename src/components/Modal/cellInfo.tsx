@@ -5,6 +5,8 @@ import Type from "./type.tsx";
 import Data from "./data.tsx";
 import Usage from "./usage.tsx";
 import {XIcon} from "lucide-react";
+import {useSelector} from "react-redux";
+import {RootState} from "../../store/store.ts";
 
 
 const MaskBox = styled.div`
@@ -33,6 +35,10 @@ const BgBox = styled.div`
 export default function CellInfo({xUdt,handleClose,noCapacity}:any){
     const [currentTab, setCurrentTab] = useState<string>("lock");
 
+    const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
+    const wallets = useSelector((state: RootState) => state.wallet.wallets);
+    const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
+
     const [tabs,setTabs] = useState([
         {
             value: "lock",
@@ -57,7 +63,7 @@ export default function CellInfo({xUdt,handleClose,noCapacity}:any){
         let arr = [...tabs]
         arr.pop()
         setTabs(arr)
-        
+
     }, [noCapacity]);
 
     return <MaskBox>
@@ -87,16 +93,16 @@ export default function CellInfo({xUdt,handleClose,noCapacity}:any){
 
             <div className="mt-4">
                 {
-                    currentTab === 'lock' && <Lock/>
+                    currentTab === 'lock' &&   <Lock lockScript={currentWallet?.chain  === 'btc'? xUdt?.cellOutput?.lock : null} type={currentWallet?.chain} />
                 }
                 {
-                    currentTab === 'type' && <Type typeScript={xUdt?.type_script || xUdt?.output.type}/>
+                    currentTab === 'type' && <Type typeScript={xUdt?.type_script || xUdt?.output?.type || xUdt?.cellOutput?.type}/>
                 }
                 {
                     currentTab === 'data' && <Data xUdt={xUdt}/>
                 }
                 {
-                    currentTab === 'usage' && <Usage xUdt={xUdt} />
+                    currentTab === 'usage' && <Usage xUdt={xUdt} type={currentWallet?.chain} />
                 }
             </div>
         </BgBox>
