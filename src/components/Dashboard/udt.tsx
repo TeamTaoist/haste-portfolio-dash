@@ -215,11 +215,9 @@ export default function UDTList() {
                           {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
                         </p>
 
-                        {
-                          chain === "ckb" &&<RhtBox onClick={()=>handleCurrent(xudt)}>
+                       <RhtBox onClick={()=>handleCurrent(xudt)}>
                               <span>Cell Info</span>
                               <EllipsisVerticalIcon size={16} className="cursor-pointer" /></RhtBox>
-                        }
 
 
 
