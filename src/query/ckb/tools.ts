@@ -65,7 +65,13 @@ export const getXudtAndSpore = async(address: string) => {
     // const cfg = getEnv() === 'Mainnet' ? TestnetInfo : MainnetInfo;
     const lumosConfig =getEnv() === 'Mainnet' ? predefined.LINA :predefined.AGGRON4 ;
     const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
-    const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');
+    // const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');
+
+
+    const sporeConfig = getEnv()==="Testnet"? predefinedSporeConfigs.Testnet:predefinedSporeConfigs.Mainnet;
+    const versionStr = getEnv() === 'Testnet'?"preview":"latest";
+    const sporeType = getSporeScript(sporeConfig,"Spore",["v2",versionStr]);
+    // const sporeTypeScript = getSporeTypeScript(getEnv() === 'Mainnet');
     const xudt_collector = indexer.collector({
       lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: {
@@ -83,8 +89,8 @@ export const getXudtAndSpore = async(address: string) => {
       lock: helpers.parseAddress(address,{config:lumosConfig}),
       type: {
         script: {
-          codeHash: sporeTypeScript?.codeHash!,
-          hashType: sporeTypeScript?.hashType!,
+          codeHash: sporeType?.script.codeHash!,
+          hashType: sporeType?.script.hashType!,
           args: "0x",
         },
         searchMode: "prefix",

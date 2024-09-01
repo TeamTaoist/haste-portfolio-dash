@@ -2,6 +2,9 @@ import { getEnv } from '../settings/env';
 import { getPublicKey, initConfig as initBTCConfig, requestAccounts } from '@joyid/bitcoin'
 import { connect, initConfig } from '@joyid/ckb';
 import { mainConfig, testConfig } from '../lib/wallet/constants';
+import store from "../store/store.ts";
+import {saveJoyidInfo} from "../store/wallet/walletSlice.ts";
+
 
 export const OKXConnect = async () => {
 
@@ -66,7 +69,12 @@ export const JoyIDCKBConnect = async () => {
       // joyidAppURL: process.env.NODE_ENV === 'development' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
       joyidAppURL: getEnv() === 'Testnet' ? testConfig.joyIdUrl : mainConfig.joyIdUrl,
   })
+
   const JoyIDCkbWallet = await connect();
+
+  store.dispatch(saveJoyidInfo(JoyIDCkbWallet))
+
+
   return {
     address: JoyIDCkbWallet.address,
     publickKey: JoyIDCkbWallet.pubkey

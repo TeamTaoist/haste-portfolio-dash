@@ -1,5 +1,5 @@
 import {BI, Script, helpers, utils, Indexer, RPC} from "@ckb-lumos/lumos";
-import { RgbAssert, WalletInfo, btc_utxo } from "../interface";
+import {RgbAssert, WalletInfo, btc_utxo, WalletType} from "../interface";
 import { BtcHepler } from "./BtcHelper";
 import {
   buildRgbppLockArgs,
@@ -21,13 +21,14 @@ import { CkbHepler } from "./CkbHelper";
 import { DataManager } from "../manager/DataManager";
 import { bytes } from "@ckb-lumos/codec";
 import { blockchain } from "@ckb-lumos/base";
-import { DataSource, sendBtc, sendRgbppUtxos } from "@rgbpp-sdk/btc";
+import {bitcoin, DataSource, sendBtc, sendRgbppUtxos} from "@rgbpp-sdk/btc";
 import { BtcAssetsApi } from "@rgbpp-sdk/service";
 // import { accountStore } from "@/store/AccountStore";
 import { mainConfig, testConfig } from "./constants";
 import store from "../../store/store";
 import {getEnv} from "../../settings/env";
 import {BitcoinUnit} from "bitcoin-units";
+import LeapHelper from "rgbpp-leap-helper/lib";
 
 import {
   OutPoint,
@@ -472,7 +473,6 @@ export class RGBHelper {
   ) {
     const cfg = getEnv() ? testConfig : mainConfig;
 
-    console.log("rgbppLockArgsList", rgbppLockArgsList, toCkbAddress);
 
     const collector = new Collector({
       ckbNodeUrl: cfg.CKB_RPC_URL,
@@ -719,4 +719,68 @@ export class RGBHelper {
   //   const jobStat = await service.getRgbppTransactionState(txId);
   //   console.log("jobStat", jobStat);
   // }
+
+  async transfer_btc_to_btc_spore(address:string,publickey:string,toAddress:string,args:string,type:string){
+
+    const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
+    const rgbppLeapHelper = new LeapHelper(
+        false,
+        cfg.BTC_ASSETS_API_URL,
+        cfg.BTC_ASSETS_TOKEN,
+        cfg.BTC_ASSETS_ORGIN
+    );
+
+    const { unsignedPsbt, ckbVirtualTxResult } =
+        await rgbppLeapHelper.spore_rgbppTransferCreateUnsignedPsbt({
+          btcAddress: address as string,
+          btcPubKey: publickey,
+          toBtcAddress: toAddress,
+          sporeId: args,
+        });
+
+    const psbtHex = await BtcHepler.instance.signPsdt(
+        unsignedPsbt.toHex(),
+        type as WalletType
+    );
+
+    const btcTxIdObj = await rgbppLeapHelper.sendPsbt({
+      ckbVirtualTxResult,
+      psbt: bitcoin.Psbt.fromHex(psbtHex),
+    });
+
+    return btcTxIdObj.btcTxHash
+
+  }
+
+  async transfer_btc_to_ckb_spore(address:string,publickey:string,toAddress:string,args:string,type:string){
+
+    const cfg = getEnv() === 'Testnet' ? testConfig : mainConfig;
+    const rgbppLeapHelper = new LeapHelper(
+        false,
+        cfg.BTC_ASSETS_API_URL,
+        cfg.BTC_ASSETS_TOKEN,
+        cfg.BTC_ASSETS_ORGIN
+    );
+
+    const { unsignedPsbt, ckbVirtualTxResult } =
+        await rgbppLeapHelper.spore_leapToCkbCreateUnsignedPsbt({
+          btcAddress: address as string,
+          btcPubKey: publickey,
+          toCkbAddress: toAddress,
+          sporeId: args,
+        });
+
+    const psbtHex = await BtcHepler.instance.signPsdt(
+        unsignedPsbt.toHex(),
+        type as WalletType
+    );
+
+    const btcTxIdObj = await rgbppLeapHelper.sendPsbt({
+      ckbVirtualTxResult,
+      psbt: bitcoin.Psbt.fromHex(psbtHex),
+    });
+
+    return btcTxIdObj.btcTxHash
+
+  }
 }

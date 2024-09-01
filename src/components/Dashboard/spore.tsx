@@ -6,10 +6,7 @@ import { ckb_SporeInfo } from "../../types/BTC";
 import {formatString, getImg} from "../../utils/common";
 import CellInfo from "../Modal/cellInfo.tsx";
 import {getRgbAssets} from "../../query/rgbpp/tools.ts";
-import {getSporeTypeScript, getXudtTypeScript} from "../../lib/wallet/constants.ts";
 import {getEnv} from "../../settings/env.ts";
-import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
-import {BI} from "@ckb-lumos/lumos";
 import {getSporeScript, predefinedSporeConfigs} from "@spore-sdk/core";
 import SporeItem from "./sporeItem.tsx";
 
@@ -34,6 +31,7 @@ export default function SporeList() {
   const _getSpore = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
     const list = await handleSporeList(assetsList.sporeList)
+
     setSpores(list as any);
     setIsLoading(false);
   }
@@ -48,8 +46,6 @@ export default function SporeList() {
 
     const {codeHash} = sporeType.script
     const sporeList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
-
-    console.log("sporeList",sporeList);
 
     // @ts-ignore
     setSpores(sporeList as any)
@@ -107,7 +103,7 @@ export default function SporeList() {
             className="relative translate-y-0 hover:z-10 hover:shadow-2xl hover:-translate-y-0.5 bg-inherit rounded-lg shadow-xl transition-all cursor-pointer group bg-white"
             onClick={()=>handleCurrent(spore)}
           >
-            <SporeItem tokenKey={(spore as any)?.cellOutput?.type?.args} data={spore?.data} key={(spore as any)?.cellOutput?.type?.args} />
+            <SporeItem tokenKey={(spore as any)?.cellOutput?.type?.args || (spore as any)?.allObj?.cellOutput?.type?.args} data={spore?.data} key={(spore as any)?.cellOutput?.type?.args} />
             {/*<div className="flex shrink-0 aspect-square rounded-t-md overflow-hidden items-center bg-gray-200 ">*/}
             {/*  {*/}
             {/*    // eslint-disable-next-line @next/next/no-img-element*/}

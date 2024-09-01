@@ -12,11 +12,13 @@ export interface WalletItem {
 interface WalletState {
   wallets: WalletItem[],
   currentWalletAddress: string | undefined
+  joyidInfo?:any
 }
 
 const initialState: WalletState = {
   wallets: [],
   currentWalletAddress: undefined,
+  joyidInfo:null,
 };
 
 export const walletSlice = createSlice({
@@ -37,6 +39,10 @@ export const walletSlice = createSlice({
         state.currentWalletAddress = state.wallets[0]?.address
       }
     },
+    saveJoyidInfo: (state, action: PayloadAction<any>) => {
+      state.joyidInfo = action.payload;
+    },
+
     removeWalletItem: (state, action: PayloadAction<string>) => {
       state.wallets = state.wallets.filter(wallet => wallet.address !== action.payload);
       if (state.currentWalletAddress === action.payload) {
@@ -53,7 +59,7 @@ export const walletSlice = createSlice({
 },
 });
 
-export const { initializeWallets, addWalletItem, removeWalletItem, setCurrentWalletAddress } = walletSlice.actions;
+export const { initializeWallets, addWalletItem, removeWalletItem, setCurrentWalletAddress,saveJoyidInfo } = walletSlice.actions;
 
 
 export default walletSlice.reducer;
