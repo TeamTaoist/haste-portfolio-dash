@@ -2,14 +2,14 @@ import styled from "styled-components";
 import {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../store/store.ts";
-import {helpers} from "@ckb-lumos/lumos";
+import {helpers, Script} from "@ckb-lumos/lumos";
 import {getEnv} from "../../settings/env.ts";
 import {mainConfig, testConfig} from "../../lib/wallet/constants.ts";
 
 const Box = styled.div`
     line-height: 2em;
 `
-export default function Lock({lockScript,type}){
+export default function Lock({lockScript,type}:{lockScript:Script,type:string}){
     const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
 
     useEffect(() => {

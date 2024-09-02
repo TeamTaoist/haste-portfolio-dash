@@ -135,6 +135,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   const [reloadData,setReloadData] = useState([])
 
 
+
   useEffect(() => {
     document.addEventListener(EventType.dashboard_tokens_reload,refreshDom)
     return () =>{
@@ -292,7 +293,7 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
 
     const chain = currentWallet?.chain;
     if ( chain && chain === 'btc') {
-
+      console.log(selectWallet)
       await _getRgbAsset(currentWallet?.address!!)
 
     } else if (chain && chain === 'ckb') {

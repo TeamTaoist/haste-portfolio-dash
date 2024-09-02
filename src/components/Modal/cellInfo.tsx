@@ -93,7 +93,7 @@ export default function CellInfo({xUdt,handleClose,noCapacity}:any){
 
             <div className="mt-4">
                 {
-                    currentTab === 'lock' &&   <Lock lockScript={currentWallet?.chain  === 'btc'? xUdt?.cellOutput?.lock : null} type={currentWallet?.chain} />
+                    currentTab === 'lock' &&   <Lock lockScript={currentWallet?.chain  === 'btc'? xUdt?.cellOutput?.lock : null} type={currentWallet?.chain!} />
                 }
                 {
                     currentTab === 'type' && <Type typeScript={xUdt?.type_script || xUdt?.output?.type || xUdt?.cellOutput?.type}/>

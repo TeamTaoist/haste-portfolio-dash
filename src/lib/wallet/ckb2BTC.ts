@@ -1,7 +1,7 @@
 import LeapHelper from "rgbpp-leap-helper/lib";
 import {getEnv} from "../../settings/env.ts";
 import {mainConfig, testConfig} from "./constants.ts";
-import {BI, Cell, helpers, Indexer, RPC, Script, Transaction,} from "@ckb-lumos/lumos";
+import {BI, Cell, CellDep, helpers, Indexer, RPC, Script, Transaction,} from "@ckb-lumos/lumos";
 import {blockchain, OutPoint} from "@ckb-lumos/base";
 import {predefined} from "@ckb-lumos/config-manager";
 import { assembleTransferSporeAction, assembleCobuildWitnessLayout } from '@spore-sdk/core/lib/cobuild'
@@ -56,6 +56,7 @@ export const ckb2BTC_spore = async (address:string,publickey:string,toAddress:st
 
     const inputArr = txSkeleton.get("inputs").toArray();
     const outputArr = txSkeleton.get("outputs").toArray();
+    console.log(publickey)
 
     const inputObj = inputArr[0];
     const {content} = inputObj.data as any
@@ -328,11 +329,11 @@ const updateWitness = async(txSkeleton:TransactionSkeletonType,myScript:Script,c
 
             let cellDeps = txSkeleton.get("cellDeps")
 
-            txSkeleton = txSkeleton.update("cellDeps", (cellDep) => cellDep.set(0,cotaCellDep));
+            txSkeleton = txSkeleton.update("cellDeps", (cellDep) => cellDep.set(0,cotaCellDep as CellDep));
 
             for (let i = 0; i < cellDeps.size; i++) {
                 const item = cellDeps.get(i)
-                txSkeleton = txSkeleton.update("cellDeps", (cellDep) => cellDep.set(i+1,item));
+                txSkeleton = txSkeleton.update("cellDeps", (cellDep) => cellDep.set(i+1,item!));
             }
         }
     }
@@ -352,7 +353,7 @@ const updateWitness = async(txSkeleton:TransactionSkeletonType,myScript:Script,c
                 lock: "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
             };
             if (witness !== "0x") {
-                const witnessArgs = blockchain.WitnessArgs.unpack(bytes.bytify(witness));
+                const witnessArgs = blockchain.WitnessArgs.unpack(bytes.bytify(witness!));
                 const lock = witnessArgs.lock;
                 if (!!lock && !!newWitnessArgs.lock && !bytes.equal(lock, newWitnessArgs.lock)) {
                     throw new Error("Lock field in first witness is set aside for signature!");
