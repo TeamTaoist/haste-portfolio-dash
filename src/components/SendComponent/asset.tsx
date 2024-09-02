@@ -21,6 +21,8 @@ import {BI} from "@ckb-lumos/lumos";
 import {getEnv} from "../../settings/env.ts";
 import {unpackAmount} from "@ckb-lumos/common-scripts/lib/sudt";
 import {getXudtTypeScript} from "../../lib/wallet/constants.ts";
+import {getSporeScript, predefinedSporeConfigs} from "@spore-sdk/core";
+import SporeItem from "../Dashboard/sporeItem.tsx";
 
 export enum ASSET_TYPE {
   UDT,
@@ -84,7 +86,6 @@ export default function AssetModal({
                   selectType === ASSET_TYPE.SPORE ? "bg-primary011 text-white font-bold" : ""
                 } focus:outline-none focus:ring-0 sm:px-4 md:px-4 whitespace-nowrap`}
                 onClick={() => setSelectType(ASSET_TYPE.SPORE)}
-                disabled={selectWallet?.chain === 'btc'}
               >
                 {selectWallet?.chain === 'btc'?"RGB++ DOB":"DOB"}
               </button>
@@ -101,7 +102,7 @@ export default function AssetModal({
             </div>
           </div>
           <div className="mt-4">
-            <div className="sm:overflow-y-auto h-full sm:h-[380px]">
+            <div className="overflow-y-auto h-[380px]">
               {selectType === ASSET_TYPE.UDT  && (
                 <UdtAsset onSelect={onSelectAsset} ref={assetRef} selectWallet={selectWallet} />
               )}
@@ -132,6 +133,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   // const wallets = useSelector((state: RootState) => state.wallet.wallets);
   // const currentAddress = useSelector((state: RootState) => state.wallet.currentWalletAddress);
   const [reloadData,setReloadData] = useState([])
+
 
 
   useEffect(() => {
@@ -288,15 +290,35 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
 
   const getCurrentAssets = async() => {
     const currentWallet = wallets.find(wallet => wallet.address === currentAddress);
-    console.log(selectWallet)
 
     const chain = currentWallet?.chain;
     if ( chain && chain === 'btc') {
+      console.log(selectWallet)
+      await _getRgbAsset(currentWallet?.address!!)
 
     } else if (chain && chain === 'ckb') {
       await _getSpore(currentWallet?.address!!);
     }
   }
+
+
+  const _getRgbAsset = async (address: string) => {
+    const list = await getRgbAssets(address);
+
+    const sporeConfig = getEnv()==="Testnet"? predefinedSporeConfigs.Testnet:predefinedSporeConfigs.Mainnet;
+    const versionStr = getEnv() === 'Testnet'?"preview":"latest";
+    const sporeType = getSporeScript(sporeConfig,"Spore",["v2",versionStr]);
+
+    const {codeHash} = sporeType.script
+    const sporeList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
+
+    const listAfter = sporeList.map((item:any)=> {return {...item, amount:item?.cellOutput?.type?.args}})
+
+    // @ts-ignore
+    setSpores(listAfter as any)
+    setFilteredSpores(listAfter as any);
+    setIsLoading(false);
+  };
 
 
   useEffect(() => {
@@ -332,9 +354,10 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
       }else{
         spores.map((spore)=>{
           console.log(spore.amount)
+
         })
 
-        const arr = spores.filter(spore => spore.amount.indexOf(keyword) >- 1);
+        const arr = spores.filter(spore => spore.amount.indexOf(keyword) >- 1 );
 
         setFilteredSpores(arr);
       }
@@ -355,35 +378,9 @@ const SporeAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet },
                   className="group group flex rounded-md items-center justify-start w-full gap-4 px-2 sm:px-4 py-3 text-sm hover:bg-gray-100"
                   onClick={() => onSelect({type: ASSET_TYPE.SPORE, data: spore})}
               >
-                <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
+                <div className="w-8 h-8 ">
 
-
-                  {
-                    // eslint-disable-next-line @next/next/no-img-element
-                      spore.type?.startsWith('image') && <img src={spore.image} alt="" className="w-full object-cover block rounded-lg" />
-                  }
-                  {
-                    // eslint-disable-next-line @next/next/no-img-element
-                      spore.url && <img src={spore.url} alt="" className="w-full object-cover block" />
-                  }
-                  {
-                      (!spore.type?.startsWith('image') && !spore.url) && <p className="p-3">{spore.textContent}</p>
-                  }
-
-                  {/*<img*/}
-                  {/*    src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}*/}
-                  {/*    alt=""*/}
-                  {/*    className="w-full object-cover block rounded-lg"*/}
-                  {/*/>*/}
-                  {/*/!*{Math.round(Math.random()) % 2 === 0 ? (*!/*/}
-                  {/*/!*    <img*!/*/}
-                  {/*/!*        src={`https://a-simple-demo.spore.pro/api/media/${spore.amount}`}*!/*/}
-                  {/*/!*        alt=""*!/*/}
-                  {/*/!*        className="w-full object-cover block rounded-lg"*!/*/}
-                  {/*/!*    />*!/*/}
-                  {/*/!*) : (*!/*/}
-                  {/*/!*    <EmptyImage className="h-full w-full max-w-[5rem] max-h-[5rem]"/>*!/*/}
-                  {/*/!*)}*!/*/}
+                  <SporeItem tokenKey={(spore as any)?.amount} data={spore?.data} key={(spore as any)?.amount} />
                 </div>
                 <div className="flex flex-col justify-start items-start truncate">
                   <p className="text-xs sm:text-sm leading-5 text-default font-bold">

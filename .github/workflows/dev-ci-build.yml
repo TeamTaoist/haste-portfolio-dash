@@ -18,3 +18,11 @@ jobs:
         run: |
           npm install
           npm run build
+
+  trigger:
+    name: trigger-netlify-build | Dev Branch
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl request
+        run: curl -X POST -d {} ${{ secrets.DEV_BUILD_HOOK }}

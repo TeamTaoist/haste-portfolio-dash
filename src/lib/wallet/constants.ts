@@ -10,7 +10,7 @@ export const testConfig = {
   CONFIG: config.predefined.AGGRON4,
   CKB_RPC_URL: "https://testnet.ckb.dev",
   CKB_INDEX_URL: "https://testnet.ckb.dev",
-
+  DOB_AGGREGATOR_URL:"https://cota.nervina.dev/aggregator",
   BTC_ASSETS_API_URL: "https://btc-assets-api.testnet.mibao.pro",
 
   BTC_ASSETS_TOKEN:
@@ -29,7 +29,7 @@ export const mainConfig = {
   CONFIG: config.predefined.LINA,
   CKB_RPC_URL: "https://mainnet.ckbapp.dev",
   CKB_INDEX_URL: "https://mainnet.ckbapp.dev/indexer",
-
+  DOB_AGGREGATOR_URL:"https://cota.nervina.dev/mainnet-aggregator",
   BTC_ASSETS_API_URL: "https://api.rgbpp.io",
   BTC_ASSETS_TOKEN:
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJIYXN0ZSBQcm8iLCJhdWQiOiJoYXN0ZS5wcm8iLCJqdGkiOiIyYzlkYmM0OS0yMDA1LTQ4YmUtOGI2ZS01YTk0MTBjODY0ZmYiLCJpYXQiOjE3MTQwMzAzMzN9.rHPfzI8Kzns2YgKU6GO7v6dRVuEh9iZkpzvntofcxIE",

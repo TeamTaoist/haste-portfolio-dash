@@ -24,6 +24,8 @@ import {RGBHelper} from "../../lib/wallet/RGBHelper";
 import {RgbAssert} from "../../lib/interface";
 import Loading from "../../components/loading";
 import {get_feeRate} from "../../query/ckb/feerate.ts";
+import SporeItem from "../Dashboard/sporeItem.tsx";
+import {ckb2BTC_spore} from "../../lib/wallet/ckb2BTC.ts";
 
 
 // import BtcImg from "../../assets/img/btc.png";
@@ -131,11 +133,78 @@ export default function SendContent() {
           case selectWallet.chain === "ckb" && isToCKB(to):
               send_ckb2ckb_Spore()
               break;
-          // case selectWallet.chain === "btc" && !isToCKB():
-          //     send_btc2btc_Spore()
-          //     break;
+          case selectWallet.chain === "btc" && !isToCKB(to):
+              send_btc2btc_Spore()
+              break;
+          case selectWallet.chain === "btc" && isToCKB(to):
+              send_btc2ckb_Spore()
+              break;
+          case selectWallet.chain === "ckb" && !isToCKB(to):
+              send_ckb2btc_Spore()
+              break;
       }
 
+  }
+
+  const send_btc2ckb_Spore = () =>{
+      RGBHelper.instance
+          .transfer_btc_to_ckb_spore(
+              selectWallet!.address,
+              selectWallet!.pubKey,
+              to,
+              selectAsset?.data.amount,
+              selectWallet?.walletName
+          )
+          .then((rs) => {
+              console.log("btc to ckb tx hash:", rs);
+              enqueueSnackbar("Transfer Successful", {variant: "success"})
+          })
+          .catch((err) => {
+              console.error(err);
+              enqueueSnackbar(err.message, {variant: "error"})
+          }).finally(()=>{
+          setLoading(false)
+      });
+  }
+  const send_ckb2btc_Spore = () =>{
+      ckb2BTC_spore(
+              selectWallet!.address,
+              selectWallet!.pubKey,
+              to,
+              selectAsset?.data.amount,
+              selectWallet?.walletName
+          )
+          .then((txSkeleton) => {
+              console.log("btc to ckb tx hash:", txSkeleton);
+              enqueueSnackbar("Transfer Successful", {variant: "success"})
+          })
+          .catch((err) => {
+              console.error(err);
+              enqueueSnackbar(err.message, {variant: "error"})
+          }).finally(()=>{
+          setLoading(false)
+      });
+  }
+
+  const send_btc2btc_Spore =() =>{
+      RGBHelper.instance
+          .transfer_btc_to_btc_spore(
+              selectWallet!.address,
+              selectWallet!.pubKey,
+              to,
+              selectAsset?.data.amount,
+              selectWallet?.walletName
+          )
+          .then((rs) => {
+              console.log("btc to ckb tx hash:", rs);
+              enqueueSnackbar("Transfer Successful", {variant: "success"})
+          })
+          .catch((err) => {
+              console.error(err);
+              enqueueSnackbar(err.message, {variant: "error"})
+          }).finally(()=>{
+          setLoading(false)
+      });
 
   }
 
@@ -154,9 +223,6 @@ export default function SendContent() {
           case selectWallet.chain === "btc" && isToCKB(to):
               send_btc2ckb_UDT()
               break;
-
-
-
       }
     }
 
@@ -266,7 +332,7 @@ export default function SendContent() {
             })
             .catch((err) => {
                 console.error(err);
-                enqueueSnackbar("Transfer Error", {variant: "error"})
+                enqueueSnackbar(err.message, {variant: "error"})
             }).finally(()=>{
                 setLoading(false)
         });
@@ -276,7 +342,6 @@ export default function SendContent() {
 
         RGBHelper.instance
             .transfer_btc_to_btc(
-
                 to,
                 type_script,
                 BI.from(parseUnit(amount.toString(), "ckb")).toBigInt(),
@@ -288,7 +353,7 @@ export default function SendContent() {
             })
             .catch((err) => {
                 console.error(err);
-                enqueueSnackbar("Transfer Error", {variant: "error"})
+                enqueueSnackbar(err.message, {variant: "error"})
             }).finally(()=>{
             setLoading(false)
         });
@@ -429,25 +494,8 @@ export default function SendContent() {
                                       </div>
                                   ) : (
                                       <div className="flex gap-2 items-center">
-                                          <div className="relative w-8 h-8 flex items-center justify-center aspect-square">
-                                              {/*<img*/}
-                                              {/*    src={`https://a-simple-demo.spore.pro/api/media/${selectAsset?.data?.amount}`}*/}
-                                              {/*    alt=""*/}
-                                              {/*    width={32}*/}
-                                              {/*    height={0}*/}
-                                              {/*    className="w-full object-cover block rounded-lg"*/}
-                                              {/*/>*/}
-                                              {
-                                                  // eslint-disable-next-line @next/next/no-img-element
-                                                  selectAsset?.data?.type?.startsWith('image') && <img src={selectAsset?.data?.image} alt="" className="w-full object-cover block rounded-lg" />
-                                              }
-                                              {
-                                                  // eslint-disable-next-line @next/next/no-img-element
-                                                  selectAsset?.data?.url && <img src={selectAsset?.data?.url} alt="" className="w-full object-cover block" />
-                                              }
-                                              {
-                                                  (!selectAsset?.data?.type?.startsWith('image') && !selectAsset?.data?.url) && <p className="p-3">{selectAsset?.data?.textContent}</p>
-                                              }
+                                          <div className="w-8 h-8">
+                                              <SporeItem tokenKey={selectAsset?.data?.amount} data={selectAsset?.data?.data} key={(selectAsset as any)?.data?.amount} />
                                           </div>
                                           <div>{formatString(selectAsset?.data?.amount, 5)}</div>
                                       </div>

@@ -15,6 +15,11 @@ import "./assets/css/globals.css"
 import styled from "styled-components";
 import Version from "./version";
 
+import { DBConfig } from "./utils/DBconfig";
+import { initDB } from "react-indexed-db-hook";
+
+initDB(DBConfig);
+
 const BottomBox = styled.div`
     position: fixed;
     left: 0;

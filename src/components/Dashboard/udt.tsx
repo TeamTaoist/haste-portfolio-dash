@@ -70,10 +70,16 @@ export default function UDTList() {
   const _getRgbAsset = async (address: string) => {
     const list = await getRgbAssets(address);
 
+    console.log("list",list)
+
     const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
     const {codeHash} = xudtTypeScript
 
+    console.log("codeHash",codeHash)
+
     const udtList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
+
+    console.log("udtList",udtList)
 
     udtList.map((item: any) => {
       item.amount = unpackAmount(item.data).toString();
@@ -93,6 +99,9 @@ export default function UDTList() {
     }, {});
 
     const result = Object.values(groupedData);
+
+
+    console.log("result",result)
     // @ts-ignore
     setXudtList(result as any)
     setIsLoading(false);
@@ -206,11 +215,9 @@ export default function UDTList() {
                           {formatUnit(((xudt?.sum?.toString() || xudt?.amount) ?? 0), 'ckb')}
                         </p>
 
-                        {
-                          chain === "ckb" &&<RhtBox onClick={()=>handleCurrent(xudt)}>
+                       <RhtBox onClick={()=>handleCurrent(xudt)}>
                               <span>Cell Info</span>
                               <EllipsisVerticalIcon size={16} className="cursor-pointer" /></RhtBox>
-                        }
 
 
 
