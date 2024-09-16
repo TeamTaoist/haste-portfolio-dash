@@ -23,7 +23,7 @@ import {getSymbol} from "../../lib/utils";
 import {RGBHelper} from "../../lib/wallet/RGBHelper";
 import {RgbAssert} from "../../lib/interface";
 import Loading from "../../components/loading";
-import {get_feeRate} from "../../query/ckb/feerate.ts";
+import {getFeeRate} from "../../query/ckb/feerate.ts";
 import SporeItem from "../Dashboard/sporeItem.tsx";
 import {ckb2BTC_spore} from "../../lib/wallet/ckb2BTC.ts";
 
@@ -231,7 +231,7 @@ export default function SendContent() {
       const cfg = getEnv() === 'Mainnet' ? Main_Config.CKB_RPC_URL: Test_Config.CKB_RPC_URL ;
       const rpc = new RPC(cfg);
 
-      let feeRateRt = await get_feeRate();
+      let feeRateRt = await getFeeRate();
       let feeRate = BI.from(feeRateRt.median).toString()
 
       let sporeCell = await getSporeById(selectAsset?.data.amount, sporeConfig);

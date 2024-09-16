@@ -1,5 +1,6 @@
 import {getEnv} from "../../settings/env.ts";
 import {Main_Config, Test_Config} from "../../lib/constant.ts";
+import {RPC} from "@ckb-lumos/lumos";
 
 let jsonRpcId = 0;
 export const _request = async(obj:any) => {
@@ -25,13 +26,16 @@ export const _request = async(obj:any) => {
 
 }
 
-export const get_feeRate = async() =>{
 
-    const cfg = getEnv() === 'Mainnet' ? Main_Config.CKB_RPC_URL: Test_Config.CKB_RPC_URL ;
-    return await _request({
-        method:"get_fee_rate_statistics",
-        url:cfg,
-        params:['0x65']
-    })
 
+export const getFeeRate = async() =>{
+
+    const rpcURL = getEnv() === 'Mainnet' ? Main_Config.CKB_RPC_URL: Test_Config.CKB_RPC_URL ;
+    const rpc = new RPC(rpcURL)
+    let result = await rpc.getFeeRateStatistics()
+
+    let maxNum = Math.max(parseInt(result.median),1100).toString(16);
+    result.median = `0x${maxNum}`;
+    return result;
 }
+
