@@ -20,6 +20,7 @@ import {bytes} from "@ckb-lumos/codec";
 import {BIish} from "@ckb-lumos/bi";
 import store from "../../store/store";
 import {CkbHepler} from "./CkbHelper.ts";
+import {getFeeRate} from "../../query/ckb/feerate.ts";
 
 const MAX_FEE = BI.from("20000000")
 const isMainnet = getEnv() === 'Mainnet';
@@ -190,7 +191,7 @@ export const ckb2BTC_spore = async (address:string,publickey:string,toAddress:st
     const size =  getTransactionSizeByTx(unsignedTx)
 
 
-    let rt = await getFeeRate(rpcURL);
+    let rt = await getFeeRate();
     const {median} = rt;
 
     let fee = BI.from(median)
@@ -390,7 +391,3 @@ const updateWitness = async(txSkeleton:TransactionSkeletonType,myScript:Script,c
 }
 
 
-export const getFeeRate = async(rpcURL:string) =>{
-    const rpc = new RPC(rpcURL)
-    return await rpc.getFeeRateStatistics();
-}

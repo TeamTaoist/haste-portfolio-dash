@@ -12,7 +12,7 @@ Main Branch Deploy Status 👇
 [![Netlify Status](https://api.netlify.com/api/v1/badges/c2fe7e44-f189-4ccc-86ca-aa9309101ba6/deploy-status)](https://app.netlify.com/sites/caboroca-portfolio/deploys)
 
 Dev Branch Deploy Status 👇  
-[![Netlify Status](https://api.netlify.com/api/v1/badges/4109aab3-dc72-4225-a4da-126134dea892/deploy-status)](https://app.netlify.com/sites/clever-sprinkles-2c0505/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fdacfbfe-8903-4f0a-b18a-07f10ce0eed7/deploy-status)](https://app.netlify.com/sites/hasteprop/deploys)
 
 
 ## How to build
@@ -49,3 +49,11 @@ with production config
 ```
 npm run build:production
 ```
+
+## Website
+
+### mainnet
+https://haste.pro/
+
+### testnet
+https://hasteprop.netlify.app/
