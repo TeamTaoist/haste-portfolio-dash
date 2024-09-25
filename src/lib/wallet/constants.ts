@@ -14,8 +14,8 @@ export const testConfig = {
   BTC_ASSETS_API_URL: "https://btc-assets-api.testnet.mibao.pro",
 
   BTC_ASSETS_TOKEN:
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzb3VsLXRlc3QtYXBwIiwiYXVkIjoibG9jYWxob3N0IiwiaWF0IjoxNzExNTM0OTMxfQ.NAhr_3Aro90wLwKOYvnjMme_YslZspRmf5GzBvxw3FU",
-  BTC_ASSETS_ORGIN: "localhost",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYXN0ZSB0ZXN0bmV0IiwiYXVkIjoiaGFzdGVwcm9wLm5ldGxpZnkuYXBwIiwianRpIjoiNDY4OWZhYjctZjhjZS00OGY0LTk0OWUtM2FlNTI0ZDg2ZTJlIiwiaWF0IjoxNzI3MjQ5Njc1fQ.wfE_UnI4X20PC-YDzQ4p8j2QmDUd_DRORNzK4HVwXyY",
+  BTC_ASSETS_ORGIN: "hasteprop.netlify.app",
 
   ckb_explorer_api: "testnet-api.explorer.nervos.org",
   rgb_networkType: NetworkType.TESTNET,
