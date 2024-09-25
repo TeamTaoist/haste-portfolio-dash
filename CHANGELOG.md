@@ -1,3 +1,14 @@
+## [0.4.1](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.0...v0.4.1) (2024-09-25)
+
+
+### Bug Fixes
+
+* update fee rate ([6571633](https://github.com/TeamTaoist/haste-portfolio-dash/commit/6571633f91138b2233827edd6c522aecafacbe12))
+* update reademe ([47bd4da](https://github.com/TeamTaoist/haste-portfolio-dash/commit/47bd4da3d49fb8c4fe71ca46ecc49d1f1e26c308))
+* update token ([f0e45c5](https://github.com/TeamTaoist/haste-portfolio-dash/commit/f0e45c5b0b2d5d45eabda3a0c6ecb6ebde31ff28))
+
+
+
 # [0.4.0](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.3.2...v0.4.0) (2024-09-02)
 
 
