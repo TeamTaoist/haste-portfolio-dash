@@ -49,3 +49,11 @@ with production config
 ```
 npm run build:production
 ```
+
+## Website
+
+### mainnet
+https://haste.pro/
+
+### testnet
+https://hasteprop.netlify.app/
