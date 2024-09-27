@@ -469,7 +469,7 @@ export default function SendContent() {
                   <div className="relative">
                       <button
                           type="button"
-                          className="relative w-full cursor-pointer rounded-md bg-gray-100 py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6"
+                          className="relative w-full cursor-pointer rounded-md bg-gray-100 py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-primary-default sm:text-sm sm:leading-6 h-11"
                           aria-haspopup="listbox"
                           aria-expanded="true"
                           aria-labelledby="listbox-label"
@@ -487,9 +487,16 @@ export default function SendContent() {
                                           {/*    className="w-8 h-8 rounded-full object-cover min-w-[2rem]"*/}
                                           {/*/>*/}
                                           <div className="leading-5">
-                                              <div
-                                                  className="font-semibold uppercase">{getSymbol(selectAsset?.data?.type_script || selectAsset?.data?.cellOutput?.type)}</div>
-                                              <div className="text-xs text-gray-500">{selectAsset?.data?.symbol}</div>
+                                              {
+                                                  !!selectAsset?.symbol && <div
+                                                      className="font-semibold uppercase">{selectAsset?.symbol}</div>
+                                              }
+
+                                              {
+                                                  !!selectAsset?.data?.symbol && <div
+                                                      className="text-xs text-gray-500 uppercase">{selectAsset?.data?.symbol}</div>
+                                              }
+
                                           </div>
                                       </div>
                                   ) : (
@@ -532,7 +539,7 @@ export default function SendContent() {
                   {!!selectAsset && !isNative&& (
                       <p className="sm:text-xs font-normal text-right text-xs">
                           Available
-                          Balance: {formatUnit( selectAsset?.data?.sum && selectAsset?.data?.sum?.toString() || selectAsset?.data?.amount, "ckb")} <span className="uppercase">{getSymbol(selectAsset?.data?.type_script || selectAsset?.data?.cellOutput?.type)}</span>
+                          Balance: {formatUnit( selectAsset?.data?.sum && selectAsset?.data?.sum?.toString() || selectAsset?.data?.amount, "ckb")} <span className="uppercase">{selectAsset?.symbol}</span>
                       </p>
                   )}
               </div>

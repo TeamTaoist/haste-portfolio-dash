@@ -51,7 +51,19 @@ export default function UDTList() {
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
 
-    setXudtList(assetsList.xudtList);
+    let arr = []
+
+    for (let i = 0; i < assetsList.xudtList.length; i++) {
+      const xudt = assetsList.xudtList[i] as any;
+      let typeScript = xudt?.cellOutput?.allObj.type?xudt?.cellOutput?.allObj?.type:xudt?.type_script
+
+      let symbol = await getSymbol(typeScript)
+      arr.push({
+        ...xudt,
+        symbol
+      })
+    }
+    setXudtList(arr);
     setIsLoading(false);
   }
 
@@ -70,30 +82,33 @@ export default function UDTList() {
   const _getRgbAsset = async (address: string) => {
     const list = await getRgbAssets(address);
 
-    console.log("list",list)
 
     const xudtTypeScript = getXudtTypeScript(getEnv() === 'Mainnet');
     const {codeHash} = xudtTypeScript
 
-    console.log("codeHash",codeHash)
-
     const udtList = list.filter((item: any) => item.cellOutput.type.codeHash === codeHash);
 
-    console.log("udtList",udtList)
+    let arr = []
+    for (let i = 0; i < udtList.length; i++) {
+      const xudt = udtList[i] as any;
+      let typeScript = xudt?.cellOutput?.type
 
-    udtList.map((item: any) => {
-      item.amount = unpackAmount(item.data).toString();
+      let symbol = await getSymbol(typeScript);
+      arr.push({
+        ...xudt,
+        amount:unpackAmount(xudt.data)?.toString(),
+        symbol
+      })
+    }
 
-    })
-
-    const groupedData = udtList.reduce((acc: any, obj: any) => {
+    const groupedData = arr.reduce((acc: any, obj: any) => {
       const key = obj?.cellOutput?.type?.args!;
       if (!acc[key]) {
         acc[key] = {category: key, sum: BI.from(0), ...obj};
 
       }
 
-      acc[key].sum = acc[key].sum.add((obj?.amount));
+      acc[key].sum = acc[key].sum?.add((obj?.amount));
 
       return acc;
     }, {});
@@ -101,7 +116,6 @@ export default function UDTList() {
     const result = Object.values(groupedData);
 
 
-    console.log("result",result)
     // @ts-ignore
     setXudtList(result as any)
     setIsLoading(false);
@@ -116,7 +130,7 @@ export default function UDTList() {
       if ( chain && chain === 'btc') {
         await _getRgbAsset(currentWallet?.address!!)
       } else if (chain && chain === 'ckb') {
-        await _getSporeAndXudt(currentWallet?.address!!);
+        await _getSporeAndXudt(currentWallet?.address!);
       }
     }catch (e) {
       console.error("getCurrentAssets",e)
@@ -198,12 +212,12 @@ export default function UDTList() {
                           </div>
                           <div>
 
-                            <p className="font-semibold uppercase">{xudt?.cellOutput?getSymbol(xudt?.cellOutput?.type):getSymbol(xudt?.type_script)}</p>
+                            <p className="font-semibold uppercase">{xudt?.symbol}</p>
 
                             {/*<p className="font-bold">{xudt && xudt.symbol}</p>*/}
 
                             <p className="text-sm text-slate-500 truncate sm:max-w-none max-w-[8rem]">
-                              {xudt?.cellOutput?getSymbol(xudt?.cellOutput?.type):getSymbol(xudt?.type_script)}
+                              {xudt?.symbol}
                             </p>
                           </div>
                         </div>

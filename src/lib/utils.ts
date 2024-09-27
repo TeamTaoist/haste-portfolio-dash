@@ -114,11 +114,9 @@ export const serializeInscriptionXudtInfo = (info: {
   return ret;
 };
 
-export const getSymbol = (udtTypeScript?: Script) => {
+export const getSymbol = async (udtTypeScript?: Script) => {
   if (!udtTypeScript) return "...";
-
-  const info = assetInfoMgr.getXUDTInfo(udtTypeScript);
-
+  const info = await assetInfoMgr.getXUDTInfo(udtTypeScript);
   return info ? info.symbol : "...";
 };
 

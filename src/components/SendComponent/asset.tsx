@@ -32,6 +32,7 @@ export enum ASSET_TYPE {
 export type SelectAssetType = {
   type: ASSET_TYPE;
   data: any;
+  symbol: string;
 };
 
 type SelectFunction = (data: SelectAssetType) => void;
@@ -151,8 +152,23 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
 
   const _getSporeAndXudt = async(address: string) => {
     const assetsList = await getXudtAndSpore(address);
-    setXudtList(assetsList.xudtList);
-    setFilteredTokens(assetsList.xudtList);
+
+    let arr = []
+
+    for (let i = 0; i < assetsList.xudtList.length; i++) {
+      const xudt = assetsList.xudtList[i] as any;
+      let typeScript = xudt?.cellOutput?.allObj.type?xudt?.cellOutput?.allObj?.type:xudt?.type_script
+
+      let symbol = await getSymbol(typeScript)
+      arr.push({
+        ...xudt,
+        symbol
+      })
+    }
+    setXudtList(arr);
+
+    // setXudtList(assetsList.xudtList);
+    setFilteredTokens(arr);
     setIsLoading(false);
   }
 
@@ -165,12 +181,26 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
 
     const udtList = list.filter((item:any)=>item.cellOutput.type.codeHash === codeHash);
 
-    udtList.map((item:any)=>{
-      item.amount  = unpackAmount(item.data).toString();
+    // udtList.map((item:any)=>{
+    //   item.amount  = unpackAmount(item.data).toString();
+    //
+    // })
 
-    })
+    let arr = []
+    for (let i = 0; i < udtList.length; i++) {
+      const xudt = udtList[i] as any;
+      let typeScript = xudt?.cellOutput?.type
 
-    const groupedData = udtList.reduce((acc:any, obj:any) => {
+      let symbol = await getSymbol(typeScript);
+      arr.push({
+        ...xudt,
+        amount:unpackAmount(xudt.data)?.toString(),
+        symbol
+      })
+    }
+
+
+    const groupedData = arr.reduce((acc:any, obj:any) => {
       const key= obj?.cellOutput?.type?.args! ;
       if (!acc[key]) {
         acc[key] = { category: key, sum: BI.from(0),...obj };
@@ -228,17 +258,17 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
   useImperativeHandle(ref, () => ({
     search: (keyword?: string) => {
       if (keyword) {
-        let arr:any[] = [...xudtList];
-        let newArr:any[] = [];
+        // let arr:any[] = [...xudtList];
+        // let newArr:any[] = [];
 
-        arr.map((udt)=>{
-          let symbol = udt?.ckbCellInfo?getSymbol(udt?.ckbCellInfo?.type_script):getSymbol(udt?.type_script);
-          newArr.push({
-            ...udt,
-            symbol
-          })
-        })
-        const tokens = newArr.filter(item=>item.symbol.indexOf(keyword) > -1);
+        // arr.map((udt)=>{
+        //   let symbol = udt?.ckbCellInfo?getSymbol(udt?.ckbCellInfo?.type_script):getSymbol(udt?.type_script);
+        //   newArr.push({
+        //     ...udt,
+        //     symbol
+        //   })
+        // })
+        const tokens = xudtList.filter(item=>item?.symbol.indexOf(keyword) > -1);
 
         setFilteredTokens(tokens);
       }else{
@@ -266,7 +296,7 @@ const UdtAsset = forwardRef<AssetRef, IAssetProps>(({ onSelect,selectWallet }, r
         {/*  className="w-8 h-8 rounded-full object-cover min-w-[2rem] border border-gray-200"*/}
         {/*/>*/}
         <div>
-          <p className="text-xs sm:text-sm leading-5 font-semibold uppercase">{udt?.cellOutput?getSymbol(udt?.cellOutput?.type):getSymbol(udt?.type_script)}</p>
+          <p className="text-xs sm:text-sm leading-5 font-semibold uppercase">{udt?.symbol}</p>
           <p className="sm:text-xs font-normal text-slate-300">{udt?.ckbCellInfo?.symbol}</p>
         </div>
       </div>
