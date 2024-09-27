@@ -47,7 +47,7 @@ class AssetInfoManager {
           name: info.name,
           decimal: parseInt(info.decimal),
         };
-        EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
+        // EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
       }
     } else if (
       ckTxInfo &&
@@ -63,12 +63,13 @@ class AssetInfoManager {
         this.infoData[hash] = info;
 
 
-        EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
+        // EventManager.instance.publish(EventType.dashboard_tokens_reload, {});
       }
     }
+    return this.infoData[hash]
   }
 
-  getXUDTInfo(xudtTS: Script) {
+  async getXUDTInfo(xudtTS: Script) {
     const hash = utils.computeScriptHash(xudtTS);
 
     if (this.infoData[hash]) {
@@ -79,13 +80,18 @@ class AssetInfoManager {
     if (!info) {
       if (!this.checking[hash]) {
         this.checking[hash] = true;
-        this.findXudtInfo(xudtTS)
-          .catch((err) => {
-            console.error(err);
-          })
-          .finally(() => {
-            this.checking[hash] = false;
-          });
+        // await this.findXudtInfo(xudtTS)
+        //   .catch((err) => {
+        //     console.error(err);
+        //   })
+        //   .finally(() => {
+        //     this.checking[hash] = false;
+        //   });
+
+
+       let dataUDT =  await this.findXudtInfo(xudtTS);
+        this.checking[hash] = false;
+       return dataUDT
       }
     } else {
       const data = JSON.parse(info) as xudt_info;
