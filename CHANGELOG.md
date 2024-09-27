@@ -1,3 +1,12 @@
+## [0.4.2](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.1...v0.4.2) (2024-09-27)
+
+
+### Bug Fixes
+
+* update udt symbol ([d6f62ba](https://github.com/TeamTaoist/haste-portfolio-dash/commit/d6f62ba6c482ae1a9f12f18701da8c54d348e64a))
+
+
+
 ## [0.4.1](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.0...v0.4.1) (2024-09-25)
 
 
