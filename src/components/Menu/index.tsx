@@ -136,7 +136,7 @@ const ResponsiveSidebar: React.FC = () => {
             <a href="https://utxo-tool.haste.pro/" target="_blank" rel="noreferrer"> <img src={LogoCol} alt=""/>
               <span>UTXO Tool</span></a>
 
-            <a href="https://trader.haste.pro/marketplace/dobby" target="_blank" rel="noreferrer"> <img src={LogoCol}
+            <a href="https://trader.haste.pro/" target="_blank" rel="noreferrer"> <img src={LogoCol}
                                                                                                         alt=""/>
               <span>Aggregator</span></a>
 
