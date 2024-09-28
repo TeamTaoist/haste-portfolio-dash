@@ -10,6 +10,7 @@ import LogoCol from "../../assets/img/logo.png";
 import styled from "styled-components";
 import TgLogo from "../../assets/img/Telegram.svg";
 
+
 const LinkBox = styled.div<{ isopen: string }>`
     position: fixed;
     left:20px;
@@ -20,6 +21,7 @@ const LinkBox = styled.div<{ isopen: string }>`
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    margin-top: 10px;
   }
   img{
     width: 24px;
@@ -131,8 +133,16 @@ const ResponsiveSidebar: React.FC = () => {
           </div>
 
           <LinkBox isopen={isColleapse.toString()}>
+            <a href="https://utxo-tool.haste.pro/" target="_blank" rel="noreferrer"> <img src={LogoCol} alt=""/>
+              <span>UTXO Tool</span></a>
+
+            <a href="https://trader.haste.pro/marketplace/dobby" target="_blank" rel="noreferrer"> <img src={LogoCol}
+                                                                                                        alt=""/>
+              <span>Aggregator</span></a>
+
             <a href="https://t.me/hastepro" target="_blank" rel="noreferrer"> <img src={TgLogo} alt=""/>
               <span>Telegram</span></a>
+
 
           </LinkBox>
 
@@ -140,9 +150,10 @@ const ResponsiveSidebar: React.FC = () => {
       ) : (
           // 移动视图
           <>
-            <div className="fixed top-0 px-4 left-0 w-full h-16 bg-gray-100 text-black flex justify-between items-center z-50">
-                {
-                  isOpen ? <AlignJustify className='rotate-90' onClick={toggleMobile}/> : <AlignJustify onClick={toggleMobile}/>
+            <div
+                className="fixed top-0 px-4 left-0 w-full h-16 bg-gray-100 text-black flex justify-between items-center z-50">
+              {
+                isOpen ? <AlignJustify className='rotate-90' onClick={toggleMobile}/> : <AlignJustify onClick={toggleMobile}/>
                 }
                 <DropdownSelect />
             </div>
