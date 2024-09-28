@@ -59,7 +59,7 @@ export class CkbHepler {
 
   public static get instance() {
     if (!CkbHepler._instance) {
-      const cfg = getEnv() ? testConfig : mainConfig;
+      const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
       initConfig({
         // your app name
@@ -640,7 +640,7 @@ export class CkbHepler {
 
   // sudt balance
   async sudtBalance(address: string, typeScript: Script) {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
 
     const collector = CkbHepler.instance.indexer.collector({
@@ -903,7 +903,7 @@ export class CkbHepler {
   // }
 
   async getUDTInfo(type_hash: string) {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
     const result = await this.sendExploreApi(
       `https://${cfg.ckb_explorer_api}/api/v1/udts/${type_hash}`
@@ -921,7 +921,7 @@ export class CkbHepler {
   // }
 
   async getCellOutPutData(id: string): Promise<CellOutPutData | undefined> {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
     const result = await this.sendExploreApi(
       `https://${cfg.ckb_explorer_api}/api/v1/cell_output_data/${id}`
@@ -930,7 +930,7 @@ export class CkbHepler {
   }
 
   async getTxInfo(txHash: string): Promise<ckb_TxInfo_new | undefined> {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
     const result = await this.sendExploreApi(
       `https://${cfg.ckb_explorer_api}/api/v1/transactions/${txHash}`
@@ -939,7 +939,7 @@ export class CkbHepler {
   }
 
   async getXudtAndSpore(address: string) {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
     const xudtTypeScript = getXudtTypeScript(cfg.isMainnet);
     const sporeTypeScript = getSporeTypeScript(cfg.isMainnet);

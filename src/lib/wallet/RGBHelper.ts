@@ -275,7 +275,7 @@ export class RGBHelper {
     //@ts-ignore
     transferAmount: bigint = 0n
   ) {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
     const collector = new Collector({
       ckbNodeUrl: cfg.CKB_RPC_URL,
       ckbIndexerUrl: cfg.CKB_INDEX_URL,
@@ -343,7 +343,7 @@ export class RGBHelper {
   ) {
     if (ckb_wallet.chain == "BTC") return;
 
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
 
     // const sudtBalance = await CkbHepler.instance.sudtBalance(
@@ -471,7 +471,7 @@ export class RGBHelper {
     typeScript: Script,
     btcWallet: WalletInfo
   ) {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
 
     const collector = new Collector({
@@ -581,7 +581,7 @@ export class RGBHelper {
   // }
 
   async getRgbppAssert(address: string) {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
     const result: btc_utxo[] | undefined = await BtcHepler.instance.getUtxo(
       address
@@ -684,7 +684,7 @@ export class RGBHelper {
 
   async retryBtcTxId(txId: string) {
     setTimeout(async () => {
-      const cfg = getEnv() ? testConfig : mainConfig;
+      const cfg = getEnv() ==="Testnet"? testConfig : mainConfig;
 
       const service = BtcAssetsApi.fromToken(
         cfg.BTC_ASSETS_API_URL,
