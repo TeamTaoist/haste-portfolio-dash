@@ -1,3 +1,14 @@
+## [0.4.3](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.2...v0.4.3) (2024-09-28)
+
+
+### Bug Fixes
+
+* add link ([9821ee3](https://github.com/TeamTaoist/haste-portfolio-dash/commit/9821ee3be195d4d2523fa3c39b53ba342674637c))
+* update config ([2a29f34](https://github.com/TeamTaoist/haste-portfolio-dash/commit/2a29f341daa4c24250a367ae36938b01445a842f))
+* update trader ([e7a98d2](https://github.com/TeamTaoist/haste-portfolio-dash/commit/e7a98d2874f178de7f982027897862418114f49c))
+
+
+
 ## [0.4.2](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.1...v0.4.2) (2024-09-27)
 
 
