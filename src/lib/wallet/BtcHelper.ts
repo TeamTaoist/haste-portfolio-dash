@@ -12,7 +12,7 @@ import {getEnv} from "../../settings/env";
 
 export class BtcHepler {
   private static _instance: BtcHepler;
-  private _network: string = getEnv() ? "testnet" : "mainnet";
+  private _network: string = getEnv()==="Testnet" ? "testnet" : "mainnet";
   private constructor() {}
 
   public static get instance() {
@@ -161,7 +161,7 @@ export class BtcHepler {
   }
 
   async getBTC(address: string): Promise<btc_AddressInfo | undefined> {
-    const cfg = getEnv() ? testConfig : mainConfig;
+    const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
 
     const result = await superagent
       .get(
@@ -203,7 +203,7 @@ export class BtcHepler {
         console.log(okxwallet.bitcoinTestnet);
 
         // {address publicKey}
-        const cfg = getEnv() ? testConfig : mainConfig;
+        const cfg = getEnv()==="Testnet" ? testConfig : mainConfig;
         if (cfg.isMainnet) {
           const result = await okxwallet.bitcoin.pushPsbt(psbtHex);
           return result;

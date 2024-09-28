@@ -27,9 +27,11 @@ class AssetInfoManager {
       }
     );
 
+
     const ckTxInfo = await CkbHepler.instance.getTxInfo(
-      txInfo.objects[0].txHash
+      txInfo.objects[0]?.txHash
     );
+
 
     const idx = BI.from(txInfo.objects[0].cells[0][1]).toNumber();
     const info = ckTxInfo?.data.attributes.display_outputs[idx].extra_info;
@@ -71,7 +73,6 @@ class AssetInfoManager {
 
   async getXUDTInfo(xudtTS: Script) {
     const hash = utils.computeScriptHash(xudtTS);
-
     if (this.infoData[hash]) {
       return this.infoData[hash];
     }
