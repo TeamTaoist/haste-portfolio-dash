@@ -1,3 +1,12 @@
+## [0.4.4](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.3...v0.4.4) (2024-09-30)
+
+
+### Bug Fixes
+
+* add sentry ([f9861bd](https://github.com/TeamTaoist/haste-portfolio-dash/commit/f9861bd6c1753439de41794d2c343e36d68ff8d3))
+
+
+
 ## [0.4.3](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.2...v0.4.3) (2024-09-28)
 
 
