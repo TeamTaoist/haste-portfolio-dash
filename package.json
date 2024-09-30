@@ -26,6 +26,7 @@
     "@rgbpp-sdk/btc": "^0.6.0",
     "@rgbpp-sdk/ckb": "^0.6.0",
     "@rgbpp-sdk/service": "^0.6.0",
+    "@sentry/react": "^8.32.0",
     "@spore-sdk/core": "0.2.0",
     "@taoist-labs/dob-decoder": "^0.0.10",
     "@types/react-redux": "^7.1.33",

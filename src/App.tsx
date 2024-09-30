@@ -19,6 +19,19 @@ import { DBConfig } from "./utils/DBconfig";
 import { initDB } from "react-indexed-db-hook";
 
 initDB(DBConfig);
+import * as Sentry from "@sentry/react";
+
+if(import.meta.env.VITE_CHAIN === "livenet" ){
+    Sentry.init({
+        dsn: "https://fe5204c4bc39123bdac5b0f2f933234b@o4507175892353024.ingest.us.sentry.io/4508040351907840",
+        integrations: [
+            Sentry.replayIntegration(),
+        ],
+        // Session Replay
+        replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
+        replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
+    });
+}
 
 const BottomBox = styled.div`
     position: fixed;
