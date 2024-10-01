@@ -1,3 +1,12 @@
+## [0.4.5](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.4...v0.4.5) (2024-10-01)
+
+
+### Bug Fixes
+
+* update sentry ([2b727cd](https://github.com/TeamTaoist/haste-portfolio-dash/commit/2b727cd672804f4e9507c948b75890da9e7c528e))
+
+
+
 ## [0.4.4](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.3...v0.4.4) (2024-09-30)
 
 
