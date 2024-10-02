@@ -47,7 +47,7 @@ jobs:
       - name: Build
         run: |
           npm install
-          npm run build
+          npm run build -- --max-old-space-size=4096
           
   trigger:
     name: trigger-netlify-build | Main Branch
