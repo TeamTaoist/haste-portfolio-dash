@@ -277,7 +277,7 @@ export default function SendContent() {
         }else if(selectWallet.walletName === "rei"){
             try {
                 const txObj = helpers.transactionSkeletonToObject(txSkeleton)
-                 await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
+                 await (window as any).rei?.ckb.request({method:"ckb_sendRawTransaction",data:{
                         txSkeleton:txObj
                     }})
                 enqueueSnackbar("Transfer Successful", {variant: "success"})

@@ -42,9 +42,9 @@ const AccountSidebar: React.FC = () => {
   }, [wallets]);
 
   useEffect(() => {
-    if(!(window as any).ckb || !wallets?.length) return;
+    if(!(window as any).rei?.ckb || !wallets?.length) return;
 
-    const {ckb} = window as any;
+    const {ckb} = (window as any).rei;
     const walletArr = wallets.filter(w=>w.walletName === "rei")
 
     ckb.on('accountsChanged',()=>{
