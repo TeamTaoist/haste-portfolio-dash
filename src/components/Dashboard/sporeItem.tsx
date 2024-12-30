@@ -25,6 +25,14 @@ export default function SporeItem({tokenKey,data}:any){
         }
 
         {
+            spore?.contentType?.indexOf("text") > -1 && <div>
+                <div className="inner">
+                    {spore?.data}
+                </div>
+            </div>
+        }
+
+        {
             spore?.contentType?.indexOf("json") > -1 && <img src={spore?.data?.url ?spore?.data?.url: DefaultImg } alt="" className="w-full object-cover block"/>
         }
         {
