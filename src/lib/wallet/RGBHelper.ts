@@ -220,7 +220,7 @@ export class RGBHelper {
 
 
 
-      return await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
+      return await (window as any).rei?.ckb.request({method:"ckb_sendRawTransaction",data:{
           txSkeleton:unsignedRawTx
         }})
     }

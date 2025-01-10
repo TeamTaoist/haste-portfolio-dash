@@ -100,7 +100,7 @@ export class CkbHepler {
     }else if(wallet.walletName === "rei"){
       console.log("=====rei",unsigned)
       const txObj = helpers.transactionSkeletonToObject(unsigned)
-      return await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
+      return await (window as any).rei?.ckb.request({method:"ckb_sendRawTransaction",data:{
           txSkeleton:txObj
         }})
     }
@@ -132,7 +132,7 @@ export class CkbHepler {
 
       // const txObj = helpers.transactionSkeletonToObject(unsigned)
       console.log("===rei",txObj)
-     return  await (window as any).ckb.request({method:"ckb_sendRawTransaction",data:{
+     return  await (window as any).rei?.ckb.request({method:"ckb_sendRawTransaction",data:{
           txSkeleton:txObj
         }})
     }

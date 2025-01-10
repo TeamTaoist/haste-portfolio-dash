@@ -83,7 +83,7 @@ export const JoyIDCKBConnect = async () => {
 
 export const ReiConnect = async () =>{
 
-    const {ckb} = window as any;
+    const {ckb} = (window as any).rei;
     if (typeof ckb !== "undefined") {
 
         let netData = getEnv() === 'Testnet' ?'testnet':"mainnet";
