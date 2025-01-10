@@ -1,3 +1,13 @@
+## [0.4.6](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.5...v0.4.6) (2025-01-10)
+
+
+### Bug Fixes
+
+* update package ([de547bb](https://github.com/TeamTaoist/haste-portfolio-dash/commit/de547bb8deaee5f62d2083ed911cabaa8afac804))
+* update window.rei.ckb & decoder ([e721eb3](https://github.com/TeamTaoist/haste-portfolio-dash/commit/e721eb3490eae918eee2f15edb250d3590a2ce44))
+
+
+
 ## [0.4.5](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.4...v0.4.5) (2024-10-01)
 
 
