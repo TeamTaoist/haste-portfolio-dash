@@ -1,3 +1,14 @@
+## [0.4.7](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.6...v0.4.7) (2025-02-17)
+
+
+### Bug Fixes
+
+* update  "@taoist-labs/dob-decoder" ([a15271e](https://github.com/TeamTaoist/haste-portfolio-dash/commit/a15271ea143592e7054439878dca5c11f811125d))
+* update  "@taoist-labs/dob-decoder" ([6c5cfb8](https://github.com/TeamTaoist/haste-portfolio-dash/commit/6c5cfb82bb2d28e82a49d0040b28a73b0d8b5e2c))
+* update "@taoist-labs/dob-decoder" ([9089b15](https://github.com/TeamTaoist/haste-portfolio-dash/commit/9089b15e415b9ef17da39b8b48d2a4602c6891b5))
+
+
+
 ## [0.4.6](https://github.com/TeamTaoist/haste-portfolio-dash/compare/v0.4.5...v0.4.6) (2025-01-10)
 
 
