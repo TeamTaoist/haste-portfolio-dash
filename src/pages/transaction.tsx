@@ -27,7 +27,8 @@ const Transaction = () => {
     const grouped: groupedTransaction = {};
     if(!transactions) return
     transactions.forEach(transaction => {
-        const date = transaction.attributes.created_at.split(' ')[0];
+        console.log(transaction.attributes)
+        const date = transaction.attributes?.created_at.split(' ')[0];
         if (!grouped[date]) {
             grouped[date] = [];
         }
@@ -214,14 +215,14 @@ function processTransaction(transaction: BTCTxInfo): TransactionDetails {
                             {groupedData[date].map((transaction, index) => (
                                 <TransactionItem
                                     key={index}
-                                    transaction={`https://${getEnv() === 'Mainnet' ? '': 'pudge.'}explorer.nervos.org/transaction/${transaction.attributes.transaction_hash}`}
-                                    txhash={transaction.attributes.transaction_hash}
-                                    from={transaction.attributes.display_inputs[0].address_hash}
-                                    to={transaction.attributes.display_outputs[0].address_hash}
-                                    hours={transaction.attributes.created_at.split(' ')[1]}
-                                    type={BI.from(transaction.attributes.income.split('.')[0]).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND}
+                                    transaction={`https://${getEnv() === 'Mainnet' ? '': 'pudge.'}explorer.nervos.org/transaction/${transaction.attributes?.transaction_hash}`}
+                                    txhash={transaction.attributes?.transaction_hash}
+                                    from={transaction.attributes?.display_inputs[0].address_hash}
+                                    to={transaction.attributes?.display_outputs[0].address_hash}
+                                    hours={transaction.attributes?.created_at.split(' ')[1]}
+                                    type={BI.from(transaction.attributes?.income?.toString().split('.')[0]).gt(0) ? TRANSACTION_TYPE.RECEIVE : TRANSACTION_TYPE.SEND}
                                     amount={
-                                        formatUnit(BI.from(transaction.attributes.income.split('.')[0]).abs().toString(), 'ckb')
+                                        formatUnit(BI.from(transaction.attributes?.income?.toString().split('.')[0]).abs().toString(), 'ckb')
                                     }
                                     token={transaction.type === 'ckb_transactions' ? 'ckb': 'btc'}
                                 />
